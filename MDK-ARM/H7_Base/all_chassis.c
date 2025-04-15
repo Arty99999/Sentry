@@ -91,9 +91,9 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					
 					chassis->Movement.Vx=brain->Lidar.vx/1.25;
 					chassis->Movement.Vy=brain->Lidar.vy/1.25;
-					if (brain->Lidar.mode==To_fortress&&brain->Lidar.Arrive==1)  
+					//if (brain->Lidar.mode==To_fortress&&brain->Lidar.Arrive==1)  
 						//	nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
-					chassis->Movement.Vomega=1000;
+					//chassis->Movement.Vomega=1000;
 				 //chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
 		
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
