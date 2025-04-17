@@ -92,7 +92,7 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 	UsartDmaPrintf("%.2f,%.2f\r\n",nmm,Brain.Lidar.vy);
 //	if (tim14.ClockTime%50==0)
 //	UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
- // UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
+  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
 	//UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Yaw.Target_Angle,Holder.Yaw.GYRO_Angle);
 	//	UsartDmaPrintf("%d,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Motors6020.motor[1].Data.Output,Holder.Pitch.GYRO_Angle_speed,Holder.Pitch.GYRO_Angle,Holder.Pitch.Target_Angle,Holder.Motors6020.turnPID[2].Out);
 	//	UsartDmaPrintf("%d,%.2f,%.2f,%d\r\n",AmmoBooster.Friction_Wheel.motor3508[0].Data.SpeedRPM,AmmoBooster.Shoot_Plate.Plate_Angle,AmmoBooster.Shoot_Plate.Target_Angle,AmmoBooster.Shoot_Plate.motor2006.Data.Output);

@@ -196,7 +196,7 @@
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>Holder</ItemText>
+          <ItemText>Holder,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
@@ -210,6 +210,11 @@
         </Ww>
         <Ww>
           <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>mpu6050</ItemText>
+        </Ww>
+        <Ww>
+          <count>12</count>
           <WinNumber>1</WinNumber>
           <ItemText>mpu6050</ItemText>
         </Ww>

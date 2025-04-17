@@ -114,7 +114,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl* rc_ctrl,Brain_t* brain)
 
 	holder->Motors6020.motor[0].Data.Output =
 	BasePID_SpeedControl( holder->Yaw.PID.CorePID, 
-	BasePID_AngleControl(holder->Yaw.PID.ShellPID, holder->Yaw.Target_Angle , holder->Yaw.GYRO_Angle)  ,-holder->Yaw.GYRO_Angle_speed);
+	BasePID_AngleControl(holder->Yaw.PID.ShellPID, holder->Yaw.Target_Angle , holder->Yaw.GYRO_Angle)  ,holder->Yaw.GYRO_Angle_speed);
 
 	holder->Motors6020.motor[1].Data.Output =
 	BasePID_SpeedControl(holder->Pitch.PID.CorePID , 

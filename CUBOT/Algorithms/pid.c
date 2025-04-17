@@ -78,7 +78,7 @@ float  BasePID_AngleControl(BasePID_Object* base_pid, float target_angle, float 
 
   if (fabs(base_pid->Error) > base_pid->KiPartDetachment) base_pid->KiPart = 0;
 	
-	base_pid->KdPart = (-1) * base_pid->Kd * feedback_angle;
+	base_pid->KdPart = (-1) * base_pid->Kd * (base_pid->Error - base_pid->LastError);
 	base_pid->Out = base_pid->KpPart + base_pid->KiPart + base_pid->KdPart;
 	base_pid->LastError=base_pid->Error;
 	return base_pid->Out;
@@ -147,9 +147,9 @@ int32_t BasePID_increment_PitchAngleControl(BasePID_Object* base_pid, float targ
 	base_pid->Error = target_angle - feedback_angle;
 	base_pid->KpPart=(base_pid->Error-base_pid->LastError)*base_pid->Kp;
 	base_pid->KiPart=base_pid->Error * base_pid->Ki;
-	base_pid->KdPart= base_pid->Kd * (base_pid->Error - 2*base_pid->LastError+base_pid->LastlastError);
+	//base_pid->KdPart= base_pid->Kd * (base_pid->Error - 2*base_pid->LastError+base_pid->LastlastError);
 
-	base_pid->LastlastError=base_pid->LastError;
+	
 	base_pid->LastError = base_pid->Error;
 
 	base_pid->Out = base_pid->KpPart + base_pid->KiPart + base_pid->KdPart;
