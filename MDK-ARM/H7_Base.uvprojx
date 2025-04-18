@@ -10,8 +10,8 @@
       <TargetName>H7_Base</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
-      <uAC6>0</uAC6>
+      <pCCUsed>6070000::V6.7::.\ARMCLANG</pCCUsed>
+      <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H750VBTx</Device>
@@ -81,7 +81,7 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>0</RunUserProg1>
-            <RunUserProg2>1</RunUserProg2>
+            <RunUserProg2>0</RunUserProg2>
             <UserProg1Name></UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
@@ -311,7 +311,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>2</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -320,13 +320,13 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>2</wLevel>
+            <wLevel>3</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
-            <v6Lang>1</v6Lang>
-            <v6LangP>1</v6LangP>
+            <v6Lang>3</v6Lang>
+            <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H750xx,STB_DS_IMPLEMENTATION</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../CubotMiddleware;../new;../User;../CubotMiddleware/Algorithms;../CubotMiddleware/Devices;../CubotMiddleware/Drivers;../CubotMiddleware/Modules;../CubotMiddleware/Support;./H7_Base;../CubotMiddleware/Devices/BMI088;../CubotMiddleware/Devices/MPU6050;../MIddlewaves/ARM/DSP/Include;../MIddlewaves/ARM/DSP/Include/dsp;../MIddlewaves/ARM/DSP/Source/BasicMathFunctions;../MIddlewaves/ARM/DSP/Source/CommonTables;../MIddlewaves/ARM/DSP/Source/FastMathFunctions;../MIddlewaves/ARM/DSP/Source/MatrixFunctions;../MIddlewaves/ARM/DSP/Source/QuaternionMathFunctions</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../CubotMiddleware;../new;../User;../CUBOT/Algorithms;../CUBOT/Devices;../CUBOT/Drivers;../CUBOT/Modules;../CUBOT/Support;../CUBOT/User;../MIddlewaves/ARM/DSP/Include;../MIddlewaves/ARM/DSP/Include/dsp;../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -604,201 +604,6 @@
               <FileName>system_stm32h7xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/system_stm32h7xx.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Cubot/driver</GroupName>
-          <Files>
-            <File>
-              <FileName>driver_can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Drivers\driver_can.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Drivers\driver_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_iic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Drivers\driver_iic.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Drivers\driver_timer.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_counter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Drivers\driver_counter.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Drivers\driver_spi.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Cubot/devices</GroupName>
-          <Files>
-            <File>
-              <FileName>referee.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\H7_Base\referee.c</FilePath>
-            </File>
-            <File>
-              <FileName>motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\motor.c</FilePath>
-            </File>
-            <File>
-              <FileName>dr16.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\dr16.c</FilePath>
-            </File>
-            <File>
-              <FileName>Supercap.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\Supercap.c</FilePath>
-            </File>
-            <File>
-              <FileName>heat_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\new\heat_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>check.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\check.c</FilePath>
-            </File>
-            <File>
-              <FileName>bmi088.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\bmi088.c</FilePath>
-            </File>
-            <File>
-              <FileName>et08.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\et08.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Cubot/modules</GroupName>
-          <Files>
-            <File>
-              <FileName>holder.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\new\holder.c</FilePath>
-            </File>
-            <File>
-              <FileName>all_chassis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\H7_Base\all_chassis.c</FilePath>
-            </File>
-            <File>
-              <FileName>reset.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Modules\reset.c</FilePath>
-            </File>
-            <File>
-              <FileName>reset.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\CubotMiddleware\Modules\reset.h</FilePath>
-            </File>
-            <File>
-              <FileName>shoot.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Modules\shoot.c</FilePath>
-            </File>
-            <File>
-              <FileName>hardware_config.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\hardware_config.c</FilePath>
-            </File>
-            <File>
-              <FileName>shoot.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\CubotMiddleware\Modules\shoot.h</FilePath>
-            </File>
-            <File>
-              <FileName>ins.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Modules\ins.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>User/Config</GroupName>
-          <Files>
-            <File>
-              <FileName>control_logic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\control_logic.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Cubot/Algorithm</GroupName>
-          <Files>
-            <File>
-              <FileName>kalman.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Algorithms\kalman.c</FilePath>
-            </File>
-            <File>
-              <FileName>pid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Algorithms\pid.c</FilePath>
-            </File>
-            <File>
-              <FileName>filter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\filter.c</FilePath>
-            </File>
-            <File>
-              <FileName>kalman_filter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Algorithms\kalman_filter.c</FilePath>
-            </File>
-            <File>
-              <FileName>quaternions_EKF.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Algorithms\quaternions_EKF.c</FilePath>
-            </File>
-            <File>
-              <FileName>user_lib.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Algorithms\user_lib.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>vision</GroupName>
-          <Files>
-            <File>
-              <FileName>brain.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\new\brain.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Cubot/MPU6050</GroupName>
-          <Files>
-            <File>
-              <FileName>driver_iic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\MPU6050\driver_iic.c</FilePath>
-            </File>
-            <File>
-              <FileName>mpu6050.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CubotMiddleware\Devices\MPU6050\mpu6050.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2151,6 +1956,161 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Cubot/User</GroupName>
+          <Files>
+            <File>
+              <FileName>control_logic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\User\control_logic.c</FilePath>
+            </File>
+            <File>
+              <FileName>hardware_config.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\User\hardware_config.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Cubot/Drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>driver_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Drivers\driver_can.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_counter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Drivers\driver_counter.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Drivers\driver_iic.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Drivers\driver_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Drivers\driver_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Drivers\driver_usart.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Cubot/Modules</GroupName>
+          <Files>
+            <File>
+              <FileName>ammo_booster.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Modules\ammo_booster.c</FilePath>
+            </File>
+            <File>
+              <FileName>brain.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Modules\brain.c</FilePath>
+            </File>
+            <File>
+              <FileName>holder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Modules\holder.c</FilePath>
+            </File>
+            <File>
+              <FileName>ins.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Modules\ins.c</FilePath>
+            </File>
+            <File>
+              <FileName>shoot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Modules\shoot.c</FilePath>
+            </File>
+            <File>
+              <FileName>all_chassis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Modules\all_chassis.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Cubot/Devices</GroupName>
+          <Files>
+            <File>
+              <FileName>bmi088.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Devices\bmi088.c</FilePath>
+            </File>
+            <File>
+              <FileName>check.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Devices\check.c</FilePath>
+            </File>
+            <File>
+              <FileName>dr16.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Devices\dr16.c</FilePath>
+            </File>
+            <File>
+              <FileName>motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Devices\motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Supercap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Devices\Supercap.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Devices\mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>referee.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Devices\referee.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CUBOT/Algorithms</GroupName>
+          <Files>
+            <File>
+              <FileName>filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Algorithms\filter.c</FilePath>
+            </File>
+            <File>
+              <FileName>kalman_filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Algorithms\kalman_filter.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Algorithms\pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>quaternions_EKF.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Algorithms\quaternions_EKF.c</FilePath>
+            </File>
+            <File>
+              <FileName>user_lib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Algorithms\user_lib.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
@@ -2160,8 +2120,8 @@
   <RTE>
     <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="4.3.0" condition="CMSIS Core">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="4.5.0"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
         <targetInfos>
           <targetInfo name="H7_Base"/>
         </targetInfos>

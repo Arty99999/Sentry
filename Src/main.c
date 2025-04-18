@@ -112,7 +112,6 @@ int main(void)
   MX_UART4_Init();
   MX_UART5_Init();
   MX_I2C2_Init();
-  MX_I2C4_Init();
   MX_UART7_Init();
   MX_UART8_Init();
   MX_TIM13_Init();
