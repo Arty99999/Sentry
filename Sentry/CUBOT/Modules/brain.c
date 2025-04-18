@@ -165,7 +165,7 @@ void Brain_Lidar_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//½â°üÀ×´ïÊý¾Ý
 		{	
 				Brain->Lidar.vy=1*((recBuffer[3] >> 6) == 0 ? 1 : -1)*((float)((recBuffer[3]&0x3f)*100 + recBuffer[4])/100)*1146*3;
 				Brain->Lidar.vx=-1*((recBuffer[5] >> 6) == 0 ? 1 : -1)*((float)((recBuffer[5]&0x3f)*100 + recBuffer[6])/100)*1146*3;				
-				Brain->Lidar.angle_to_lidar=((recBuffer[7] >> 6) == 0 ? 1 : -1)*((float)((recBuffer[7]&0x3f)*100 + recBuffer[8])/100);
+				//Brain->Lidar.angle_to_lidar=((recBuffer[7] >> 6) == 0 ? 1 : -1)*((float)((recBuffer[7]&0x3f)*100 + recBuffer[8])/100);
 			  Brain->Lidar.Arrive = recBuffer[9];
 		}
 	}
@@ -194,7 +194,7 @@ void  Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//½â°ü×ÔÃéÊý¾
       Brain->Autoaim.IsFire = ((float)(recBuffer[8]));
 			Brain->Autoaim.camara_num=recBuffer[11];
       Brain->Autoaim.fire_flag=0;
-			if (rc_Ctrl.rc.s2==2)
+			if (rc_Ctrl_et.rc.s2==2)
 			{ if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.4) Brain->Autoaim.fire_flag=1;else Brain->Autoaim.fire_flag=0;	
 		   	  Holder.Yaw1.Target_Angle=Brain->Autoaim.Use_Can_angle+Brain->Autoaim.Yaw_add;
 					Holder.Pitch.Target_Angle= Brain->Autoaim.Use_Gyro_angle+Brain->Autoaim.Pitch_add ;}

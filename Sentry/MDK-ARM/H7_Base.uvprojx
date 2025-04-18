@@ -2078,6 +2078,11 @@
               <FileType>1</FileType>
               <FilePath>..\CUBOT\Devices\referee.c</FilePath>
             </File>
+            <File>
+              <FileName>et08.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Devices\et08.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

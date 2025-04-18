@@ -20,7 +20,7 @@ FPS tim14_FPS={
   *读取机器人状态，各部分是否在线，
 	*/
 	
-void RobotOnlineState(Check_Robot_State *CheckRobotState,RC_Ctrl *rc_ctrl)
+void RobotOnlineState(Check_Robot_State *CheckRobotState,RC_Ctrl_ET *rc_ctrl)
 {
 	Motor* motor = NULL;
 	list_t *node = NULL;	
@@ -61,9 +61,9 @@ void RobotOnlineState(Check_Robot_State *CheckRobotState,RC_Ctrl *rc_ctrl)
 	CheckRobotState->Check_Usart.Check_referee_cnt= int16_constrain(CheckRobotState->Check_Usart.Check_referee_cnt,0,200);
   CheckRobotState->Check_Usart.Check_referee = (CheckRobotState->Check_Usart.Check_referee_cnt > 100) ? 0 : 1;
 	
-	  
+//	  
 	CheckRobotState->Check_Usart.Check_receiver_cnt=int16_constrain(CheckRobotState->Check_Usart.Check_receiver_cnt,0,200);
-	if(CheckRobotState->Check_Usart.Check_receiver_cnt>30)  {rc_ctrl->isOnline = 0 ;CheckRobotState->Check_Usart.Check_receiver=0;} else {rc_ctrl->isOnline = 1;CheckRobotState->Check_Usart.Check_receiver=1;}
+	if(CheckRobotState->Check_Usart.Check_receiver_cnt>100)  {rc_ctrl->isOnline = 0 ;CheckRobotState->Check_Usart.Check_receiver=0;} else { if (rc_Ctrl_et.rc.sA==1)rc_ctrl->isOnline = 1;else rc_ctrl->isOnline = 0;CheckRobotState->Check_Usart.Check_receiver=1;}
 		
 }
 

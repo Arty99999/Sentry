@@ -4,6 +4,7 @@
 #include "brain.h"
 #include "Holder.h"
 #include "math.h"
+#include <stdlib.h>
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define AtR 0.0174532f	              //<  3.1415 /180 角度制 转化为弧度制	
 float total_power;//总功率
@@ -45,7 +46,7 @@ AllChassis allchassis={
 extern int Flag_Follow;
 float nmm;
 float Change_angel(float vx,float vy,float Can_angle);
-void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotState,Brain_t* brain,RC_Ctrl* rc_ctrl)
+void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotState,Brain_t* brain,RC_Ctrl_ET* rc_ctrl)
 {
 	static int cnu,cnl,clock=0;
 	//变速自旋
@@ -89,12 +90,12 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 				else if(brain->Lidar.mode == 1)//普通平移
 				{					
 					
-					chassis->Movement.Vx=brain->Lidar.vx/1.25;
-					chassis->Movement.Vy=brain->Lidar.vy/1.25;
-					//if (brain->Lidar.mode==To_fortress&&brain->Lidar.Arrive==1)  
-						//	nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
-					//chassis->Movement.Vomega=1000;
-				 //chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
+					chassis->Movement.Vx=brain->Lidar.vx;
+					chassis->Movement.Vy=brain->Lidar.vy;
+		//						nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
+			//	if  (chassis->Movement.Vx==0)				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
+		//		  chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
+			//	 chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
 		
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 				}
@@ -102,9 +103,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 				{					
 					chassis->Movement.Vx=chassis->Movement.brain_vx;
 					chassis->Movement.Vy=chassis->Movement.brain_vy;
-				//nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
-				//if (chassis->Movement.Vx==0)				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
-				//else chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,-nmm,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
+
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 				}
 				else if(brain->Lidar.mode  == 3)//原地自旋
@@ -120,18 +119,20 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 			{
 				brain->Lidar.angle_to_lidar=0;
 				angle_to_holder=0;
-					chassis->Movement.Vx=-(rc_Ctrl.rc.ch0-1024)*5;
-					chassis->Movement.Vy=-(rc_Ctrl.rc.ch1-1024)*5;				
-				  if(rc_Ctrl.rc.sw>1400) chassis->Movement.Vomega=7000;
-				  else if(rc_Ctrl.rc.sw<600) chassis->Movement.Vomega=-7000;
-					else if(rc_Ctrl.rc.sw>600&&rc_Ctrl.rc.sw<1400)
-				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);	
-				
-			//	nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
-			//	if (chassis->Movement.Vx==0)				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
-			//	else chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,-nmm,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
-					//Check_Slope(&allchassis,&Holder);	
-					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
+					chassis->Movement.Vx=-(rc_Ctrl_et.rc.ch0-1024)*5;
+					chassis->Movement.Vy=-(rc_Ctrl_et.rc.ch1-1024)*5;				
+//				  if(rc_Ctrl.rc.sw>1400) chassis->Movement.Vomega=7000;
+//				  else if(rc_Ctrl.rc.sw<600) chassis->Movement.Vomega=-7000;
+//					else if(rc_Ctrl.rc.sw>600&&rc_Ctrl.rc.sw<1400)
+					//if (rc_Ctrl_et.rc.sD==1)
+						chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
+                    // else
+					//	 chassis->Movement.Vomega = 7000;
+							 //	nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
+							 //	if (chassis->Movement.Vx==0)				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
+							 //	else chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,-nmm,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
+							 // Check_Slope(&allchassis,&Holder);
+							 ALLChassisSetSpeed(chassis, Holder.Motors6020.motor[0].Data.Angle);
 		//		atan(chassis->Movement.Vx/chassis->Movement.Vy)*57.3
 //	chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);	
 			}
@@ -193,7 +194,7 @@ void ALLChassisSetSpeedTwo(AllChassis* chassis, float canAngle)
 void Speed_Poweroutput_Control(AllChassis* chassis)
 {
   total_power=abs(chassis->Motors.motor[0].Data.Output)+abs(chassis->Motors.motor[1].Data.Output)+abs(chassis->Motors.motor[2].Data.Output)+abs(chassis->Motors.motor[3].Data.Output);
-	max_power=BasePID_BaseControl(&pid_base, referee2022.power_heat_data.chassis_power_buffer, referee2022.power_heat_data.chassis_power);
+	max_power=BasePID_SpeedControl(&chassis->Motors.BasePID, referee2022.power_heat_data.chassis_power_buffer, referee2022.power_heat_data.chassis_power);
 	power_bili=total_power/max_power;
 	if(power_bili>1)
 	{
@@ -279,13 +280,15 @@ chassis->Power.refereeData.max_power=referee2022.game_robot_status.chassis_power
 /**
   * @brief  麦轮底盘初始化函数，创建四个底盘电机，并且拷贝相同的PID参数，
   */
-void AllChassisInit(AllChassis *chassis, BasePID_Object run_pid)
+void AllChassisInit(AllChassis *chassis, BasePID_Object* run_pid,BasePID_Object* follow_pid,BasePID_Object* base_pid)
 {
 	for(int i = 1;i <= 4; i++)  //< 初始化四个电机和对应的pid结构体
 	{
 		MotorInit(&chassis->Motors.motor[i - 1], 0, Motor3508,CAN2, (0x200 + i)); 	//< 麦轮底盘的代码是默认挂载在0x200上的
-		BasePID_Init(&chassis->Motors.RunPID[i - 1], run_pid.Kp, run_pid.Ki, run_pid.Kd, run_pid.KiPartDetachment);
+		BasePID_Init(&chassis->Motors.RunPID[i - 1], run_pid->Kp, run_pid->Ki, run_pid->Kd, run_pid->KiPartDetachment);
 	}	
+	BasePID_Init(&chassis->Motors.FollowPID,follow_pid->Kp, follow_pid->Ki, follow_pid->Kd, follow_pid->KiPartDetachment);
+	BasePID_Init(&chassis->Motors.BasePID,base_pid->Kp, base_pid->Ki, base_pid->Kd, base_pid->KiPartDetachment);
 	chassis->Movement.Vomega_Sensitivity = 1;
 	chassis->Movement.Vx_Sensitivity     = 1;
 	chassis->Movement.Vy_Sensitivity     = 1;
@@ -325,7 +328,7 @@ double normalize_angle(double theta) {
 }
 	float angle;
 float a1,a2,a3,a4,abs1,abs2,abs3,abs4;
-#define abs(x) ((x)>0? (x):(-(x)))
+
 float Change_angel(float vx,float vy,float Can_angle)
 {
 	//float a1,a2,a3,a4,abs1,abs2,abs3,abs4;
@@ -338,10 +341,10 @@ angle = atan2(vx, vy) ;  // 使用更精确的弧度转角度系数
 	a3=normalize_angle(angle-3.1416);
   a4= angle;
 	
-	abs1=min(abs(Can_angle - a1),2*3.1416-abs(Can_angle -a1));
-	abs2=min(abs(Can_angle - a2),2*3.1416-abs(Can_angle -a2));
-	abs3=min(abs(Can_angle - a3),2*3.1416-abs(Can_angle -a3));
-	abs4=min(abs(Can_angle - a4),2*3.1416-abs(Can_angle -a4));
+	abs1=min(fabs(Can_angle - a1),2*3.1416-fabs(Can_angle -a1));
+	abs2=min(fabs(Can_angle - a2),2*3.1416-fabs(Can_angle -a2));
+	abs3=min(fabs(Can_angle - a3),2*3.1416-fabs(Can_angle -a3));
+	abs4=min(fabs(Can_angle - a4),2*3.1416-fabs(Can_angle -a4));
  
   if  (min(abs1,min(abs2,min(abs3,abs4)))==abs1) return a1*57.3;
 	else if  (min(abs1,min(abs2,min(abs3,abs4)))==abs2)return a2*57.3;

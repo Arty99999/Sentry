@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "brain.h": "c",
+        "check.h": "c",
+        "hardware_config.h": "c",
+        "referee.h": "c",
+        "pid.h": "c",
+        "supercap.h": "c",
+        "et08.h": "c",
+        "holder.h": "c",
+        "math.h": "c",
+        "shoot.h": "c",
+        "control_logic.h": "c"
+    }
+}

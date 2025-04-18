@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 #include "referee.h"
-#include "dr16.h"
+#include "ET08.h"
 #include "motor.h"
 typedef	 struct 
 	{	
@@ -50,7 +50,7 @@ typedef struct
 	uint16_t Camera_cnt;
 }FPS;
 
-void RobotOnlineState(Check_Robot_State *CheckRobotState,RC_Ctrl *rc_ctrl);
+void RobotOnlineState(Check_Robot_State *CheckRobotState,RC_Ctrl_ET* rc_ctrl_et);
 void FPS_Check(FPS * fps);
 void Motor_CheckFPS();
 void  Motor_Check(Check_Motor* check,CAN_Object canx) ;

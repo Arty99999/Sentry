@@ -24,7 +24,7 @@ typedef struct
 
 		int16_t ShootNum;
 		uint8_t  Shoot_rest_flag;
-			uint8_t heat_status;
+		uint8_t heat_status;
 	}Shoot_Plate;
 	
 	struct
@@ -40,13 +40,12 @@ typedef struct
 	
 }Ammo_Booster;
 
-float Pid_Control(BasePID_Object* base_pid, float target, int16_t Feedback);
+
 void AmmoBoosterInit(Ammo_Booster *ammo_booster,BasePID_Object* friction_pid, BasePID_Object* friction_pid1,BasePID_Object* load_pid);
-void AmmoBoosterInit1(Ammo_Booster *ammo_booster2, BasePID_Object friction_pid, BasePID_Object friction_pid1,BasePID_Object load_pid, CanNumber canx);
+
 void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain);
 void FrictionWheelControl(Ammo_Booster *ammo_booster);
 
 extern Ammo_Booster AmmoBooster;
-extern uint8_t gun_state;
-extern uint8_t change_gun;
+
 #endif

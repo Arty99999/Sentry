@@ -1,14 +1,12 @@
 #include "shoot.h"
-#include "stm32h7xx_hal.h"
-#include "motor.h"
-#include "fdcan.h"
+
+
 #include "driver_timer.h"
-#include "dr16.h"
-#include "pid.h"
+#include "ET08.h"
 
 #include "brain.h"
 #include "referee.h"
-#include "brain.h"
+
 #include "Holder.h"
 #include "user_lib.h"
 
@@ -36,8 +34,7 @@ void AmmoBoosterInit(Ammo_Booster *ammo_booster,BasePID_Object* friction_pid, Ba
 	ammo_booster->Friction_Wheel.Friction_Start = 0;
 	ammo_booster->Friction_Wheel.Friction_Speed[0] = -5700;
 	ammo_booster->Friction_Wheel.Friction_Speed[1] =-5690;
-//		ammo_booster->Friction_Wheel.Friction_Speed[0] = -100;
-//	ammo_booster->Friction_Wheel.Friction_Speed[1] =- 100;
+
 }
 
 void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
@@ -53,23 +50,22 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 	  ammo_booster->Shoot_Plate.Plate_Angle += ammo_booster->Shoot_Plate.Delta_Angle;
 	
 
-	if(rc_Ctrl.isOnline == 1&&ammo_booster->Shoot_Plate.heat_status==1)   ///
+	if(rc_Ctrl_et.isOnline == 1&&ammo_booster->Shoot_Plate.heat_status==1)   ///
 	{
-
     if(referee2022.power_heat_data.shooter_id1_17mm_cooling_heat >= referee2022.game_robot_status.shooter_id1_17mm_cooling_limit - ammo_booster->Shoot_Plate.Fire_Margin-70)
 			ammo_booster->Shoot_Plate.Fire_Divider=125;else ammo_booster->Shoot_Plate.Fire_Divider=50;	
      	
 		if (ammo_booster->Shoot_Plate.Shoot_rest_flag) ammo_booster->Shoot_Plate.Shoot_Cut++;
  		if (ammo_booster->Shoot_Plate.Shoot_Cut==ammo_booster->Shoot_Plate.Fire_Divider) ammo_booster->Shoot_Plate.Shoot_rest_flag=0;
 		
-				if((rc_Ctrl.rc.s1==1||referee2022.game_status.game_progress==4)&&rc_Ctrl.rc.s2 ==2&&brain->Autoaim.fire_flag==1&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0 &&brain->Autoaim.IsFire==1)
+				if((rc_Ctrl_et.rc.s1==1||referee2022.game_status.game_progress==4)&&rc_Ctrl_et.rc.s2 ==2&&brain->Autoaim.fire_flag==1&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0 &&brain->Autoaim.IsFire==1)
 				{
 					ammo_booster->Shoot_Plate.Target_Angle  += 45;
 					ammo_booster->Shoot_Plate.ShootNum++;
 					ammo_booster->Shoot_Plate.Shoot_rest_flag=1;
 					ammo_booster->Shoot_Plate.Shoot_Cut=0;
 				}
-				else if (rc_Ctrl.rc.s1 ==1&&rc_Ctrl.rc.s2 !=2&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0)
+				else if (rc_Ctrl_et.rc.s1 ==1&&rc_Ctrl_et.rc.s2 !=2&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0)
 				{
 				ammo_booster->Shoot_Plate.Target_Angle  += 45;
 					ammo_booster->Shoot_Plate.ShootNum++;
@@ -89,9 +85,10 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 	 *拨弹盘控制（角度判断、速度控制）
 	 */
 	if(ammo_booster->Shoot_Plate.Target_Angle - ammo_booster->Shoot_Plate.Plate_Angle > 5)
-	  ammo_booster->Shoot_Plate.Plate_Out = Pid_Control(&ammo_booster->Shoot_Plate.RunPID, ammo_booster->Shoot_Plate.Fire_Rate, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
-	else ammo_booster->Shoot_Plate.Plate_Out = Pid_Control(&ammo_booster->Shoot_Plate.RunPID, 0, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
-	
+		ammo_booster->Shoot_Plate.Plate_Out = BasePID_SpeedControl(&ammo_booster->Shoot_Plate.RunPID, ammo_booster->Shoot_Plate.Fire_Rate, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
+	else
+		ammo_booster->Shoot_Plate.Plate_Out = BasePID_SpeedControl(&ammo_booster->Shoot_Plate.RunPID, 0, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
+
 	if(ammo_booster->Shoot_Plate.Target_Angle - ammo_booster->Shoot_Plate.Plate_Angle > 5 && ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM < 1000)
 	{
 		kadan++;
@@ -99,7 +96,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 		{
 			ammo_booster->Shoot_Plate.Target_Angle = ammo_booster->Shoot_Plate.Plate_Angle+6;
 			kadan++;
-			ammo_booster->Shoot_Plate.Plate_Out = Pid_Control(&ammo_booster->Shoot_Plate.RunPID, -2000, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
+			ammo_booster->Shoot_Plate.Plate_Out = BasePID_SpeedControl(&ammo_booster->Shoot_Plate.RunPID, -2000, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
 			if(kadan > 1200) kadan = 0;
 				
 		}	
@@ -113,7 +110,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 void FrictionWheelControl(Ammo_Booster *ammo_booster)
 { 
 	if(tim14.ClockTime % 2 == 0)
-	{if (rc_Ctrl.isOnline == 1) ammo_booster->Friction_Wheel.Friction_Start++;else ammo_booster->Friction_Wheel.Friction_Start--;}
+	{if (rc_Ctrl_et.isOnline == 1) ammo_booster->Friction_Wheel.Friction_Start++;else ammo_booster->Friction_Wheel.Friction_Start--;}
 	
 
 	ammo_booster->Friction_Wheel.Friction_Start=int16_constrain(ammo_booster->Friction_Wheel.Friction_Start,0,1000);
@@ -127,20 +124,3 @@ void FrictionWheelControl(Ammo_Booster *ammo_booster)
   }
 }
 
-float Pid_Control(BasePID_Object* base_pid, float target, int16_t Feedback)
-{   
-	base_pid->Error = target - Feedback;
-	
-  base_pid->KpPart = base_pid->Error * base_pid->Kp;	
-	
-	base_pid->KiPart += base_pid->Error* base_pid->Ki;
-	
-	if(base_pid->KiPart>1200) base_pid->KiPart=1000;
-	if(base_pid->KiPart<-1200) base_pid->KiPart=-1000;
-		
-	base_pid->Out=base_pid->KpPart+base_pid->KiPart; 
-	
-	if(base_pid->Out>10000) base_pid->Out=10000;//电流值给得太大
-	if(base_pid->Out<-10000) base_pid->Out=-10000;
-	return base_pid->Out;
-}

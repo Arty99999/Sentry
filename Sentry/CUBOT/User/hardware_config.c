@@ -8,7 +8,7 @@
 #include "mpu6050.h"
 #include "all_chassis.h"
 #include "ins.h"
-#include "dr16.h"
+#include "et08.h"
 #include "pid.h"
 #include "holder.h"
 #include "referee.h"
@@ -86,8 +86,8 @@ void HardwareConfig(void)
 	
 	//< 推荐先进行设备初始化，再进行硬件初始化
 	MPU_Init_();
-	DR16Init(&rc_Ctrl);
-	
+	//DR16Init(&rc_Ctrl);
+	ET08Init(&rc_Ctrl_et);
   DWT_Init(480);
 
 
@@ -128,7 +128,7 @@ void HardwareConfig(void)
 	UARTx_Init(&huart3, Referee_callback);
 
 	
-	UARTx_Init(&huart1, DR16_callback);
+	UARTx_Init(&huart1, ET08_callback);
 
 	
 	UARTx_Init(&huart4, Brain_Camera_callback);  

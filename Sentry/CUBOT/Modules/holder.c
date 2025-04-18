@@ -46,14 +46,14 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 		
 
 float y3,k3;
-void HolderGetRemoteData(Holder_t* holder, RC_Ctrl* rc_ctrl,Brain_t* brain) 
+void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain) 
 {
 	static int16_t yaw_time,pitch_time;
-	holder->Pitch.Target_Angle -= ((rc_ctrl->rc.ch3 -1024) * holder->Pitch.Sensitivity-rc_ctrl->mouse.y*holder->Pitch.MouseSensitivity);
-	if(rc_ctrl->rc.s2!=1) holder->Yaw.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity+rc_ctrl->mouse.x*holder->Yaw.MouseSensitivity);
-	else if(rc_ctrl->rc.s2==1)holder->Yaw1.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity+rc_ctrl->mouse.x*holder->Yaw.MouseSensitivity);
+	holder->Pitch.Target_Angle -= ((rc_ctrl->rc.ch3 -1024) * holder->Pitch.Sensitivity);
+	if(rc_ctrl->rc.s2!=1) holder->Yaw.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
+	else if(rc_ctrl->rc.s2==1)holder->Yaw1.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 		
-	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait)
+	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait)
 			{
 //				if (brain->Autoaim.Last_mode!=Cruise)
 //				{

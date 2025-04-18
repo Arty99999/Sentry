@@ -4,6 +4,7 @@
 #include "devices.h"
 #include "pid.h"
 #include "brain.h"
+#include "ET08.h"
 extern float a12;
 struct Holder_Motor_Info
 {
@@ -52,7 +53,7 @@ extern  Holder_t Holder;
 //void HolderYawChassisInit(Holder_t* holder, CanNumber canx);
 //void HolderReset(Holder_t* holder);
 void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_pid,DualPID_Object* yaw1_pid,CanNumber canx);
-void HolderGetRemoteData(Holder_t* holder, RC_Ctrl* rc_ctrl,Brain_t* brain) ;
+void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain) ;
 void thinchicken_feedback_control(void);
 
 #endif
