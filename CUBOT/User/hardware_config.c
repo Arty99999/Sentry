@@ -102,7 +102,7 @@ void HardwareConfig(void)
 	BasePID_Init(&pid_friction1,10,1.5 , 2, 0);
 	
 
-	BasePID_Init(&pid_yaw_angle, 2,0 ,0,  3);//-4 -0.01,300   0
+	BasePID_Init(&pid_yaw_angle, 2,0.02 ,-100,  3);//-4 -0.01,300   0
 	BasePID_Init(&pid_yaw_speed, 2000, 0, 0,  100);//1
 	
 	BasePID_Init(&pid_yaw1_angle, 5,0,0,  2);//7
