@@ -198,6 +198,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>uart1</ItemText>
         </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>tim14_FPS,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Holder,0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
