@@ -117,14 +117,14 @@ Attitude_t *INS_GetAttitude(IMU_InitData_t *imu_data)
     t += dt;
 
     imu_data->Read(imu_data);
-
-    ins.attitude.accel[X] = imu_data->accel[X];
+if (imu_data->accel[0]!=0&&imu_data->accel[1]!=0&&imu_data->accel[2]!=0)
+{ins.attitude.accel[X] = imu_data->accel[X];
     ins.attitude.accel[Y] = imu_data->accel[Y];
     ins.attitude.accel[Z] = imu_data->accel[Z];
     ins.attitude.gyro[X]  = imu_data->gyro[X];
     ins.attitude.gyro[Y]  = imu_data->gyro[Y];
     ins.attitude.gyro[Z]  = imu_data->gyro[Z];
-
+}
     // demo function,用于修正安装误差,可以不管,暂时没用
   //  IMU_Param_Correction(&IMU_paramCorrect, ins.attitude.gyro, ins.attitude.accel);
 

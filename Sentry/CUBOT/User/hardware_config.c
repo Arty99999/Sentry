@@ -76,7 +76,7 @@ uint8_t vofa_callback(uint8_t * recBuffer, uint16_t len)
 	return 0;
 }
 
-
+uint8_t Wifi_callback(uint8_t * recBuffer, uint16_t len);
 void HardwareConfig(void)
 {
 	
@@ -106,12 +106,12 @@ void HardwareConfig(void)
 	BasePID_Init(&pid_yaw_speed, 2000, 0, 0,  100);//1
 	
 	BasePID_Init(&pid_yaw1_angle, 5,0,0,  2);//7
-	BasePID_Init(&pid_yaw1_speed, 1500, 10, 0,  2);//6
+	BasePID_Init(&pid_yaw1_speed, 1500, 10, 0,  10);//6
 	
 	BasePID_Init(&pid_pitch_angle, 6, 0.04, 0, 2.5);//2
-	BasePID_Init(&pid_pitch_speed,1300,0, 0,0);//3
+	BasePID_Init(&pid_pitch_speed,1000,0, 0,0);//3
 	
-	BasePID_Init(&run_pid,10,0,0,0);
+	BasePID_Init(&run_pid,5,0,0,0);
 
 
 
@@ -132,9 +132,38 @@ void HardwareConfig(void)
 
 	
 	UARTx_Init(&huart4, Brain_Camera_callback);  
-
+UARTx_Init(&huart8,Wifi_callback);
 	UARTx_Init(&huart7, Vofa_callback);
+	UsarttoWifi("+++");
+	HAL_Delay(1500);
+		UsarttoWifi("+++");
+	HAL_Delay(1500);
+	int i=0;
+	while (uart8.uart_RxBuffer[11]!=0x2B &&uart8.uart_RxBuffer[21]!=0x55)
+	{
 
+	UsarttoWifi("AT+CWJAP?\r\n");
+		HAL_Delay(1000);
+		i++;
+		if (i>=15) break;
+	}
+//	
+//	while (uart4.uart_RxBuffer[15]!=0x4F &&uart4.uart_RxBuffer[21]!=0x62)
+//	{
+//	UsarttoWifi("AT+CIPMUX=0\r\n");
+//		
+//	}
+//		while (uart4.uart_RxBuffer[15]!=0x4F &&uart4.uart_RxBuffer[21]!=0x62)
+//	{
+//	UsarttoWifi("AT+CWJAP=\"CUBOT\",\"12345678\"\r\n");'
+//	HAL_Delay(2000);
+//	}
+
+	UsarttoWifi("AT+CIPSTART=\"UDP\",\"192.168.1.72\",8080\r\n");
+	HAL_Delay(500);
+  UsarttoWifi("AT+CIPMODE=1\r\n");
+	HAL_Delay(500);
+	UsarttoWifi("AT+CIPSEND\r\n");
 	
 //	
 	
@@ -163,7 +192,15 @@ uint8_t Vofa_callback(uint8_t * recBuffer, uint16_t len)
 {
 	//if ((recBuffer[23]==0x3E && recBuffer[1]==0x54 ) ||recBuffer[4]==0x3C) FLAG_1=1;
 	//if (recBuffer[2]==0x53 && recBuffer[7]==0x4F)  FLAG_Send=1;
-	//HAL_UART_Transmit_DMA(&huart8, recBuffer, len);
+	//HAL_UART_Transmit_DMA(&huart4, recBuffer, len);
 	return 0;
 }
 
+int FLAG_1=0,FLAG_Send;
+uint8_t Wifi_callback(uint8_t * recBuffer, uint16_t len)
+{
+//	if (recBuffer[21]==0x3E && recBuffer[1]==0x54 )FLAG_1=1;
+//	if (recBuffer[2]==0x53 && recBuffer[7]==0x4F)  FLAG_Send=1;
+	//HAL_UART_Transmit_DMA(&huart7, recBuffer, len);
+	return 0;
+}

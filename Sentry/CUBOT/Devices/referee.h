@@ -226,7 +226,9 @@ struct
 
 struct
 {
- uint32_t sentry_info;
+  uint8_t sentry_respawn_flag ;
+  uint16_t sentry_shooting_num;
+  uint8_t  sentry_shooting_num_far;
 }sentry_info_t;
 
 //19. 飞镖机器人客户端指令数据：0x020A。发送频率：10Hz，发送范围：单一机器人。
@@ -279,6 +281,9 @@ uint8_t target_robot_id;
 uint8_t cmd_source; 
 }map_command_t; 
 
+
+
+
 }Referee2022;
 
 		
@@ -292,7 +297,7 @@ uint32_t Verify_CRC16_Check_Sum(uint8_t *pchMessage, uint32_t dwLength);
 void Referee_Data_Diapcak(uint8_t *data,uint8_t this_time_len);
 void sentry_send_meseage(void);
 void sentry_decision_control(void);
-extern uint16_t sentry_shooting_num;
+
 extern uint8_t sentry_shooting_time;
 void Judege_reverge();
 

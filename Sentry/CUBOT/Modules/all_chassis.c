@@ -4,6 +4,7 @@
 #include "brain.h"
 #include "Holder.h"
 #include "math.h"
+#include <ins.h>
 #include <stdlib.h>
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define AtR 0.0174532f	              //<  3.1415 /180 角度制 转化为弧度制	
@@ -43,8 +44,11 @@ AllChassis allchassis={
   * @brief  全向轮底盘逆运动学，Inverse Kinematics ,根据chassis结构体中的movement结构体解算转速。
   * @notec  处理过后将未进行功率控制的电流参数填写到Motor结构体中。 
   */
+
 extern int Flag_Follow;
+extern float a222;
 float nmm;
+extern int hurt_flag;
 float Change_angel(float vx,float vy,float Can_angle);
 void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotState,Brain_t* brain,RC_Ctrl_ET* rc_ctrl)
 {
@@ -78,41 +82,30 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 				else
 			  {
 					
-				if(brain->Lidar.mode == 0)//停止
+				if(brain->Lidar.movemode == 0)//停止
 				{
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-
-					chassis->Movement.Vomega=0;
+if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;
+			else		chassis->Movement.Vomega=-3000;
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 					
 				}
-				else if(brain->Lidar.mode == 1)//普通平移
+				else if(brain->Lidar.movemode == 1)//普通平移
 				{					
 					
-					chassis->Movement.Vx=brain->Lidar.vx;
-					chassis->Movement.Vy=brain->Lidar.vy;
-		//						nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
-			//	if  (chassis->Movement.Vx==0)				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
-		//		  chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
-			//	 chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
-		
+					chassis->Movement.Vx=brain->Lidar.vx*1.25;
+					chassis->Movement.Vy=brain->Lidar.vy*1.25;
+					Check_Slope(&allchassis,&Holder);
+					if (hurt_flag==1) chassis->Movement.Vomega=speed1;
+			else 	if (chassis->Movement.Slope_Flag.flag_up_up_slope==1 ) chassis->Movement.Vomega=0;
+					else chassis->Movement.Vomega=-2000;
+				
+					
+	//	if  (Brain.Lidar.mode==4) chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 				}
-				else if(brain->Lidar.mode  == 2)//自旋平移
-				{					
-					chassis->Movement.Vx=chassis->Movement.brain_vx;
-					chassis->Movement.Vy=chassis->Movement.brain_vy;
 
-					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
-				}
-				else if(brain->Lidar.mode  == 3)//原地自旋
-				{					
-					chassis->Movement.Vx=0;
-					chassis->Movement.Vy=0;
-					chassis->Movement.Vomega=0;
-					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
-				}
 			  }
 			}
 			else 
@@ -121,17 +114,14 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 				angle_to_holder=0;
 					chassis->Movement.Vx=-(rc_Ctrl_et.rc.ch0-1024)*5;
 					chassis->Movement.Vy=-(rc_Ctrl_et.rc.ch1-1024)*5;				
-//				  if(rc_Ctrl.rc.sw>1400) chassis->Movement.Vomega=7000;
-//				  else if(rc_Ctrl.rc.sw<600) chassis->Movement.Vomega=-7000;
-//					else if(rc_Ctrl.rc.sw>600&&rc_Ctrl.rc.sw<1400)
-					//if (rc_Ctrl_et.rc.sD==1)
-						chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
+//				if (rc_Ctrl_et.rc.s2==1) chassis->Movement.Vomega=0;
+				chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
                     // else
 					//	 chassis->Movement.Vomega = 7000;
 							 //	nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
 							 //	if (chassis->Movement.Vx==0)				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
 							 //	else chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,-nmm,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
-							 // Check_Slope(&allchassis,&Holder);
+							  Check_Slope(&allchassis,&Holder);
 							 ALLChassisSetSpeed(chassis, Holder.Motors6020.motor[0].Data.Angle);
 		//		atan(chassis->Movement.Vx/chassis->Movement.Vy)*57.3
 //	chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);	
@@ -223,14 +213,14 @@ void Speed_Poweroutput_Control_New(AllChassis* chassis)
 	chassis->Power.target_require_power_sum =0;
 	    for (int8_t i = 0; i < 4; i++) {
         chassis->Motors.motor[i].Data.Output = BasePID_SpeedControl((BasePID_Object*)(chassis->Motors.RunPID + i), chassis->Motors.motor[i].Data.Target, chassis->Motors.motor[i].Data.SpeedRPM);
-				if (i<=1)
-				{chassis->Motors.motor[i].Data.Output+=chassis->Movement.Slope_Flag.flag_up_up_slope*4000-chassis->Movement.Slope_Flag.flag_up_down_slope*1500+chassis->Movement.Slope_Flag.flag_up_stat_slope*1500;
-				chassis->Motors.motor[i].Data.Output-=chassis->Movement.Slope_Flag.flag_down_up_slope*4000-chassis->Movement.Slope_Flag.flag_down_down_slope*1500+chassis->Movement.Slope_Flag.flag_down_stat_slope*1500;
-				}
-				else 
-       {chassis->Motors.motor[i].Data.Output-=chassis->Movement.Slope_Flag.flag_up_up_slope*4000-chassis->Movement.Slope_Flag.flag_up_down_slope*1500+chassis->Movement.Slope_Flag.flag_up_stat_slope*1500;
-				chassis->Motors.motor[i].Data.Output+=chassis->Movement.Slope_Flag.flag_down_up_slope*4000-chassis->Movement.Slope_Flag.flag_down_down_slope*1500+chassis->Movement.Slope_Flag.flag_down_stat_slope*1500;
-				}
+//				if (i<=1)
+//				{chassis->Motors.motor[i].Data.Output+=chassis->Movement.Slope_Flag.flag_up_up_slope*4000-chassis->Movement.Slope_Flag.flag_up_down_slope*1500+chassis->Movement.Slope_Flag.flag_up_stat_slope*1500;
+//				chassis->Motors.motor[i].Data.Output-=chassis->Movement.Slope_Flag.flag_down_up_slope*4000-chassis->Movement.Slope_Flag.flag_down_down_slope*1500+chassis->Movement.Slope_Flag.flag_down_stat_slope*1500;
+//				}
+//				else 
+//       {chassis->Motors.motor[i].Data.Output-=chassis->Movement.Slope_Flag.flag_up_up_slope*4000-chassis->Movement.Slope_Flag.flag_up_down_slope*1500+chassis->Movement.Slope_Flag.flag_up_stat_slope*1500;
+//				chassis->Motors.motor[i].Data.Output+=chassis->Movement.Slope_Flag.flag_down_up_slope*4000-chassis->Movement.Slope_Flag.flag_down_down_slope*1500+chassis->Movement.Slope_Flag.flag_down_stat_slope*1500;
+//				}
         chassis->Power.initial_give_power[i] = chassis->Motors.motor[i].Data.Output * chassis->Power.coefficient.TORQUE_COEFFICIENT * chassis->Motors.motor[i].Data.SpeedRPM +
       chassis->Power.coefficient.speed_term_k2* chassis->Motors.motor[i].Data.SpeedRPM * chassis->Motors.motor[i].Data.SpeedRPM +
      chassis->Power.coefficient.torque_term_k1 *chassis->Motors.motor[i].Data.Output * chassis->Motors.motor[i].Data.Output + chassis->Power.coefficient.CONSTANT_COEFFICIENT;
@@ -239,7 +229,7 @@ void Speed_Poweroutput_Control_New(AllChassis* chassis)
         chassis->Power.target_require_power_sum += chassis->Power.initial_give_power[i];
     }
 
-chassis->Power.refereeData.max_power=referee2022.game_robot_status.chassis_power_limit+(referee2022.power_heat_data.chassis_power_buffer-15)*2;
+chassis->Power.refereeData.max_power=100+(referee2022.power_heat_data.chassis_power_buffer-15)*2;
 		chassis->Power.scaling_ratio =chassis->Power.refereeData.max_power	 / chassis->Power.target_require_power_sum;
     chassis->Power.scaling_ratio = LIMIT(chassis->Power.scaling_ratio, 0, 1);
 	
@@ -293,28 +283,38 @@ void AllChassisInit(AllChassis *chassis, BasePID_Object* run_pid,BasePID_Object*
 	chassis->Movement.Vx_Sensitivity     = 1;
 	chassis->Movement.Vy_Sensitivity     = 1;
 }
+float d;
 void Check_Slope(AllChassis *chassis,Holder_t* holder)
 {
 	static int Cnt_stat,Cnt_up_slope,Cnt_down_slope;
-	if (holder->Pitch.GYRO_Angle-holder->Pitch.Can_Angle>8)  { Cnt_up_slope++  ;Cnt_stat=0;Cnt_down_slope=0;}
-	else if (holder->Pitch.GYRO_Angle-holder->Pitch.Can_Angle<-8) {Cnt_down_slope++ ;Cnt_stat=0;Cnt_up_slope=0;}
-	else {Cnt_up_slope=0 ;Cnt_down_slope=0;Cnt_stat++;}
-	if (Cnt_up_slope>100)
-	{
-	if (allchassis.Movement.Vy>200) {chassis->Movement.Slope_Flag.flag_up_up_slope=1;chassis->Movement.Slope_Flag.flag_up_down_slope=0;chassis->Movement.Slope_Flag.flag_up_stat_slope=0;}
-	else if (allchassis.Movement.Vy<-200) {chassis->Movement.Slope_Flag.flag_up_up_slope=0;chassis->Movement.Slope_Flag.flag_up_down_slope=1;chassis->Movement.Slope_Flag.flag_up_stat_slope=0;}
-  else {chassis->Movement.Slope_Flag.flag_up_up_slope=0;chassis->Movement.Slope_Flag.flag_up_down_slope=0;chassis->Movement.Slope_Flag.flag_up_stat_slope=1;}
-Cnt_up_slope=100;
-	}
-	else if (Cnt_down_slope>100)
-	{
-	if (allchassis.Movement.Vy>200) {chassis->Movement.Slope_Flag.flag_down_down_slope=1;chassis->Movement.Slope_Flag.flag_down_up_slope=0;chassis->Movement.Slope_Flag.flag_down_stat_slope=0;}
-	else if (allchassis.Movement.Vy<-200) {chassis->Movement.Slope_Flag.flag_down_down_slope=0;chassis->Movement.Slope_Flag.flag_down_up_slope=1;chassis->Movement.Slope_Flag.flag_down_stat_slope=0;}
-  else {chassis->Movement.Slope_Flag.flag_down_down_slope=0;chassis->Movement.Slope_Flag.flag_down_up_slope=0;chassis->Movement.Slope_Flag.flag_down_stat_slope=1;}
-	Cnt_down_slope=100;
-	}
-	else if (Cnt_stat>100)
-	{Cnt_stat=100;chassis->Movement.Slope_Flag.flag_up_up_slope=0;chassis->Movement.Slope_Flag.flag_up_down_slope=0;chassis->Movement.Slope_Flag.flag_down_up_slope=0;chassis->Movement.Slope_Flag.flag_down_down_slope=0;chassis->Movement.Slope_Flag.flag_up_stat_slope=0;chassis->Movement.Slope_Flag.flag_down_stat_slope=0;}
+//	if (holder->Pitch.GYRO_Angle-holder->Pitch.Can_Angle>5)  { Cnt_up_slope++  ;Cnt_stat=0;Cnt_down_slope=0;}
+//	else if (holder->Pitch.GYRO_Angle-holder->Pitch.Can_Angle<-5) {Cnt_down_slope++ ;Cnt_stat=0;Cnt_up_slope=0;}
+//	else {Cnt_up_slope=0 ;Cnt_down_slope=0;Cnt_stat++;}
+//	if (Cnt_up_slope>100)
+//	{
+//	if (allchassis.Movement.Vy>200) {chassis->Movement.Slope_Flag.flag_up_up_slope=1;chassis->Movement.Slope_Flag.flag_up_down_slope=0;chassis->Movement.Slope_Flag.flag_up_stat_slope=0;}
+//	else if (allchassis.Movement.Vy<-200) {chassis->Movement.Slope_Flag.flag_up_up_slope=0;chassis->Movement.Slope_Flag.flag_up_down_slope=1;chassis->Movement.Slope_Flag.flag_up_stat_slope=0;}
+//  else {chassis->Movement.Slope_Flag.flag_up_up_slope=0;chassis->Movement.Slope_Flag.flag_up_down_slope=0;chassis->Movement.Slope_Flag.flag_up_stat_slope=1;}
+//Cnt_up_slope=100;
+//	}
+//	else if (Cnt_down_slope>100)
+//	{
+//	if (allchassis.Movement.Vy>200) {chassis->Movement.Slope_Flag.flag_down_down_slope=1;chassis->Movement.Slope_Flag.flag_down_up_slope=0;chassis->Movement.Slope_Flag.flag_down_stat_slope=0;}
+//	else if (allchassis.Movement.Vy<-200) {chassis->Movement.Slope_Flag.flag_down_down_slope=0;chassis->Movement.Slope_Flag.flag_down_up_slope=1;chassis->Movement.Slope_Flag.flag_down_stat_slope=0;}
+//  else {chassis->Movement.Slope_Flag.flag_down_down_slope=0;chassis->Movement.Slope_Flag.flag_down_up_slope=0;chassis->Movement.Slope_Flag.flag_down_stat_slope=1;}
+//	Cnt_down_slope=100;
+//	}
+//	else if (Cnt_stat>100)
+//	{Cnt_stat=100;chassis->Movement.Slope_Flag.flag_up_up_slope=0;chassis->Movement.Slope_Flag.flag_up_down_slope=0;chassis->Movement.Slope_Flag.flag_down_up_slope=0;chassis->Movement.Slope_Flag.flag_down_down_slope=0;chassis->Movement.Slope_Flag.flag_up_stat_slope=0;chassis->Movement.Slope_Flag.flag_down_stat_slope=0;}
+//		
+
+		if (pow(holder->Pitch.GYRO_Angle-holder->Pitch.Can_Angle,2)+pow(INS_attitude->roll,2)>64) 
+			Cnt_up_slope++;else Cnt_up_slope=0;
+		if (Cnt_up_slope>100)
+		{chassis->Movement.Slope_Flag.flag_up_up_slope=1;Cnt_down_slope=100;}
+		else chassis->Movement.Slope_Flag.flag_up_up_slope=0;
+			
+	
 }
 double fmod_positive(double x, double y) {
     double result = fmod(x, y);

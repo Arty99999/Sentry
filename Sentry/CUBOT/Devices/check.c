@@ -63,7 +63,7 @@ void RobotOnlineState(Check_Robot_State *CheckRobotState,RC_Ctrl_ET *rc_ctrl)
 	
 //	  
 	CheckRobotState->Check_Usart.Check_receiver_cnt=int16_constrain(CheckRobotState->Check_Usart.Check_receiver_cnt,0,200);
-	if(CheckRobotState->Check_Usart.Check_receiver_cnt>100)  {rc_ctrl->isOnline = 0 ;CheckRobotState->Check_Usart.Check_receiver=0;} else { if (rc_Ctrl_et.rc.sA==1)rc_ctrl->isOnline = 1;else rc_ctrl->isOnline = 0;CheckRobotState->Check_Usart.Check_receiver=1;}
+	if(CheckRobotState->Check_Usart.Check_receiver_cnt>100)  {rc_ctrl->isOnline = 0 ;CheckRobotState->Check_Usart.Check_receiver=0;} else { if (rc_Ctrl_et.rc.sA==1&&rc_Ctrl_et.rc.ch2!=1)rc_ctrl->isOnline = 1;else rc_ctrl->isOnline = 0;CheckRobotState->Check_Usart.Check_receiver=1;}
 		
 }
 

@@ -68,7 +68,10 @@ UART_Object uart6;
 UART_Object uart7;
 UART_Object uart8;
 UART_Object* Find_UART(UART_HandleTypeDef *huart);
+
+
 uint8_t Usart_TxBuffer[128];
+uint8_t Usart_TxBuffer_[128];
 void UsartDmaPrintf(const char *format,...)
 {
 	uint16_t len;
@@ -77,6 +80,15 @@ void UsartDmaPrintf(const char *format,...)
 	len = vsnprintf((char*)Usart_TxBuffer,sizeof(Usart_TxBuffer)+1,(char*)format,args);
 	va_end(args);
 	HAL_UART_Transmit_DMA(&huart7, Usart_TxBuffer, len);
+}
+void UsarttoWifi(const char *format,...)
+{
+	uint16_t len;
+	va_list args;	
+	va_start(args,format);
+	len = vsnprintf((char*)Usart_TxBuffer_,sizeof(Usart_TxBuffer_)+1,(char*)format,args);
+	va_end(args);
+	HAL_UART_Transmit_DMA(&huart8, Usart_TxBuffer_, len);
 }
 /**
   * @brief   串口初始化，将句柄和接收回调拷贝至串口结构体

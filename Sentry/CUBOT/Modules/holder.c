@@ -24,7 +24,7 @@ void Camare_control(Brain_t* brain,Holder_t* holder);
 void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_pid,DualPID_Object* yaw1_pid,CanNumber canx)
 {
 	MotorInit(&holder->Motors6020.motor[0],5645 ,Motor6020,CAN2,0x205);   
-	MotorInit(&holder->Motors6020.motor[1], 6767 ,Motor6020,canx,0x206);
+	MotorInit(&holder->Motors6020.motor[1], 6993 ,Motor6020,canx,0x206);
 	MotorInit(&holder->Motors6020.motor[2], 4898 ,Motor6020,canx,0x205);   
 
 	DualPID_Init(&holder->Pitch.PID,pitch_pid->ShellPID,pitch_pid->CorePID);
@@ -43,8 +43,11 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 	holder->right_litmit=-90;
 	holder->left_litmit=84;
 }
-		
-
+uint8_t flag000;
+uint32_t m=0;
+int cntmm;
+extern float a222;
+extern uint8_t referee_Fps;
 float y3,k3;
 void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain) 
 {
@@ -52,8 +55,8 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 	holder->Pitch.Target_Angle -= ((rc_ctrl->rc.ch3 -1024) * holder->Pitch.Sensitivity);
 	if(rc_ctrl->rc.s2!=1) holder->Yaw.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 	else if(rc_ctrl->rc.s2==1)holder->Yaw1.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
-		
-	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait)
+		//&&tim14_FPS.Vision_FPS>0
+	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&& (referee_Fps==0 ||referee2022.game_status.game_progress==4))
 			{
 //				if (brain->Autoaim.Last_mode!=Cruise)
 //				{
@@ -61,9 +64,15 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 //				  holder->Cruise_Mode.pitch_time=(holder->Pitch.GYRO_Angle-5)/25/holder->Cruise_Mode.pitch_sense;
 //				}
 				
-				
-				holder->Cruise_Mode.pitch_time++;
+		m++;
+				if (m<=10000) 
+				{
+					holder->Cruise_Mode.pitch_time++;
 				holder->Cruise_Mode.yaw1_time++;
+					
+				}
+				else if (m>14000) {m=0;}
+				else {holder->Cruise_Mode.pitch_time=0;holder->Cruise_Mode.yaw1_time=0;}
 				if (brain->Autoaim.Mode==Autoaim)
 				{Holder.Yaw1.Target_Angle = 85.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
 			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
@@ -72,10 +81,13 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 				{Holder.Yaw1.Target_Angle = 85.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
 			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
 			}
-			
-			
-			
-			
+			else m=0;
+			if (a222!=0 && flag000==0&& rc_ctrl->rc.s1==2&&Brain.Lidar.mode==4) {  if (a222>180) Holder.Yaw.Target_Angle-=(a222-360)*57.3;else Holder.Yaw.Target_Angle-=a222*57.3;flag000=1;}
+
+//			if (brain->Autoaim.mode==Cruise && brain->Autoaim.Mode==Outpost) cntmm++;else cntmm=0;
+//				if (cntmm>4000) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
+				
+				
 		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise)
 		{
 			brain->Autoaim.mode=Change;
@@ -96,7 +108,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 	 holder->Yaw1.GYRO_Angle=INS_attitude->yaw;
 	 holder->Yaw.GYRO_Angle_speed=-150*mpu6050.mpu6050_Data.gyro[2]*0.001*50*3;
 	 holder->Pitch.GYRO_Angle_speed=-(INS_attitude->gyro[0]*0.001)*150*57.32;
-	 holder->Yaw1.GYRO_Angle_speed=((INS_attitude->gyro[2]-mpu6050.mpu6050_Data.gyro[2])*0.001)*150*50;
+	 holder->Yaw1.GYRO_Angle_speed=((INS_attitude->gyro[2]-mpu6050.mpu6050_Data.gyro[2])*0.001)*150*50*2;
 	 holder->Pitch.GYRO_Angle=-INS_attitude->pitch;
 
 	if(tim14.ClockTime%100==0&& holder->Yaw_Fllow_Mode.Flag_Fllow==0&&brain->Autoaim.mode!=Cruise)//´óÔÆÌ¨¸úËæ
@@ -110,7 +122,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 
  holder->Yaw1.Target_Angle =float_constrain(holder->Yaw1.Target_Angle,holder->right_litmit,holder->left_litmit);	
  holder->Pitch.Target_Angle =float_constrain(holder->Pitch.Target_Angle,holder->down_litmit,holder->up_litmit);		
-
+thinchicken_feedback_control();
 
 	holder->Motors6020.motor[0].Data.Output =
 	BasePID_SpeedControl( holder->Yaw.PID.CorePID, 
@@ -129,18 +141,29 @@ for (int i=0;i<3;i++)
 
 }
 
- 
-// void thinchicken_feedback_control()//Êİ¼¦·´À¡
-// {
-//	 hurt_id=referee2022.robot_hurt.armor_id;
-//static int flag_hurt,cnt_hurt;
-//		 if (blood-referee2022.game_robot_status.remain_HP==100) hurt_flag=1;
-//		else if (blood-referee2022.game_robot_status.remain_HP>0&& referee2022.robot_hurt.hurt_type==0) hurt_cnt++;
-//	 if (hurt_cnt>0) {hurt_flag=1;hurt_cnt=0;}
-//	 
-//		 blood=referee2022.game_robot_status.remain_HP;
+ int hurt_flag;
+ void thinchicken_feedback_control()//Êİ¼¦·´À¡
+ {
+	// hurt_id=referee2022.robot_hurt.armor_id;
+static int flag_hurt,cnt_hurt,cnt_hurt_reset,hurt_flag_doubt,blood,hurt_cnt,cnt_hurt_reset_;
+		 
+	 if (blood-referee2022.game_robot_status.remain_HP<=58&&blood-referee2022.game_robot_status.remain_HP>=8&&referee2022.robot_hurt.hurt_type==0) hurt_flag_doubt=1;
+	 if (hurt_flag_doubt==1) cnt_hurt_reset++;
+     if (cnt_hurt_reset>10&cnt_hurt_reset<500 && (blood-referee2022.game_robot_status.remain_HP>=8&&referee2022.robot_hurt.hurt_type==0)){hurt_flag=1;cnt_hurt_reset=0;hurt_flag_doubt=0;}
+	 else if (cnt_hurt_reset>1000) {hurt_flag=0;cnt_hurt_reset=0;hurt_flag_doubt=0;}
+    
+	 
+	 if ((blood-referee2022.game_robot_status.remain_HP>=90) && referee2022.robot_hurt.hurt_type==0) hurt_flag=1;
+	 if (hurt_flag==1&&Brain.Autoaim.mode==Cruise) cnt_hurt_reset_++;else cnt_hurt_reset_=0;
+		 
+	 
+	 
+	 if (cnt_hurt_reset_>2500) {hurt_flag=0;cnt_hurt_reset_=0;}
+	 
+	 
+		 blood=referee2022.game_robot_status.remain_HP;
 
-//	 
+	 
 //	 if(hurt_flag==1&&brain_flag==0)//×°¼×Ä£¿éÊÜµ¯Íè»÷´ò
 //	 {
 //		 if (hurt_id==2) Holder.Yaw.Target_Angle-=90;
@@ -164,8 +187,8 @@ for (int i=0;i<3;i++)
 //cnt_hurt=0;
 //		 flag_hurt=0;
 //	 }		 
-//	 
-//}
+	 
+}
 float Target_Angle,yaw1_Angle;
 void Camare_control(Brain_t* brain,Holder_t* holder)
 {

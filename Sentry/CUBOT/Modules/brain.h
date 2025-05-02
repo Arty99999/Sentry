@@ -39,7 +39,11 @@ typedef enum
 }Brain_Autoaim_mode;   
 typedef enum
 {
-  Stop=0
+  Lidar_home=1,
+	Lidar_Outpost=2,
+	Lidar_Patrol=3,
+	Lidar_Fortress=4
+	
 }Brain_Lidar_mode;
 typedef enum
 {
@@ -77,7 +81,7 @@ typedef struct
 			uint8_t IsFire;
 	}Autoaim;
 	 struct{
-		uint8_t mode;
+		Brain_Lidar_mode mode;
 		uint16_t mode_cnt[2];
 		CubotBrain_t Brain_Data;
 		uint8_t	movemode;
@@ -113,5 +117,6 @@ void RobotToBrain_Autoaim(float yaw,Brain_t* brain);//发给自瞄
 extern 	UART_RxBuffer uart2_buffer;
 extern 	UART_RxBuffer uart5_buffer;
 void RobotToBrain_Lidar(Brain_t* Brain);//发给雷达
+void Change_BrainMode(Brain_t* Brain);
 #endif
 

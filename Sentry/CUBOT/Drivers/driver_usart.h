@@ -62,7 +62,7 @@ void UsartDmaPrintf(const char *format,...);
   */
 uint8_t* itoa(int num,uint8_t* str, int radix);
 void ANO_V6_Send_Up_Computer(int16_t user1,int16_t user2,int16_t user3,int16_t user4,int16_t user5,int16_t user6);
-
+void UsarttoWifi(const char *format,...);
 
 extern UART_Object uart1;
 extern UART_Object uart2;
