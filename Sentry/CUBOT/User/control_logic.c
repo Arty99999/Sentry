@@ -67,7 +67,7 @@ if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 //	
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
-		Brain.Autoaim.Mode=Outpost;
+
 		 if(tim14.ClockTime%200==0)  sentry_decision_control();
 		Change_BrainMode(&Brain);
 
@@ -88,7 +88,7 @@ if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 //			FLAG_Send=0;
 //		}
 		if (tim14.ClockTime%200==0)
-			UsarttoWifi("%d\r\n",Brain.Lidar.vx);
+			UsarttoWifi("%d,%d,%d,%.2f\r\n",Brain.Lidar.vx,Brain.Lidar.mode,Brain.Lidar.movemode,INS_attitude->roll);
 		
 		if (referee2022.game_status.game_progress!=4) bullet_num_17mm=0; 
 		

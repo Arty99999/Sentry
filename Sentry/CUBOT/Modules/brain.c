@@ -338,7 +338,7 @@ void RobotToBrain(Brain_t* Brain)
 extern int hurt_flag;
 void Change_BrainMode(Brain_t* Brain)
 {
-		if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.movemode==0&&hurt_flag==0 &&bullet_num_17mm<=300&&referee2022.game_status.game_progress==4) Brain->Autoaim.Mode=Outpost;
+		if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1&&hurt_flag==0 &&bullet_num_17mm<=300&&referee2022.game_status.game_progress==4) Brain->Autoaim.Mode=Outpost;
 else Brain->Autoaim.Mode=Autoaim;
 		
 	if (referee2022.game_robot_status.remain_HP>=400) Brain->Lidar.mode=Lidar_Outpost;
