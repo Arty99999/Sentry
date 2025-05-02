@@ -3,7 +3,7 @@
 #include "bmi088.h"
 
 #include "ET08.h"
-
+#include <arm_math.h>
 #include "holder.h"
 #include "shoot.h"
 #include "all_chassis.h"
@@ -43,10 +43,12 @@ void TIM14_Task(void)
 	{referee_Fps=referee_cnt;
 		referee_cnt=0;
 	}
-	if(tim14.ClockTime%2500==0&& Brain.Lidar.mode==3&&Brain.Lidar.Arrive==1&&change_position==0)  change_position=1;
-	else if(tim14.ClockTime%2500==0&& Brain.Lidar.mode==3&&Brain.Lidar.Arrive==1&&change_position==1)  change_position=2;
-	else if(tim14.ClockTime%2500==0&& Brain.Lidar.mode==3&&Brain.Lidar.Arrive==1&&change_position==2)  change_position=0;
 	
+	if (tim14.ClockTime%2500==0&& Brain.Lidar.mode==3)
+	{if(Brain.Lidar.Arrive==1&&change_position==0)  change_position=1;
+	else if(Brain.Lidar.Arrive==1&&change_position==1)  change_position=2;
+	else if(Brain.Lidar.Arrive==1&&change_position==2)  change_position=0;
+	}
 		if(tim14.ClockTime%1000==0) FPS_Check(&tim14_FPS);
 	if (Brain.Lidar.mode== 4&& Brain.Lidar.movemode==0) {flag000=0;a222=0;}
     if(tim14.ClockTime%10==0 &&Brain.Autoaim.mode!=Change) Brain.Autoaim.mode_cnt[Cruise]++;
@@ -67,9 +69,9 @@ if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 //	
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
-		Brain.Autoaim.Mode=Outpost;
+
 		 if(tim14.ClockTime%200==0)  sentry_decision_control();
-		Change_BrainMode(&Brain);
+		
 
 	RobotToBrain(&Brain);
 		if(rc_Ctrl_et.isOnline == 1) {;}
@@ -108,10 +110,12 @@ if (referee2022.game_robot_status.mains_power_gimbal_output==0) MotorFillData(&H
  Judege_reverge();
 Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 		if (flag01==0)
-		{MotorCanOutput(can1, 0x1ff);
+		{
+ MotorCanOutput(can1, 0x1ff);
  MotorCanOutput(can1, 0x200);
  MotorCanOutput(can2, 0x1ff);
- MotorCanOutput(can2, 0x200);}
+ MotorCanOutput(can2, 0x200);
+		}
   	//UsartDmaPrintf("%d,%d,%d,%d,%d,%d\r\n",bmi088.bmi088_Data.Raw_accel[0],bmi088.bmi088_Data.Raw_accel[1],bmi088.bmi088_Data.Raw_accel[2],bmi088.bmi088_Data.Raw_gyro[0],bmi088.bmi088_Data.Raw_gyro[1],bmi088.bmi088_Data.Raw_gyro[2]);
 //	if (tim14.ClockTime%50==0)
 //	UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
