@@ -82,6 +82,7 @@ void FPS_Check(FPS * fps)
 		fps->Vision_cnt=0;
 		fps->Gyro_Out_cnt= 0;
 	  fps->Camera_cnt=0;
+	Motor_CheckFPS();
 }
 
 void  Motor_Check(Check_Motor* check,CAN_Object canx) 

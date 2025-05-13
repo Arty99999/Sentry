@@ -69,7 +69,7 @@ void TIM14_Task(void)
 	
 			Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
 		}
-if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
+//if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 //	
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
@@ -113,10 +113,10 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 	 
 	 IMUupdate_1(&mpu6050.mpu6050_Data);
 	IMUupdate(&mpu6050.mpu6050_Data);
-//		MotorCanOutput(can1, 0x1ff);
-// MotorCanOutput(can1, 0x200);
-// MotorCanOutput(can2, 0x1ff);
-// MotorCanOutput(can2, 0x200);
+		MotorCanOutput(can1, 0x1ff);
+ MotorCanOutput(can1, 0x200);
+ MotorCanOutput(can2, 0x1ff);
+ MotorCanOutput(can2, 0x200);
 //		if (tim14.ClockTime%200==0)
 		UsartDmaPrintf("%d\r\n",Holder.Motors6020.motor[2].Data.Output);
 //	UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
