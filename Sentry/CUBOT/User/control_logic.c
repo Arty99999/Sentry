@@ -109,16 +109,13 @@ if (referee2022.game_robot_status.mains_power_gimbal_output==0) MotorFillData(&H
 
  Judege_reverge();
 Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
-	MPU6050_Read_1(&mpu6050.mpu6050_Data);
-	 
-	 IMUupdate_1(&mpu6050.mpu6050_Data);
-	IMUupdate(&mpu6050.mpu6050_Data);
+
 		MotorCanOutput(can1, 0x1ff);
  MotorCanOutput(can1, 0x200);
  MotorCanOutput(can2, 0x1ff);
  MotorCanOutput(can2, 0x200);
 //		if (tim14.ClockTime%200==0)
-		UsartDmaPrintf("%d\r\n",Holder.Motors6020.motor[2].Data.Output);
+		UsartDmaPrintf("%d,%.2f\r\n",Holder.Motors6020.motor[0].Data.RawEcd,Holder.Motors6020.motor[0].Data.Angle);
 //	UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
 //  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
 	//UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Yaw.Target_Angle,Holder.Yaw.GYRO_Angle);
