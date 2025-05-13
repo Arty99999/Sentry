@@ -116,6 +116,7 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
  MotorCanOutput(can2, 0x1ff);
  MotorCanOutput(can2, 0x200);
 		}
+		INS_attitude = INS_GetAttitude(IMU_data);
   	//UsartDmaPrintf("%d,%d,%d,%d,%d,%d\r\n",bmi088.bmi088_Data.Raw_accel[0],bmi088.bmi088_Data.Raw_accel[1],bmi088.bmi088_Data.Raw_accel[2],bmi088.bmi088_Data.Raw_gyro[0],bmi088.bmi088_Data.Raw_gyro[1],bmi088.bmi088_Data.Raw_gyro[2]);
 //	if (tim14.ClockTime%50==0)
 //	UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
@@ -132,6 +133,6 @@ void TIM13_Task(void)
 	tim14_FPS.Gyro_Out_cnt++;
 	MPU6050_Read(&mpu6050.mpu6050_Data);	
 	 IMUupdate_1(&mpu6050.mpu6050_Data);
-	if (flag00==0 ) INS_attitude = INS_GetAttitude(IMU_data);
+//	if (flag00==0 ) INS_attitude = INS_GetAttitude(IMU_data);
 	
 }
