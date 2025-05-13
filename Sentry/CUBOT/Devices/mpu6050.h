@@ -7,7 +7,7 @@
 // 需手动校准，修改数据
 #define MPU6050_GxOFFSET       -0.0100490293f
 #define MPU6050_GyOFFSET       -0.00745377829f
-#define MPU6050_GzOFFSET       -0.01659795428f
+#define MPU6050_GzOFFSET       0.0308543202f
 #define MPU6050_gNORM          9.27340317f
 
 #define MPU6050_ADDRESS       0xD0 // 从机地址0x68左移一位得到

@@ -14,7 +14,7 @@ typedef struct
 {
     UART_HandleTypeDef *Handle;
     UART_RxIdleCallback RxIdleCallback;
-    uint8_t uart_RxBuffer[100];
+    uint8_t uart_RxBuffer[200];
 	 uint8_t recv_buff_size;
 	uint8_t is_first_idle;
 } UART_Object;

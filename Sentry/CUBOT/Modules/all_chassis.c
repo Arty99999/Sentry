@@ -6,6 +6,7 @@
 #include "math.h"
 #include <ins.h>
 #include <stdlib.h>
+#include <mpu6050.h>
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define AtR 0.0174532f	              //<  3.1415 /180 角度制 转化为弧度制	
 float total_power;//总功率
@@ -19,16 +20,15 @@ float vtemp;//改VXVY用的
 float angle_to_holder;//（雷达）云台坐标系相对世界坐标系的角度
 float speed1=0;//自旋速度
 float chassis_feedforward=1;
-float lidar_check_speed;//雷达启动检查
-int cnt_3508;
+
 uint32_t band_time;
-int band_number[20]={20,78,44,70,32,65,19,99,23,66,86,19,30,6,12,56,36,74,50,27};
+int band_number[20]={20,78,44,60,32,65,19,39,23,66,76,19,30,56,12,56,36,74,50,27};
 int band_number_ins;
 	
 void Speed_Poweroutput_Control_New(AllChassis* chassis);
 void ALLChassisSetSpeed(AllChassis* chassis, float canAngle);
 void ALLChassisSetSpeedTwo(AllChassis* chassis, float canAngle);
-void Speed_Poweroutput_Control(AllChassis* chassis);
+
 	
 AllChassis allchassis={
 .Power.coefficient={
@@ -44,7 +44,7 @@ AllChassis allchassis={
   * @brief  全向轮底盘逆运动学，Inverse Kinematics ,根据chassis结构体中的movement结构体解算转速。
   * @notec  处理过后将未进行功率控制的电流参数填写到Motor结构体中。 
   */
-
+extern uint8_t flag000;
 extern int Flag_Follow;
 extern float a222;
 float nmm;
@@ -86,23 +86,23 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 				{
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;
-			else		chassis->Movement.Vomega=-3000;
+//if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;
+					chassis->Movement.Vomega=-1500;
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 					
 				}
 				else if(brain->Lidar.movemode == 1)//普通平移
 				{					
 					
-					chassis->Movement.Vx=brain->Lidar.vx*1.25;
-					chassis->Movement.Vy=brain->Lidar.vy*1.25;
+					chassis->Movement.Vx=brain->Lidar.vx;
+					chassis->Movement.Vy=brain->Lidar.vy;
 					Check_Slope(&allchassis,&Holder);
 					if (hurt_flag==1) chassis->Movement.Vomega=speed1;
 			else 	if (chassis->Movement.Slope_Flag.flag_up_up_slope==1 ) chassis->Movement.Vomega=0;
-					else chassis->Movement.Vomega=-2000;
+					else chassis->Movement.Vomega=-3000;
 				
 					
-	//	if  (Brain.Lidar.mode==4) chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
+		if  (flag000) chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 				}
 
@@ -177,37 +177,11 @@ void ALLChassisSetSpeedTwo(AllChassis* chassis, float canAngle)
 	chassis->Motors.motor[2].Data.Target = (-1) * rotated_vx +  1 * chassis->Movement.Vomega;
 	chassis->Motors.motor[3].Data.Target =   1  * rotated_vy +  1 * chassis->Movement.Vomega;	
 	
-  Speed_Poweroutput_Control(chassis);
+
 	 
 }
 
-void Speed_Poweroutput_Control(AllChassis* chassis)
-{
-  total_power=abs(chassis->Motors.motor[0].Data.Output)+abs(chassis->Motors.motor[1].Data.Output)+abs(chassis->Motors.motor[2].Data.Output)+abs(chassis->Motors.motor[3].Data.Output);
-	max_power=BasePID_SpeedControl(&chassis->Motors.BasePID, referee2022.power_heat_data.chassis_power_buffer, referee2022.power_heat_data.chassis_power);
-	power_bili=total_power/max_power;
-	if(power_bili>1)
-	{
-			for(int i=0;i<4;i++)  //< 计算底盘电机
-	{   
-		if( chassis->Motors.motor[i].Data.Target >  7800)   chassis->Motors.motor[i].Data.Target =  7800;
-		if( chassis->Motors.motor[i].Data.Target < -7800)   chassis->Motors.motor[i].Data.Target = -7800;
-		chassis->Motors.motor[i].Data.Output = BasePID_SpeedControl((BasePID_Object*)(chassis->Motors.RunPID + i), chassis->Motors.motor[i].Data.Target, chassis->Motors.motor[i].Data.SpeedRPM);
-		MotorFillData(&chassis->Motors.motor[i], chassis->Motors.motor[i].Data.Output/power_bili);
-	}
-	}
-	else
-	{
-		for(int i=0;i<4;i++)
-		{
-		if( chassis->Motors.motor[i].Data.Target >  7800)   chassis->Motors.motor[i].Data.Target =  7800;
-		if( chassis->Motors.motor[i].Data.Target < -7800)   chassis->Motors.motor[i].Data.Target = -7800;
-		chassis->Motors.motor[i].Data.Output = BasePID_SpeedControl((BasePID_Object*)(chassis->Motors.RunPID + i), chassis->Motors.motor[i].Data.Target, chassis->Motors.motor[i].Data.SpeedRPM);
-		MotorFillData(&chassis->Motors.motor[i], chassis->Motors.motor[i].Data.Output);
-		}
-	}
-	
-}
+
 void Speed_Poweroutput_Control_New(AllChassis* chassis)
 {
 	chassis->Power.target_require_power_sum =0;
@@ -229,7 +203,7 @@ void Speed_Poweroutput_Control_New(AllChassis* chassis)
         chassis->Power.target_require_power_sum += chassis->Power.initial_give_power[i];
     }
 
-chassis->Power.refereeData.max_power=100+(referee2022.power_heat_data.chassis_power_buffer-15)*2;
+chassis->Power.refereeData.max_power=referee2022.game_robot_status.chassis_power_limit+(referee2022.power_heat_data.chassis_power_buffer-40)*2;
 		chassis->Power.scaling_ratio =chassis->Power.refereeData.max_power	 / chassis->Power.target_require_power_sum;
     chassis->Power.scaling_ratio = LIMIT(chassis->Power.scaling_ratio, 0, 1);
 	
@@ -308,11 +282,15 @@ void Check_Slope(AllChassis *chassis,Holder_t* holder)
 //	{Cnt_stat=100;chassis->Movement.Slope_Flag.flag_up_up_slope=0;chassis->Movement.Slope_Flag.flag_up_down_slope=0;chassis->Movement.Slope_Flag.flag_down_up_slope=0;chassis->Movement.Slope_Flag.flag_down_down_slope=0;chassis->Movement.Slope_Flag.flag_up_stat_slope=0;chassis->Movement.Slope_Flag.flag_down_stat_slope=0;}
 //		
 
-		if (pow(holder->Pitch.GYRO_Angle-holder->Pitch.Can_Angle,2)+pow(INS_attitude->roll,2)>64) 
-			Cnt_up_slope++;else Cnt_up_slope=0;
-		if (Cnt_up_slope>100)
-		{chassis->Movement.Slope_Flag.flag_up_up_slope=1;Cnt_down_slope=100;}
-		else chassis->Movement.Slope_Flag.flag_up_up_slope=0;
+		if (pow(mpu6050.Pitch+1.5,2)+pow(mpu6050.Roll-2,2)>100) 
+			Cnt_up_slope++;else Cnt_up_slope--;
+		if (Cnt_up_slope>300)
+		{chassis->Movement.Slope_Flag.flag_up_up_slope=1;}else chassis->Movement.Slope_Flag.flag_up_up_slope=0;
+		if (Cnt_up_slope>600)
+		{Cnt_up_slope=600;}
+		if (Cnt_up_slope<=0)
+		{Cnt_up_slope=0;}
+		
 			
 	
 }

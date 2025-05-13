@@ -68,6 +68,7 @@ void SystemClock_Config(void);
 #include "bmi088.h"
 int flag00=0;
 int flag01=0;
+extern uint8_t flag_Wifi;
 /* USER CODE END 0 */
 
 /**
@@ -125,18 +126,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		if (INS_attitude->pitch==180) {
-		flag01=1;
-      flag00=1;
-			HAL_Delay(2000);
-        float init_quaternion[4] = {0};
-        InitQuaternion(init_quaternion, &bmi088.bmi088_Data);
-        IMU_QuaternionEKF_Init(init_quaternion, 10, 0.001, 1000000, 1, 0);
-			flag00=0;
-					HAL_Delay(1000);
-				flag01=0;
-	}
-		
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

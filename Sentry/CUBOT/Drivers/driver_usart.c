@@ -104,7 +104,7 @@ void UARTx_Init(UART_HandleTypeDef* handle, UART_RxIdleCallback rxIdleCallback)
 			uart->RxIdleCallback=rxIdleCallback;
 			__HAL_UART_CLEAR_IDLEFLAG(uart->Handle);
 			__HAL_UART_ENABLE_IT(uart->Handle, UART_IT_IDLE); 
-		 HAL_UART_Receive_DMA(uart->Handle, uart->uart_RxBuffer,100);		
+		 HAL_UART_Receive_DMA(uart->Handle, uart->uart_RxBuffer,200);		
     }
 		
 		
@@ -127,14 +127,14 @@ void UART_Idle_Handler(UART_HandleTypeDef *huart)
         HAL_UART_DMAStop(uart->Handle);          
         __HAL_UART_CLEAR_IDLEFLAG(uart->Handle); 
         __HAL_UART_CLEAR_OREFLAG(uart->Handle);
-        usart_rx_num = 100- ((DMA_Stream_TypeDef *)uart->Handle->hdmarx->Instance)->NDTR;
+        usart_rx_num = 200- ((DMA_Stream_TypeDef *)uart->Handle->hdmarx->Instance)->NDTR;
 
 			if (uart->is_first_idle==0)  {uart->is_first_idle=1;}
 			else uart->RxIdleCallback(uart->uart_RxBuffer, usart_rx_num); //<用户回调
                 
   
         HAL_UART_DMAResume(uart->Handle);
-        HAL_UART_Receive_DMA(uart->Handle, uart->uart_RxBuffer,100);
+        HAL_UART_Receive_DMA(uart->Handle, uart->uart_RxBuffer,200);
     }
 }
 

@@ -75,7 +75,7 @@ uint8_t vofa_callback(uint8_t * recBuffer, uint16_t len)
 {
 	return 0;
 }
-
+uint8_t flag_Wifi;
 uint8_t Wifi_callback(uint8_t * recBuffer, uint16_t len);
 void HardwareConfig(void)
 {
@@ -123,7 +123,7 @@ void HardwareConfig(void)
 	UARTx_Init(&huart2, Brain_Autoaim_callback);
 	
 	UARTx_Init(&huart5, Brain_Lidar_callback);
-
+UARTx_Init(&huart8,Wifi_callback);
 	
 	UARTx_Init(&huart3, Referee_callback);
 
@@ -132,21 +132,9 @@ void HardwareConfig(void)
 
 	
 	UARTx_Init(&huart4, Brain_Camera_callback);  
-UARTx_Init(&huart8,Wifi_callback);
-	UARTx_Init(&huart7, Vofa_callback);
-	UsarttoWifi("+++");
-	HAL_Delay(1500);
-		UsarttoWifi("+++");
-	HAL_Delay(1500);
-	int i=0;
-	while (uart8.uart_RxBuffer[11]!=0x2B &&uart8.uart_RxBuffer[21]!=0x55)
-	{
 
-	UsarttoWifi("AT+CWJAP?\r\n");
-		HAL_Delay(1000);
-		i++;
-		if (i>=15) break;
-	}
+	UARTx_Init(&huart7, Vofa_callback);
+
 //	
 //	while (uart4.uart_RxBuffer[15]!=0x4F &&uart4.uart_RxBuffer[21]!=0x62)
 //	{
@@ -159,11 +147,7 @@ UARTx_Init(&huart8,Wifi_callback);
 //	HAL_Delay(2000);
 //	}
 
-	UsarttoWifi("AT+CIPSTART=\"UDP\",\"192.168.1.72\",8080\r\n");
-	HAL_Delay(500);
-  UsarttoWifi("AT+CIPMODE=1\r\n");
-	HAL_Delay(500);
-	UsarttoWifi("AT+CIPSEND\r\n");
+
 	
 //	
 	
@@ -177,10 +161,27 @@ UARTx_Init(&huart8,Wifi_callback);
 	
 	INS_Init(&bmi088.bmi088_Data); // 
   MPU6050_Init(&mpu6050.mpu6050_Data);
-	
+		UsarttoWifi("+++");
+	HAL_Delay(1000);
+		UsarttoWifi("+++");
+HAL_Delay(1000);	
+	int i=0;
+	while (uart8.uart_RxBuffer[11]!=0x2B ||uart8.uart_RxBuffer[20]!=0x55)
+	{
 
-
-
+	UsarttoWifi("AT+CWJAP?\r\n");
+		HAL_Delay(1000);
+		i++;
+		if (i>=15) break;
+	}
+if (i!=15) flag_Wifi=1;else flag_Wifi=0;
+	if (flag_Wifi)
+	{UsarttoWifi("AT+CIPSTART=\"UDP\",\"192.168.1.72\",8080\r\n");
+	HAL_Delay(500);
+  UsarttoWifi("AT+CIPMODE=1\r\n");
+	HAL_Delay(500);
+	UsarttoWifi("AT+CIPSEND\r\n");}
+HAL_Delay(1000);
 		TIMx_Init(&htim14, TIM14_Task);
 	TIM_Open(&tim14);
 

@@ -25,7 +25,7 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 {
 	MotorInit(&holder->Motors6020.motor[0],5645 ,Motor6020,CAN2,0x205);   
 	MotorInit(&holder->Motors6020.motor[1], 6993 ,Motor6020,canx,0x206);
-	MotorInit(&holder->Motors6020.motor[2], 4898 ,Motor6020,canx,0x205);   
+	MotorInit(&holder->Motors6020.motor[2], 6000 ,Motor6020,canx,0x205);   
 
 	DualPID_Init(&holder->Pitch.PID,pitch_pid->ShellPID,pitch_pid->CorePID);
   DualPID_Init(&holder->Yaw.PID,yaw_pid->ShellPID,yaw_pid->CorePID);
@@ -40,8 +40,8 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 	holder->up_litmit=29;
 	holder->down_litmit=-35;//-35
 	
-	holder->right_litmit=-90;
-	holder->left_litmit=84;
+	holder->right_litmit=-85;
+	holder->left_litmit=70;
 }
 uint8_t flag000;
 uint32_t m=0;
@@ -49,14 +49,16 @@ int cntmm;
 extern float a222;
 extern uint8_t referee_Fps;
 float y3,k3;
+ extern int hurt_flag;
+int cntxx;
 void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain) 
 {
 	static int16_t yaw_time,pitch_time;
 	holder->Pitch.Target_Angle -= ((rc_ctrl->rc.ch3 -1024) * holder->Pitch.Sensitivity);
 	if(rc_ctrl->rc.s2!=1) holder->Yaw.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 	else if(rc_ctrl->rc.s2==1)holder->Yaw1.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
-		//&&tim14_FPS.Vision_FPS>0
-	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&& (referee_Fps==0 ||referee2022.game_status.game_progress==4))
+
+	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&& (referee_Fps==0 ||(referee2022.game_status.game_progress==4&&tim14_FPS.Vision_FPS>0)))
 			{
 //				if (brain->Autoaim.Last_mode!=Cruise)
 //				{
@@ -65,35 +67,39 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 //				}
 				
 		m++;
-				if (m<=10000) 
+				if (m<=14000) 
 				{
 					holder->Cruise_Mode.pitch_time++;
 				holder->Cruise_Mode.yaw1_time++;
 					
 				}
-				else if (m>14000) {m=0;}
+				else if (m>15000) {m=0;}
 				else {holder->Cruise_Mode.pitch_time=0;holder->Cruise_Mode.yaw1_time=0;}
 				if (brain->Autoaim.Mode==Autoaim)
 				{Holder.Yaw1.Target_Angle = 85.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
 			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
 				
 				else 
-				{Holder.Yaw1.Target_Angle = 85.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
+				{Holder.Yaw1.Target_Angle = 65.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
 			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
 			}
 			else m=0;
 			if (a222!=0 && flag000==0&& rc_ctrl->rc.s1==2&&Brain.Lidar.mode==4) {  if (a222>180) Holder.Yaw.Target_Angle-=(a222-360)*57.3;else Holder.Yaw.Target_Angle-=a222*57.3;flag000=1;}
 
-//			if (brain->Autoaim.mode==Cruise && brain->Autoaim.Mode==Outpost) cntmm++;else cntmm=0;
-//				if (cntmm>4000) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
+			if (brain->Autoaim.mode==Cruise && brain->Autoaim.Mode==Outpost&&referee2022.game_status.game_progress==4) cntmm++;else cntmm=0;
 				
+				if (cntmm>3000) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
+				if (brain->Autoaim.mode==Cruise && hurt_flag==1) cntxx++;else cntxx=0;
+				if (cntxx>1500) {Holder.Yaw.Target_Angle-=180;cntxx=0;}
 				
 		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise)
 		{
 			brain->Autoaim.mode=Change;
+//
 		Camare_control(brain,holder);
 		brain->All_See.mode=Wait;
 		}	
+			
 		if (holder->Yaw1.Can_Angle>61) holder->down_litmit=-19;else holder->down_litmit=-35;
 	
 	holder->Yaw.Can_Angle = holder->Motors6020.motor[0].Data.Angle;
@@ -194,7 +200,7 @@ void Camare_control(Brain_t* brain,Holder_t* holder)
 {
 	
 	uint8_t Target=Choose_Target(brain);
-	
+
 	Target_Angle=30+(brain->All_See.Camera_Index[Target]*60)+brain->All_See.Yaw_add[Target];
   yaw1_Angle=90-holder->Yaw1.Can_Angle;
 	if ((Target_Angle+yaw1_Angle)<180)
@@ -252,6 +258,8 @@ uint8_t Choose_Target(Brain_t* brain)
         }
     }
 
+		
+		
     return best_index;
 		
 		

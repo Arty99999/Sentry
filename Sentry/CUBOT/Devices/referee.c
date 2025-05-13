@@ -45,7 +45,7 @@ uint8_t Referee_callback(uint8_t * recBuffer, uint16_t len)
   Referee_Data_Diapcak(recBuffer,len);
 	return 0;
 }
-int blue_3=1;
+int blue_3=0;
 extern uint8_t referee_cnt;
 /******************************************************************
 函数名；_Data_Diapcak
@@ -272,10 +272,14 @@ if (Brain.Autoaim.Mode==Outpost)
 			BYTE3(referee2022.map_command_t.target_position_y)=*(pdata+data_addr+7);
 			
 			referee2022.map_command_t.cmd_keyboard=*(pdata+data_addr+8);
+			
+			if (referee2022.map_command_t.cmd_keyboard=='F'&&fabs(referee2022.map_command_t.target_position_y-8)<2) blue_3=1;
+			else blue_3=0;
 //			if(referee2022.map_command_t.cmd_keyboard!=0)
 //			{
 //			lidar_mode++;
 //			}
+			
 		}
 }
 
@@ -484,8 +488,8 @@ void Append_CRC16_Check_Sum(uint8_t * pchMessage,uint32_t dwLength)
 void sentry_decision_control()//复活，买弹逻辑
 {
   referee2022.sentry_info_t.sentry_respawn_flag = (referee2022.game_robot_status.remain_HP == 0) ? 1 : 0;
-	if (referee2022.bullet_remaining.bullet_remaining_num<=50)
-referee2022.sentry_info_t.sentry_shooting_num+=100;
+//	if (referee2022.bullet_remaining.bullet_remaining_num<=50)
+//referee2022.sentry_info_t.sentry_shooting_num+=100;
 
 	sentry_decision=referee2022.sentry_info_t.sentry_respawn_flag+referee2022.sentry_info_t.sentry_shooting_num*4+referee2022.sentry_info_t.sentry_shooting_num_far*4096;
 	sentry_send_meseage();
@@ -543,3 +547,37 @@ void Judege_reverge()
 	}
 	
 }
+//void Referee_Data_Diapcak(uint8_t *data,uint8_t this_time_len)
+//{
+//	uint32_t Verify_CRC8_OK;
+//	uint32_t Verify_CRC16_OK;
+//  uint8_t i = 0;
+//	uint8_t pack_size=0;
+//	while(pack_size < this_time_len&&*data==0xA5)
+//		{
+//			referee2022.frame_info.head.sof=*data;
+//			referee2022.frame_info.head.data_len=*(data+2)| *(data+1);
+//			
+//		pack_size += (7+referee2022.frame_info.head.data_len+2);
+//			if (pack_size>=200)  break;
+//			referee2022.frame_info.head.seq=*(data+3);//包序号
+//			referee2022.frame_info.head.crc8=*(data+4); 				
+//			referee2022.frame_info.cmd_id=*(data+6)<<8|*(data+5); 
+//			
+//			Verify_CRC8_OK=Verify_CRC8_Check_Sum(data, frame_header_len);
+//			Verify_CRC16_OK= Verify_CRC16_Check_Sum(data,pack_len);	
+
+//			if((Verify_CRC8_OK==1)&&(Verify_CRC16_OK==1))  //校验通过
+//			{
+//				memcpy(ref_packge[i],  data, 7+referee2022.frame_info.head.data_len+2);	
+//				_Data_Diapcak(ref_packge[i]);					
+//				i++;
+//			}
+//		data += (7+referee2022.frame_info.head.data_len+2);
+//		//	check_robot_state.usart_state.Check_referee = 0;
+
+//		
+//	}
+//	index_i = i;
+//	if (index_i>max_i) max_i=index_i;//用于在debug中观察
+//}

@@ -25,7 +25,7 @@ void AmmoBoosterInit(Ammo_Booster *ammo_booster,BasePID_Object* friction_pid, Ba
 	BasePID_Init(&ammo_booster->Friction_Wheel.Friction_PID[1], friction_pid1->Kp, friction_pid1->Ki, friction_pid1->Kd, friction_pid1->KiPartDetachment);
 
 	
-	ammo_booster->Shoot_Plate.Fire_Rate = 8000;//5250
+	ammo_booster->Shoot_Plate.Fire_Rate = 8000;//5250//8000
 	ammo_booster->Shoot_Plate.Fire_Margin = 40;
 	ammo_booster->Shoot_Plate.Angle_Sense = 0.1689f;
 
@@ -53,7 +53,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 	if(rc_Ctrl_et.isOnline == 1&&ammo_booster->Shoot_Plate.heat_status==1)   ///
 	{
     if(referee2022.power_heat_data.shooter_id1_17mm_cooling_heat >= referee2022.game_robot_status.shooter_id1_17mm_cooling_limit - ammo_booster->Shoot_Plate.Fire_Margin-70)
-			ammo_booster->Shoot_Plate.Fire_Divider=125;else ammo_booster->Shoot_Plate.Fire_Divider=50;	
+			ammo_booster->Shoot_Plate.Fire_Divider=125;else if (Brain.Autoaim.Mode==Outpost)ammo_booster->Shoot_Plate.Fire_Divider=50;	else ammo_booster->Shoot_Plate.Fire_Divider=50;
      	
 		if (ammo_booster->Shoot_Plate.Shoot_rest_flag) ammo_booster->Shoot_Plate.Shoot_Cut++;
  		if (ammo_booster->Shoot_Plate.Shoot_Cut==ammo_booster->Shoot_Plate.Fire_Divider) ammo_booster->Shoot_Plate.Shoot_rest_flag=0;
@@ -89,15 +89,15 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 	else
 		ammo_booster->Shoot_Plate.Plate_Out = BasePID_SpeedControl(&ammo_booster->Shoot_Plate.RunPID, 0, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
 
-	if(ammo_booster->Shoot_Plate.Target_Angle - ammo_booster->Shoot_Plate.Plate_Angle > 5 && ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM < 1000)
+	if(ammo_booster->Shoot_Plate.Target_Angle - ammo_booster->Shoot_Plate.Plate_Angle > 5 && ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM < 400)
 	{
 		kadan++;
-		if(kadan >= 200)
+		if(kadan >= 900)
 		{
 			ammo_booster->Shoot_Plate.Target_Angle = ammo_booster->Shoot_Plate.Plate_Angle+6;
 			kadan++;
 			ammo_booster->Shoot_Plate.Plate_Out = BasePID_SpeedControl(&ammo_booster->Shoot_Plate.RunPID, -2000, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
-			if(kadan > 1200) kadan = 0;
+			if(kadan > 1600) kadan = 0;
 				
 		}	
 	}

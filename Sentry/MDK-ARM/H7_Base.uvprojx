@@ -311,7 +311,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>7</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1959,14 +1959,14 @@
           <GroupName>Cubot/User</GroupName>
           <Files>
             <File>
-              <FileName>control_logic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CUBOT\User\control_logic.c</FilePath>
-            </File>
-            <File>
               <FileName>hardware_config.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\CUBOT\User\hardware_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>control_logic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\User\control_logic.c</FilePath>
             </File>
           </Files>
         </Group>
