@@ -82,6 +82,7 @@ void FPS_Check(FPS * fps)
 		fps->Vision_cnt=0;
 		fps->Gyro_Out_cnt= 0;
 	  fps->Camera_cnt=0;
+	Motor_CheckFPS();
 }
 
 void  Motor_Check(Check_Motor* check,CAN_Object canx) 
@@ -134,4 +135,5 @@ for (node = can2.DevicesList.next;    		//< 对循环链表遍历一圈
     motor->Data.Online_check.FPS=motor->Data.Online_check.Cnt;
 		motor->Data.Online_check.Cnt=0;
 	}
+	
 }

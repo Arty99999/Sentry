@@ -66,6 +66,7 @@ void SystemClock_Config(void);
 #include "ins.h"
 #include "check.h"
 #include "bmi088.h"
+#include "mpu6050.h"
 int flag00=0;
 int flag01=0;
 extern uint8_t flag_Wifi;
@@ -128,7 +129,10 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-
+	MPU6050_Read(&mpu6050.mpu6050_Data);
+	 
+	 IMUupdate_1(&mpu6050.mpu6050_Data);
+	IMUupdate(&mpu6050.mpu6050_Data);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
