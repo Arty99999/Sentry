@@ -206,7 +206,7 @@ mpu6050_data->gyro[1]=0;
     mpu6050_raw_temp      = (int16_t)(gyroBuf_[0] << 8) | gyroBuf_[1];
 	  mpu6050_data->Raw_gyro[2]=mpu6050_raw_temp ;
     mpu6050_data->gyro[2] = mpu6050_raw_temp * MPU6050_GYRO_SEN - mpu6050_data->gyro_offset[2];
-		if (abs(mpu6050_data->gyro[2]/MPU6050_GYRO_SEN)<30) mpu6050_data->gyro[2]=0;
+		if (fabs(mpu6050_data->gyro[2]/MPU6050_GYRO_SEN)<30) mpu6050_data->gyro[2]=0;
 
 }
 
