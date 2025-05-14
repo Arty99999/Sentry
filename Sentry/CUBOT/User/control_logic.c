@@ -96,8 +96,8 @@ void TIM14_Task(void)
 //		if (tim14.ClockTime%200==0)
 //			UsarttoWifi("%d,%.2f,%.2f,%d,%d,%d,%d,%d,%d\r\n",Brain.Lidar.vx,allchassis.Movement.Vx,allchassis.Movement.Vomega,Brain.Lidar.mode,referee2022.power_heat_data.chassis_power_buffer,referee2022.game_status.stage_remain_time,tim14_FPS.Lidar_FPS,m00,bmi088.bmi088_Data.Raw_accel[0]);
 //		
-		if (tim14.ClockTime%200==0)
-		  	UsarttoWifi("%d,%.2f,%d,%d,%.2f,%.2f,%d,%d,%d,%d\r\n",bmi088.bmi088_Data.Raw_accel[0],INS_attitude->roll,m00,Brain.Lidar.vx,allchassis.Movement.Vx,allchassis.Movement.Vomega,tim14_FPS.Lidar_FPS,allchassis.Motors.motor[0].Data.Output,allchassis.Power.refereeData.max_power,referee2022.game_status.stage_remain_time);
+		//if (tim14.ClockTime%200==0)
+		  	//UsarttoWifi("%d,%.2f,%d,%d,%.2f,%.2f,%d,%d,%d,%d\r\n",bmi088.bmi088_Data.Raw_accel[0],INS_attitude->roll,m00,Brain.Lidar.vx,allchassis.Movement.Vx,allchassis.Movement.Vomega,tim14_FPS.Lidar_FPS,allchassis.Motors.motor[0].Data.Output,allchassis.Power.refereeData.max_power,referee2022.game_status.stage_remain_time);
 		if (referee2022.game_status.game_progress!=4) bullet_num_17mm=0; 
 		
 		
@@ -110,10 +110,10 @@ if (referee2022.game_robot_status.mains_power_gimbal_output==0) MotorFillData(&H
  Judege_reverge();
 Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 
-		MotorCanOutput(can1, 0x1ff);
- MotorCanOutput(can1, 0x200);
- MotorCanOutput(can2, 0x1ff);
- MotorCanOutput(can2, 0x200);
+//		MotorCanOutput(can1, 0x1ff);
+// MotorCanOutput(can1, 0x200);
+// MotorCanOutput(can2, 0x1ff);
+// MotorCanOutput(can2, 0x200);
 //		if (tim14.ClockTime%200==0)
 		UsartDmaPrintf("%d,%.2f\r\n",Holder.Motors6020.motor[0].Data.RawEcd,Holder.Motors6020.motor[0].Data.Angle);
 //	UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
@@ -128,10 +128,8 @@ int cnt1111;
 void TIM13_Task(void)
 {
 	tim14_FPS.Gyro_Out_cnt++;
-	MPU6050_Read_1(&mpu6050.mpu6050_Data);
-	 
-	 IMUupdate_1(&mpu6050.mpu6050_Data);
-	IMUupdate(&mpu6050.mpu6050_Data);
-	
+	MPU6050_Read(&mpu6050.mpu6050_Data,IT_MODE);
+//	 IMUupdate_1(&mpu6050.mpu6050_Data);
+	IMUupdate_1(&mpu6050.mpu6050_Data);
 	INS_attitude = INS_GetAttitude(IMU_data);
 }

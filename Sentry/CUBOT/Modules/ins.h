@@ -21,23 +21,30 @@
 #define X               0
 #define Y               1
 #define Z               2
-
+typedef enum {
+    BLOCK_MODE, // 默认使用阻塞模式
+    IT_MODE,
+    DMA_MODE,
+} Device_MODE;
 #define INS_TASK_PERIOD 1
 
 typedef struct _IMU_InitData_t
 {
     float accel[3];
     float gyro[3];
-    float temp_when_cali;
+	  float gyro_offset[3];
+	
+    float temp_when_cali;//标定温度
     float temperature;
     float accel_scale;
-    float gyro_offset[3];
-    float g_norm;
-	  I2C_HandleTypeDef *i2cHandler;
-		  int16_t Raw_accel[3];
-	  int16_t Raw_gyro[3];
+	
+    int16_t Raw_accel[3];
+    int16_t Raw_gyro[3];
+	
     uint8_t (*Init)(struct _IMU_InitData_t *);
-    void (*Read)(struct _IMU_InitData_t *);
+    void (*Read)(struct _IMU_InitData_t *,Device_MODE mode);
+	
+	 Device_MODE mode;
 } IMU_InitData_t;
 
 typedef struct

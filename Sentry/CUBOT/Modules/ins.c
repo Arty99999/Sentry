@@ -14,10 +14,17 @@
 #include "ins.h"
 #include "user_lib.h"
 #include "bmi088.h"
+#include "mpu6050.h"
 
 
-Attitude_t* INS_attitude;
-IMU_InitData_t* IMU_data;
+
+
+
+
+
+
+Attitude_t *INS_attitude;
+IMU_InitData_t *IMU_data;
 static INS_t ins                           = {0};
 static IMU_CorrectParam_t IMU_paramCorrect = {0};
 
@@ -30,20 +37,20 @@ static uint32_t INS_DWT_Count = 0;
 
 static void IMU_Param_Correction(IMU_CorrectParam_t *param, float gyro[3], float accel[3]);
 
-// 使用加速度计的数据初始化Roll和Pitch,而Yaw置0,作为初始姿态
+// 使用加速度计的数据初始化Roll和Pitch,而Yaw置0,这样可以避免在初始时候的姿态估计误差
 /**
  * @brief
  *
  * @param init_q4
  */
-void InitQuaternion(float *init_q4, IMU_InitData_t *imu_data)
+static void InitQuaternion(float *init_q4, IMU_InitData_t *imu_data)
 {
     float acc_init[3]     = {0};
     float gravity_norm[3] = {0, 0, 1}; // 导航系重力加速度矢量,归一化后为(0,0,1)
     float axis_rot[3]     = {0};       // 旋转轴
     // 读取100次加速度计数据,取平均值作为初始值
     for (uint8_t i = 0; i < 100; ++i) {
-        imu_data->Read(imu_data);
+        imu_data->Read(imu_data,BLOCK_MODE);
         acc_init[X] += imu_data->accel[X];
         acc_init[Y] += imu_data->accel[Y];
         acc_init[Z] += imu_data->accel[Z];
@@ -60,12 +67,7 @@ void InitQuaternion(float *init_q4, IMU_InitData_t *imu_data)
     for (uint8_t i = 0; i < 2; ++i)
         init_q4[i + 1] = axis_rot[i] * sinf(angle / 2.0f); // 轴角公式,第三轴为0(没有z轴分量)
 }
-// 将初始化函数和读取函数传入结构体
-static void IMU_FuncInit(void)
-{
-	  bmi088.bmi088_Data.Init   = BMI088_Init;
-    bmi088.bmi088_Data.Read   = BMI088_Read;
-}
+
 /**
  * @brief 初始化惯导解算系统
  *
@@ -73,11 +75,10 @@ static void IMU_FuncInit(void)
  */
 uint8_t INS_Init(IMU_InitData_t *imu_data)
 {
-    IMU_FuncInit();
 	IMU_data = imu_data;
     if (ins.init_done)
-        return ins.init_done;//意义不明
-    else {                                             
+        return ins.init_done;
+    else {
         while (imu_data->Init(imu_data) != 0) ;
         IMU_paramCorrect.scale[X] = 1;
         IMU_paramCorrect.scale[Y] = 1;
@@ -100,7 +101,6 @@ uint8_t INS_Init(IMU_InitData_t *imu_data)
         return ins.init_done;
     }
 }
-int m00;
 /**
  * @brief INS解算
  * @attention 此函数放入实时系统中,以1kHz频率运行。p.s. osDelay(1);
@@ -117,23 +117,17 @@ Attitude_t *INS_GetAttitude(IMU_InitData_t *imu_data)
     dt = DWT_GetDeltaT(&INS_DWT_Count);
     t += dt;
 
-    imu_data->Read(imu_data);
-if (bmi088.bmi088_Data.Raw_accel[0]!=0||bmi088.bmi088_Data.Raw_accel[1]!=0||bmi088.bmi088_Data.Raw_accel[2]!=0)
-{ins.attitude.accel[X] = imu_data->accel[X];
+    imu_data->Read(imu_data,imu_data->mode);
+
+    ins.attitude.accel[X] = imu_data->accel[X];
     ins.attitude.accel[Y] = imu_data->accel[Y];
     ins.attitude.accel[Z] = imu_data->accel[Z];
     ins.attitude.gyro[X]  = imu_data->gyro[X];
     ins.attitude.gyro[Y]  = imu_data->gyro[Y];
     ins.attitude.gyro[Z]  = imu_data->gyro[Z];
-}
-else 
-{
-	m00++;
-	
-	
-}
+
     // demo function,用于修正安装误差,可以不管,暂时没用
-  //  IMU_Param_Correction(&IMU_paramCorrect, ins.attitude.gyro, ins.attitude.accel);
+    IMU_Param_Correction(&IMU_paramCorrect, ins.attitude.gyro, ins.attitude.accel);
 
     // 计算重力加速度矢量和b系的XY两轴的夹角,可用作功能扩展,暂时没用
     ins.atanxz = -atan2f(ins.attitude.accel[X], ins.attitude.accel[Z]) * 180 / PI;
@@ -225,12 +219,12 @@ static void IMU_Param_Correction(IMU_CorrectParam_t *param, float gyro[3], float
     if (fabsf(param->yaw - lastYawOffset) > 0.001f ||
         fabsf(param->pitch - lastPitchOffset) > 0.001f ||
         fabsf(param->roll - lastRollOffset) > 0.001f || param->flag) {
-//        cosYaw   = arm_cos_f32(param->yaw / 57.295779513f);
-//        cosPitch = arm_cos_f32(param->pitch / 57.295779513f);
-//        cosRoll  = arm_cos_f32(param->roll / 57.295779513f);
-//        sinYaw   = arm_sin_f32(param->yaw / 57.295779513f);
-//        sinPitch = arm_sin_f32(param->pitch / 57.295779513f);
-//        sinRoll  = arm_sin_f32(param->roll / 57.295779513f);
+        cosYaw   = cos(param->yaw / 57.295779513f);
+        cosPitch = cos(param->pitch / 57.295779513f);
+        cosRoll  = cos(param->roll / 57.295779513f);
+        sinYaw   = sin(param->yaw / 57.295779513f);
+        sinPitch = sin(param->pitch / 57.295779513f);
+        sinRoll  = sin(param->roll / 57.295779513f);
 
         // 1.yaw(alpha) 2.pitch(beta) 3.roll(gamma)
         c_11        = cosYaw * cosRoll + sinYaw * sinPitch * sinRoll;
