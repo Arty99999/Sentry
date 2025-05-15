@@ -69,10 +69,10 @@ CAN_TxBuffer txBuffer0x2FFforCAN2 = {
  * @brief  ±àÂëÆ÷½âËãº¯Êý£¬±àÂëÆ÷¿Ì¶È×ª»»Îª½Ç¶È
  */
 
-		
+	int8_t num = 0;	
 static void MotorEcdtoAngle(Motor *motor)
 {
-    static int8_t num = 0;
+ 
     int16_t total_ecd,a,b;
     if (motor->Param.CanId == 0x205 && motor->Param.CanNumber == CAN2) {
         if (motor->Data.Ecd < 1000 && motor->Data.Ecd >= 0 && motor->Data.LastEcd < 8192 && motor->Data.LastEcd >7191) {
@@ -90,8 +90,8 @@ static void MotorEcdtoAngle(Motor *motor)
             total_ecd -= motor->Param.EcdFullRange*2+1;
         motor->Data.Angle = K_ECD_TO_ANGLE * (total_ecd - motor->Param.EcdOffset) / 2;
 				
-				
-				
+			//	motor->Data.Online_check.Cnt++;
+				UsartDmaPrintf("%d,%d,%d,%.2f\r\n",num,motor->Data.Ecd,motor->Data.LastEcd,motor->Data.Angle);
     } else {
         if ((&motor->Param)->EcdOffset < ((&motor->Param)->EcdFullRange / 2)) {
             if (motor->Data.Ecd > (motor->Param.EcdOffset + motor->Param.EcdFullRange / 2))

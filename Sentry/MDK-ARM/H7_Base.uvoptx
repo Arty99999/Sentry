@@ -233,6 +233,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>bmi088,0x0A</ItemText>
         </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>num</ItemText>
+        </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
