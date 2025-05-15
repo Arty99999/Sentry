@@ -67,7 +67,7 @@ uint8_t Brain_Autoaim_callback(uint8_t * recBuffer, uint16_t len)
 uint8_t Brain_Camera_callback(uint8_t * recBuffer, uint16_t len)
 {
 	tim14_FPS.Camera_cnt++;
-  Brain_Camera_DataUnpack(&Brain,recBuffer);
+  Brain_Camera_DataUnpack_New(&Brain,recBuffer);
 	return 0;
 }
 
@@ -127,7 +127,46 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
 		
 	}
 }
+void Brain_Camera_DataUnpack_New(Brain_t* Brain ,uint8_t * recBuffer)//解包雷达数据
+{
+	uint8_t k=0;
+	if(recBuffer[0]==0xAA  &&recBuffer[1]<5)
+	{
+		Brain->All_See.Find_size=recBuffer[1];
+		if ( Brain->All_See.Find_size==0) 
+		{
+			memset(&Brain->All_See.Camera_Index, 0, 
+       sizeof(Brain->All_See.Camera_Index) + 
+       sizeof(Brain->All_See.armorNumber) + 
+       sizeof(Brain->All_See.Pitch_add) + 
+       sizeof(Brain->All_See.Yaw_add) + 
+       sizeof(Brain->All_See.Distance));
+		}
+		
+		
+		if	(Brain->All_See.mode!=Wait) Brain->All_See.mode=None;
+		
+for (int i=0;i< Brain->All_See.Find_size;i++)
+			{     
+				if	(Brain->All_See.mode!=Wait) Brain->All_See.mode_cnt[Found]++;else Brain->All_See.mode_cnt[Found]=0;
+				
+		  Brain->All_See.armorNumber[i] = recBuffer[i*6+2];
 
+			Brain->All_See.Distance[i]=10*recBuffer[i*6+7];
+					if((recBuffer[i*6+3] >> 7) == 0) 
+				Brain->All_See.Yaw_add[i] = ((float)((recBuffer[i*6+3]&0x7f)*100 + recBuffer[i*6+4])/100);
+			else if((recBuffer[i*6+3] >> 7) == 1) 
+				Brain->All_See.Yaw_add[i] = (-1) * ((float)((recBuffer[i*6+3]&0x7f)*100 + recBuffer[i*6+4])/100);
+			
+			if((recBuffer[i*6+5] >> 7) == 0) 
+				Brain->All_See.Pitch_add[i] = ((float)((recBuffer[i*6+5]&0x7f)*100 + recBuffer[i*6+6])/100);
+			else if((recBuffer[i*6+5] >> 7) == 1) 
+				Brain->All_See.Pitch_add[i] = (-1) * ((float)((recBuffer[i*6+5]&0x7f)*100 + recBuffer[i*6+6])/100);
+       
+		}
+		
+	}
+}
 float a222;
 void Brain_Lidar_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//解包雷达数据
 {

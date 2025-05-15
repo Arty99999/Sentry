@@ -113,6 +113,7 @@ uint8_t Brain_Camera_callback(uint8_t * recBuffer, uint16_t len);
 void Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer);//解包自瞄数据
 void Brain_Lidar_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer);//解包雷达数据
 void Brain_Camera_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer);//解包雷达数据
+void Brain_Camera_DataUnpack_New(Brain_t* Brain ,uint8_t * recBuffer);
 void RobotToBrain_Autoaim(float yaw,Brain_t* brain);//发给自瞄	
 extern 	UART_RxBuffer uart2_buffer;
 extern 	UART_RxBuffer uart5_buffer;

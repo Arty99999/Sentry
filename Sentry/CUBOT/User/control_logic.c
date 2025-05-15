@@ -69,7 +69,7 @@ void TIM14_Task(void)
 	
 			Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
 		}
-//if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
+if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 //	
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);

@@ -257,7 +257,7 @@ void MPU6050_Read_1(IMU_InitData_t *mpu6050_data)
 	static uint8_t Buf[14];
 	static int16_t mpu6050_raw_temp;
 	MPU6050_t* mpu6050  =(MPU6050_t*)mpu6050_data ;
-	MPU6050_ReadData_1(MPU6050_ACC_OUT, Buf, 14,mpu6050->mpu6050_Data.i2cHandler);
+	MPU6050_ReadData(MPU6050_ACC_OUT, Buf, 14,mpu6050->mpu6050_Data.i2cHandler);
 	mpu6050_raw_temp       = (int16_t)(Buf[0] << 8) | Buf[1];
 	mpu6050_data->accel[0] = mpu6050_raw_temp * MPU6050_ACCEL_SEN * mpu6050_data->accel_scale;
 	mpu6050_raw_temp       = (int16_t)(Buf[2] << 8) | Buf[3];

@@ -25,7 +25,7 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 {
 	MotorInit(&holder->Motors6020.motor[0],5645 ,Motor6020,CAN2,0x205);   
 	MotorInit(&holder->Motors6020.motor[1], 6993 ,Motor6020,canx,0x206);
-	MotorInit(&holder->Motors6020.motor[2], 6000 ,Motor6020,canx,0x205);   
+	MotorInit(&holder->Motors6020.motor[2], 5924 ,Motor6020,canx,0x205);   
 
 	DualPID_Init(&holder->Pitch.PID,pitch_pid->ShellPID,pitch_pid->CorePID);
   DualPID_Init(&holder->Yaw.PID,yaw_pid->ShellPID,yaw_pid->CorePID);
@@ -201,7 +201,7 @@ void Camare_control(Brain_t* brain,Holder_t* holder)
 	
 	uint8_t Target=Choose_Target(brain);
 
-	Target_Angle=30+(brain->All_See.Camera_Index[Target]*60)+brain->All_See.Yaw_add[Target];
+	Target_Angle=90+brain->All_See.Yaw_add[Target];
   yaw1_Angle=90-holder->Yaw1.Can_Angle;
 	if ((Target_Angle+yaw1_Angle)<180)
 	{if 		((5*Target_Angle)<2*yaw1_Angle-140) {Holder.Yaw.Target_Angle+=(yaw1_Angle+Target_Angle)/3.5;Holder.Yaw1.Target_Angle+=(yaw1_Angle+Target_Angle)/3.5*2.5;}
@@ -209,7 +209,8 @@ void Camare_control(Brain_t* brain,Holder_t* holder)
 	else 
 		{if 		(0>(2*yaw1_Angle-5*Target_Angle+645)) {Holder.Yaw.Target_Angle-=(360-yaw1_Angle-Target_Angle)/3.5;Holder.Yaw1.Target_Angle-=(360-yaw1_Angle-Target_Angle)/3.5*2.5;}
 	else {Holder.Yaw.Target_Angle-=196-Target_Angle;Holder.Yaw1.Target_Angle=-74;}}
-			Holder.Pitch.Target_Angle= - atan((brain->All_See.Distance[0]/1000.0*sin(-1*brain->All_See.Pitch_add[0]/57.3)-0.0725)/(0.06+brain->All_See.Distance[0]/1000.0*cos(-1*brain->All_See.Pitch_add[0]/57.3)))*57.3;
+			//Holder.Pitch.Target_Angle= - atan((brain->All_See.Distance[0]/1000.0*sin(-1*brain->All_See.Pitch_add[0]/57.3)-0.0725)/(0.06+brain->All_See.Distance[0]/1000.0*cos(-1*brain->All_See.Pitch_add[0]/57.3)))*57.3;
+	Holder.Pitch.Target_Angle= -15;
 }
 
 uint8_t Choose_Target(Brain_t* brain)

@@ -129,10 +129,11 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-	MPU6050_Read(&mpu6050.mpu6050_Data);
+	MPU6050_Read_1(&mpu6050.mpu6050_Data);
 	 
 	 IMUupdate_1(&mpu6050.mpu6050_Data);
 	IMUupdate(&mpu6050.mpu6050_Data);
+		HAL_Delay(1);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
