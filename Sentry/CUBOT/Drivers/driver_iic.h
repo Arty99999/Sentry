@@ -32,6 +32,9 @@ int Sensors_I2C_ReadRegister(unsigned char slave_addr,
 	unsigned char reg_addr,
 	unsigned short len,
 	unsigned char* data_ptr,I2C_HandleTypeDef *hi2c);
-
+int Sensors_I2C_ReadRegister_1(unsigned char slave_addr,
+	unsigned char reg_addr,
+	unsigned short len,
+	unsigned char* data_ptr,I2C_HandleTypeDef *hi2c);
 #endif 
 
