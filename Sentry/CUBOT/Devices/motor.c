@@ -91,7 +91,7 @@ static void MotorEcdtoAngle(Motor *motor)
         motor->Data.Angle = K_ECD_TO_ANGLE * (total_ecd - motor->Param.EcdOffset) / 2;
 				
 			//	motor->Data.Online_check.Cnt++;
-				UsartDmaPrintf("%d,%d,%d,%.2f\r\n",num,motor->Data.Ecd,motor->Data.LastEcd,motor->Data.Angle);
+//				UsartDmaPrintf("%d,%d,%d,%.2f\r\n",num,motor->Data.Ecd,motor->Data.LastEcd,motor->Data.Angle);
     } else {
         if ((&motor->Param)->EcdOffset < ((&motor->Param)->EcdFullRange / 2)) {
             if (motor->Data.Ecd > (motor->Param.EcdOffset + motor->Param.EcdFullRange / 2))

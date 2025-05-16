@@ -77,11 +77,11 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 				else {holder->Cruise_Mode.pitch_time=0;holder->Cruise_Mode.yaw1_time=0;}
 				if (brain->Autoaim.Mode==Autoaim)
 				{Holder.Yaw1.Target_Angle = 85.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
-			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
+			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*15.0f;}
 				
 				else 
 				{Holder.Yaw1.Target_Angle = 65.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
-			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
+			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*15.0f;}
 			}
 			else m=0;
 			if (a222!=0 && flag000==0&& rc_ctrl->rc.s1==2&&Brain.Lidar.mode==4) {  if (a222>180) Holder.Yaw.Target_Angle-=(a222-360)*57.3;else Holder.Yaw.Target_Angle-=a222*57.3;flag000=1;}

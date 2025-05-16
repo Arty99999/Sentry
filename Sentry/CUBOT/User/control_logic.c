@@ -116,7 +116,7 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
  MotorCanOutput(can2, 0x200);
 //		if (tim14.ClockTime%200==0)
 
-	//	UsartDmaPrintf("%d,%.2f\r\n",Holder.Motors6020.motor[0].Data.RawEcd,Holder.Motors6020.motor[0].Data.Angle);
+		UsartDmaPrintf("%.2f,%.2f,%.2f,%d\r\n",Holder.Pitch.Target_Angle,Holder.Pitch.GYRO_Angle,Holder.Pitch.GYRO_Angle_speed,Holder.Motors6020.motor[1].Data.Output);
 //	UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
 //  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
 	//UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Yaw.Target_Angle,Holder.Yaw.GYRO_Angle);
