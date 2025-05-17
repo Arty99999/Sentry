@@ -35,6 +35,7 @@ int cnt000;
 extern int m00;
 int cnt_change,flag_change;
 extern uint8_t flag_Wifi;
+int cntll,flag_roll,cnt_refree;
 void TIM14_Task(void)
 {
 	
@@ -62,6 +63,7 @@ void TIM14_Task(void)
 	if (Brain.Autoaim.mode_cnt[Cruise]>30) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
 		if (Brain.All_See.mode_cnt[Wait]>1200) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;if (Brain.Autoaim.mode==Change)  Brain.Autoaim.mode=Cruise;}
 		if (Brain.All_See.mode_cnt[Found]>2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
+			rc_Ctrl_et.rc.s2=2;
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
 		  ShootPlateControl(&AmmoBooster,&Brain);
@@ -71,7 +73,7 @@ void TIM14_Task(void)
 	
 			Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
 		}
-//if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
+if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 //	
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
@@ -99,7 +101,7 @@ void TIM14_Task(void)
 //			UsarttoWifi("%d,%.2f,%.2f,%d,%d,%d,%d,%d,%d\r\n",Brain.Lidar.vx,allchassis.Movement.Vx,allchassis.Movement.Vomega,Brain.Lidar.mode,referee2022.power_heat_data.chassis_power_buffer,referee2022.game_status.stage_remain_time,tim14_FPS.Lidar_FPS,m00,bmi088.bmi088_Data.Raw_accel[0]);
 //		
 		if (tim14.ClockTime%200==0)
-		  	UsarttoWifi("%d,%.2f,%d,%d,%.2f,%.2f,%d,%d,%d,%d\r\n",bmi088.bmi088_Data.Raw_accel[0],INS_attitude->roll,m00,Brain.Lidar.vx,allchassis.Movement.Vx,allchassis.Movement.Vomega,tim14_FPS.Lidar_FPS,allchassis.Motors.motor[0].Data.Output,allchassis.Power.refereeData.max_power,referee2022.game_status.stage_remain_time);
+		  	UsarttoWifi("%d,%.2f,%.2f,%.2f,%d,%d\r\n",bmi088.bmi088_Data.Raw_gyro[0],INS_attitude->roll,INS_attitude->pitch,Holder.Pitch.Can_Angle,tim14_FPS.Lidar_FPS,referee2022.game_status.stage_remain_time);
 		if (referee2022.game_status.game_progress!=4) bullet_num_17mm=0; 
 		
 		
@@ -118,7 +120,18 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
  MotorCanOutput(can2, 0x1ff);
  MotorCanOutput(can2, 0x200);
 //		if (referee2022.buff.remaining_energy!=0x32) k=referee2022.buff.remaining_energy;
+		if (fabs(INS_attitude->roll>=15)&&flag_roll==0) cntll++;else cntll=0;
+		if (cntll>200) {cntll=0;flag_roll=1;}
 		
+		
+		if (flag_roll==1) 
+			
+		{
+			for (int i=1;i<3;i++)
+  MotorFillData(&(Holder.Motors6020.motor[i]),0);
+			cnt_refree++;
+		}
+		if (cnt_refree>=4000) {cnt_refree=0;flag_roll=0;}
 		INS_attitude = INS_GetAttitude(IMU_data);
 //		if (tim14.ClockTime%200==0)
 		UsartDmaPrintf("%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Can_Angle,Holder.Yaw1.Target_Angle,Brain.Autoaim.Yaw_add);
@@ -130,24 +143,16 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 	//UsartDmaPrintf("%d\r\n",Brain.Autoaim.mode);
 }
 
-int cnt1111;
-uint32_t cn2 = 0;
-float time_us;
-uint32_t start, end, cycles;
 void TIM13_Task(void)
 {
 	tim14_FPS.Gyro_Out_cnt++;
 	MPU6050_Read_1(&mpu6050.mpu6050_Data);
-start = DWT->CYCCNT;          // 记录开始周期
-//INS_attitude = INS_GetAttitude(IMU_data);
-end = DWT->CYCCNT;            // 记录结束周期
-
-cycles = end - start;         // 计算周期数
-time_us = (float)cycles / SystemCoreClock * 1e6; // 转换为微秒/
-	 IMUupdate_1(&mpu6050.mpu6050_Data);
+	IMUupdate_1(&mpu6050.mpu6050_Data);
 	IMUupdate(&mpu6050.mpu6050_Data);
-
-	
-	
 	
 }
+//start = DWT->CYCCNT;          // 记录开始周期
+////INS_attitude = INS_GetAttitude(IMU_data);
+//end = DWT->CYCCNT;            // 记录结束周期
+//cycles = end - start;         // 计算周期数
+//time_us = (float)cycles / SystemCoreClock * 1e6; // 转换为微秒/

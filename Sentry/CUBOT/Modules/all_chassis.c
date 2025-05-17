@@ -87,7 +87,9 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
 //if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;
-					chassis->Movement.Vomega=-1500;
+
+									if (hurt_flag==1) chassis->Movement.Vomega=speed1;
+			else 	chassis->Movement.Vomega=-1500;;
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 					
 				}
