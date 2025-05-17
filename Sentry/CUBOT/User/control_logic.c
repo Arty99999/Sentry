@@ -55,17 +55,20 @@ void TIM14_Task(void)
 		if(tim14.ClockTime%1000==0) FPS_Check(&tim14_FPS);
 	if (Brain.Lidar.mode!=4) {flag000=0;a222=0;}
 	
+	if (Brain.Autoaim.mode==Change&&fabs(Holder.Yaw1.Can_Angle-Holder.Yaw1.Target_Angle)<1) Brain.Autoaim.mode_cnt[2]++;
+		if (Brain.Autoaim.mode_cnt[2]>=300) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[2]=0;}
 	
 	
     if(tim14.ClockTime%10==0 &&Brain.Autoaim.mode!=Change) Brain.Autoaim.mode_cnt[Cruise]++;
 	if (Brain.All_See.mode==Wait) Brain.All_See.mode_cnt[Wait]++;
 	if (Brain.Autoaim.mode_cnt[Cruise]>30) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
-		if (Brain.All_See.mode_cnt[Wait]>1200) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;if (Brain.Autoaim.mode==Change)  Brain.Autoaim.mode=Cruise;}
+		if (Brain.All_See.mode_cnt[Wait]>1200) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;}
 		if (Brain.All_See.mode_cnt[Found]>2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
+		rc_Ctrl_et.rc.s2=2;
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
 		  ShootPlateControl(&AmmoBooster,&Brain);
-
+//Brain.Autoaim.Mode=1;
 		  HolderGetRemoteData(&Holder, &rc_Ctrl_et,&Brain);
 
 	
@@ -121,7 +124,7 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 		
 		INS_attitude = INS_GetAttitude(IMU_data);
 //		if (tim14.ClockTime%200==0)
-		UsartDmaPrintf("%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Can_Angle,Holder.Yaw1.Target_Angle,Brain.Autoaim.Yaw_add);
+		UsartDmaPrintf("%d\r\n",tim14_FPS.Camera_FPS);
 	//UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
 //  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
 	//UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Yaw.Target_Angle,Holder.Yaw.GYRO_Angle);

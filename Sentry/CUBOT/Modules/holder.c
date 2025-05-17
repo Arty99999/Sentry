@@ -60,11 +60,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 
 	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&& (referee_Fps==0 ||(referee2022.game_status.game_progress==4&&tim14_FPS.Vision_FPS>0)))
 			{
-//				if (brain->Autoaim.Last_mode!=Cruise)
-//				{
-//					holder->Cruise_Mode.yaw1_time=asin(holder->Yaw.Can_Angle/85)/holder->Cruise_Mode.yaw1_sense;
-//				  holder->Cruise_Mode.pitch_time=(holder->Pitch.GYRO_Angle-5)/25/holder->Cruise_Mode.pitch_sense;
-//				}
+
 				
 		m++;
 				if (m<=14000) 
@@ -74,14 +70,21 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 					
 				}
 				else if (m>15000) {m=0;}
-				else {holder->Cruise_Mode.pitch_time=0;holder->Cruise_Mode.yaw1_time=0;}
+
 				if (brain->Autoaim.Mode==Autoaim)
-				{Holder.Yaw1.Target_Angle = 85.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
-			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
+				{
+									if (brain->Autoaim.Last_mode!=Cruise)
+				{
+					holder->Cruise_Mode.yaw1_time=acos(holder->Yaw1.Can_Angle/65)/holder->Cruise_Mode.yaw1_sense;
+				  holder->Cruise_Mode.pitch_time=acos((holder->Pitch.GYRO_Angle-5)/25)/holder->Cruise_Mode.pitch_sense;
+				}
+					
+					Holder.Yaw1.Target_Angle = 65.0f*cos(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
+			Holder.Pitch.Target_Angle = 5-fabs(cos(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*30.0f;}
 				
 				else 
-				{Holder.Yaw1.Target_Angle = 65.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
-			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
+				{Holder.Yaw1.Target_Angle = 65.0f*cos(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
+			Holder.Pitch.Target_Angle = 5+fabs(cos(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*20.0f;}
 			}
 			else m=0;
 			if (a222!=0 && flag000==0&& rc_ctrl->rc.s1==2&&Brain.Lidar.mode==4) {  if (a222>180) Holder.Yaw.Target_Angle-=(a222-360)*57.3;else Holder.Yaw.Target_Angle-=a222*57.3;flag000=1;}

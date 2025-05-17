@@ -14,10 +14,10 @@ uint16_t time;
 uint8_t time_flag;
 uint16_t time2;
 uint8_t sentry_attack;//¹¥»÷ÉÕ±ý±êÖ¾Î»
-uint8_t lidar_mode;
-uint8_t sentry_attack1;//¹¥»÷ÉÕ±ý±êÖ¾£¨ÓÃÓÚµ÷ÊÔ£©
-float YawDeflectionAngle_test; //Î´Ê¹ÓÃ
 
+
+
+extern uint8_t referee_Fps;
 
 float pitch_comp_angle;  //Î´Ê¹ÓÃ
 float brain_sense_pitch=1.0;  //pitchÊÓ¾õÁéÃô¶È£¬ÓÃÓÚÖ¡ÂÊÆ¥Åä
@@ -194,12 +194,12 @@ void  Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//½â°ü×ÔÃéÊý¾
 		Brain->Autoaim.Brain_Data.FrameType=recBuffer[1];
 		Brain->Autoaim.Brain_Data.FrameCoreID = recBuffer[2];
 		
-		if((Brain->Autoaim.Brain_Data.FrameType == BRAIN_TO_ROBOT_CMD) && recBuffer[13] == 0xDD)  //< ½âËãÆ«×ª½Ç
+		if((Brain->Autoaim.Brain_Data.FrameType == BRAIN_TO_ROBOT_CMD) && recBuffer[13] == 0xDD&&Brain->Autoaim.mode!=Change)  //< ½âËãÆ«×ª½Ç
 		{
 			Brain->Autoaim.mode_cnt[Cruise] = 0;
 			Brain->Autoaim.Use_Can_angle=Brain->Autoaim.Send_Can_angle[recBuffer[12]];
 			Brain->Autoaim.Use_Gyro_angle=Brain->Autoaim.Send_Gyro_angle[recBuffer[12]];
-			
+
 			Brain->Autoaim.mode=Lock;
 			
       Brain->Autoaim.Yaw_add = ((recBuffer[3] >> 6) == 0 ? 1 : -1) * ((float)((recBuffer[3] & 0x3f) * 100 + recBuffer[4]) / 100);
@@ -306,9 +306,11 @@ void RobotToBrain_Lidar(Brain_t* Brain)//·¢¸øÀ×´ï
 //	y = referee2022.map_command_t.target_position_y * 100;
 	RobotToBrainChassisTimeBuffer[0]  = 0xAA;
 
-	if (referee2022.game_status.game_progress==0&&referee2022.game_status.game_type==0)
-  {RobotToBrainChassisTimeBuffer[1]  = 1;        
-	  RobotToBrainChassisTimeBuffer[2]  = 1;}
+	if (referee_Fps==0)
+  {
+		RobotToBrainChassisTimeBuffer[1]  = 1;        
+	  RobotToBrainChassisTimeBuffer[2]  = 1;
+	}
 	else if(referee2022.game_status.game_progress == 4) 
 	{
 		RobotToBrainChassisTimeBuffer[1]  = referee2022.game_status.stage_remain_time & 0xff;        //referee2022.game_status.stage_remain_time
@@ -341,7 +343,7 @@ void RobotToBrain_Lidar(Brain_t* Brain)//·¢¸øÀ×´ï
 	RobotToBrainChassisTimeBuffer[3]  = change_position;
 
 
-	//=Lidar_Fortress;
+
 	
 	RobotToBrainChassisTimeBuffer[4]  = Brain->Lidar.mode ;
 //	RobotToBrainChassisTimeBuffer[5]  = y&0xff;    
@@ -361,8 +363,8 @@ void RobotToBrain_Lidar(Brain_t* Brain)//·¢¸øÀ×´ï
 //	RobotToBrainChassisTimeBuffer[16]  = referee2022.bullet_remaining.money&0xff;	
 //	RobotToBrainChassisTimeBuffer[17]  = referee2022.bullet_remaining.money >> 8;  
   //RobotToBrainChassisTimeBuffer[18]  = defense_flag;
-	RobotToBrainChassisTimeBuffer[19]  = lidar_station_flag;
-	RobotToBrainChassisTimeBuffer[20]  = lidar_mode;
+//	RobotToBrainChassisTimeBuffer[19]  = lidar_station_flag;
+//	RobotToBrainChassisTimeBuffer[20]  = lidar_mode;
 	RobotToBrainChassisTimeBuffer[21]  = 0xDD;
 	HAL_UART_Transmit_DMA(&huart5, RobotToBrainChassisTimeBuffer, 22);
 }
@@ -387,19 +389,33 @@ extern uint8_t referee_Fps;
 extern int hurt_flag;
 void Change_BrainMode(Brain_t* Brain)
 {
-		if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1&&hurt_flag==0 &&bullet_num_17mm<=300&&(referee2022.game_status.game_progress==4||referee_Fps==0)) Brain->Autoaim.Mode=Outpost;
-else Brain->Autoaim.Mode=Autoaim;
-		
-	if (referee2022.game_robot_status.remain_HP>=400) {
-		Brain->Lidar.mode=Lidar_Outpost;
-	if (referee2022.game_status.game_progress==4&&referee2022.game_status.game_type==1)
-	{if (referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) {Brain->Autoaim.Mode=Autoaim;Brain->Lidar.mode=Lidar_Patrol;}
-	else if (referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0) {Brain->Autoaim.Mode=Autoaim;Brain->Lidar.mode=Lidar_Patrol;}
- }}
-	if (referee2022.game_robot_status.remain_HP<150||(referee2022.bullet_remaining.bullet_remaining_num<=50&&referee2022.game_status.game_progress==4)) Brain->Lidar.mode=Lidar_home;
-	if (rc_Ctrl_et.rc.s2==1)Brain->Lidar.mode=Lidar_Fortress;
-	//Brain->Autoaim.Mode=Outpost;
-//	if (Brain->Autoaim.Mode==c) cnt_Outpost++;
-	//if (brain->Autoaim.Mode==Autoaim)
 
+if (referee_Fps==0)
+{	
+	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
+	else if (rc_Ctrl_et.rc.s2==1) Brain->Lidar.mode=Lidar_Fortress;
+	else if (rc_Ctrl_et.rc.s2==3) Brain->Lidar.mode=Lidar_Patrol;
+	else Brain->Lidar.mode=Lidar_Outpost;
+	
+	
+		 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) Brain->Autoaim.Mode=Outpost;
+	 else Brain->Autoaim.Mode=Autoaim;
+
+}
+ else if (referee2022.game_status.game_progress==4)
+ {
+	 
+	 
+	 if (referee2022.game_robot_status.remain_HP<150||(referee2022.bullet_remaining.bullet_remaining_num<=50)) Brain->Lidar.mode=Lidar_home;
+	 else if (referee2022.map_command_t.cmd_keyboard=='F'&&fabs(referee2022.map_command_t.target_position_y-8)<2) Brain->Lidar.mode=Lidar_Fortress;
+	 else 	
+	{
+if ((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)) Brain->Lidar.mode=Lidar_Patrol;
+	else Brain->Lidar.mode=Lidar_Outpost;
+	}
+
+	 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) Brain->Autoaim.Mode=Outpost;
+	 else Brain->Autoaim.Mode=Autoaim;
+ }
+ 
 }

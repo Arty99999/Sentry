@@ -49,6 +49,7 @@ extern int Flag_Follow;
 extern float a222;
 float nmm;
 extern int hurt_flag;
+int mll;
 float Change_angel(float vx,float vy,float Can_angle);
 void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotState,Brain_t* brain,RC_Ctrl_ET* rc_ctrl)
 {
@@ -57,7 +58,11 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 	band_time++;
   if(band_time%1000==0)band_number_ins++;
 	if(band_number_ins==20)band_number_ins=0;
-	speed1=3000+band_number[band_number_ins]*50;
+//	speed1=3000+band_number[band_number_ins]*50;
+	speed1=5000*sin(tim14.ClockTime*0.0005);
+	if (speed1<2500 && speed1>=0) speed1=2500;
+	if (speed1>-2500 && speed1<0) speed1=-2500;
+	
 				if(rc_ctrl->rc.s1==2)                         
 			{
 				if(CheckRobotState->Check_Usart.Check_lidar==0)//À×´ïÀëÏß
@@ -67,7 +72,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					{
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-					chassis->Movement.Vomega=speed1;
+					chassis->Movement.Vomega=1000;
 
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 					}
@@ -86,8 +91,8 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 				{
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-//if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;
-					chassis->Movement.Vomega=-1500;
+if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;
+					chassis->Movement.Vomega=-2500;
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 					
 				}
@@ -99,9 +104,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					Check_Slope(&allchassis,&Holder);
 					if (hurt_flag==1) chassis->Movement.Vomega=speed1;
 			else 	if (chassis->Movement.Slope_Flag.flag_up_up_slope==1 ) chassis->Movement.Vomega=0;
-					else chassis->Movement.Vomega=-3000;
-				
-					
+					else chassis->Movement.Vomega=-2400;
 		if  (flag000) chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 				}
@@ -117,7 +120,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 //				if (rc_Ctrl_et.rc.s2==1) chassis->Movement.Vomega=0;
 				chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
                     // else
-			
+//			chassis->Movement.Vomega=mll;
 							 //	nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
 							 //	if (chassis->Movement.Vx==0)				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
 							 //	else chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,-nmm,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
