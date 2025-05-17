@@ -58,7 +58,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 		if (ammo_booster->Shoot_Plate.Shoot_rest_flag) ammo_booster->Shoot_Plate.Shoot_Cut++;
  		if (ammo_booster->Shoot_Plate.Shoot_Cut==ammo_booster->Shoot_Plate.Fire_Divider) ammo_booster->Shoot_Plate.Shoot_rest_flag=0;
 		
-				if((rc_Ctrl_et.rc.s1==1||referee2022.game_status.game_progress==4)&&rc_Ctrl_et.rc.s2 ==2&&brain->Autoaim.fire_flag==1&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0 &&brain->Autoaim.IsFire==1)
+				if((rc_Ctrl_et.rc.s1==1||(referee2022.game_status.game_progress==4&&referee2022.bullet_remaining.bullet_remaining_num>=20))&&rc_Ctrl_et.rc.s2 ==2&&brain->Autoaim.fire_flag==1&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0 &&brain->Autoaim.IsFire==1)
 				{
 					ammo_booster->Shoot_Plate.Target_Angle  += 45;
 					ammo_booster->Shoot_Plate.ShootNum++;

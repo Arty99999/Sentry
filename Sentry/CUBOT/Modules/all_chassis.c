@@ -76,7 +76,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 	        chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
 					chassis->Movement.Vomega=speed1;
-						
+						ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 					}
 				}
 				else
@@ -117,7 +117,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 //				if (rc_Ctrl_et.rc.s2==1) chassis->Movement.Vomega=0;
 				chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
                     // else
-				//		 chassis->Movement.Vomega = 4000;
+			
 							 //	nmm=Change_angel(-chassis->Movement.Vx,-chassis->Movement.Vy,Holder.Motors6020.motor[0].Data.Angle);
 							 //	if (chassis->Movement.Vx==0)				chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,0,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
 							 //	else chassis->Movement.Vomega=BasePID_AngleControlFollow(&pid_follow,-nmm,-Holder.Motors6020.motor[0].Data.Angle, Holder.Motors6020.motor[0].Data.SpeedRPM);
@@ -202,8 +202,10 @@ void Speed_Poweroutput_Control_New(AllChassis* chassis)
             continue;
         chassis->Power.target_require_power_sum += chassis->Power.initial_give_power[i];
     }
-
+if (referee2022.buff.remaining_energy==50||referee2022.buff.remaining_energy==0)
 chassis->Power.refereeData.max_power=referee2022.game_robot_status.chassis_power_limit+(referee2022.power_heat_data.chassis_power_buffer-40)*2;
+		else chassis->Power.refereeData.max_power=3*referee2022.buff.remaining_energy+2;
+		
 		chassis->Power.scaling_ratio =chassis->Power.refereeData.max_power	 / chassis->Power.target_require_power_sum;
     chassis->Power.scaling_ratio = LIMIT(chassis->Power.scaling_ratio, 0, 1);
 	

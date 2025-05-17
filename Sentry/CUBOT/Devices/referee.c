@@ -181,6 +181,9 @@ void _Data_Diapcak(uint8_t *pdata)
 		referee2022.buff.vulnerability_buff=*(pdata + data_addr + 3);
 		BYTE0(referee2022.buff.attack_buff)=*(pdata + data_addr + 4);
 		BYTE1(referee2022.buff.attack_buff)=*(pdata + data_addr + 5);
+		referee2022.buff.remaining_energy=*(pdata + data_addr + 6);
+		
+
 	}
 //	if(cmd_id==0x0205)
 //	{	

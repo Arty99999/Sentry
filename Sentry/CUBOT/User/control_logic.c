@@ -55,6 +55,8 @@ void TIM14_Task(void)
 		if(tim14.ClockTime%1000==0) FPS_Check(&tim14_FPS);
 	if (Brain.Lidar.mode!=4) {flag000=0;a222=0;}
 	
+	
+	
     if(tim14.ClockTime%10==0 &&Brain.Autoaim.mode!=Change) Brain.Autoaim.mode_cnt[Cruise]++;
 	if (Brain.All_See.mode==Wait) Brain.All_See.mode_cnt[Wait]++;
 	if (Brain.Autoaim.mode_cnt[Cruise]>30) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
@@ -63,7 +65,7 @@ void TIM14_Task(void)
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
 		  ShootPlateControl(&AmmoBooster,&Brain);
-  //Brain.Autoaim.Mode=1;
+
 		  HolderGetRemoteData(&Holder, &rc_Ctrl_et,&Brain);
 
 	
@@ -115,9 +117,11 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 		if (tim14.ClockTime%4==0)
  MotorCanOutput(can2, 0x1ff);
  MotorCanOutput(can2, 0x200);
+//		if (referee2022.buff.remaining_energy!=0x32) k=referee2022.buff.remaining_energy;
+		
 		INS_attitude = INS_GetAttitude(IMU_data);
 //		if (tim14.ClockTime%200==0)
-		UsartDmaPrintf("%.2f,%.2f,%d,%.2f,%.2f\r\n",Holder.Pitch.GYRO_Angle,Holder.Pitch.Target_Angle,Holder.Motors6020.motor[1].Data.Output,Holder.Pitch.PID.ShellPID->Out,Holder.Pitch.GYRO_Angle_speed);
+		UsartDmaPrintf("%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Can_Angle,Holder.Yaw1.Target_Angle,Brain.Autoaim.Yaw_add);
 	//UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
 //  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
 	//UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Yaw.Target_Angle,Holder.Yaw.GYRO_Angle);
@@ -127,12 +131,23 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 }
 
 int cnt1111;
+uint32_t cn2 = 0;
+float time_us;
+uint32_t start, end, cycles;
 void TIM13_Task(void)
 {
 	tim14_FPS.Gyro_Out_cnt++;
 	MPU6050_Read_1(&mpu6050.mpu6050_Data);
-	 
+start = DWT->CYCCNT;          // 记录开始周期
+//INS_attitude = INS_GetAttitude(IMU_data);
+end = DWT->CYCCNT;            // 记录结束周期
+
+cycles = end - start;         // 计算周期数
+time_us = (float)cycles / SystemCoreClock * 1e6; // 转换为微秒/
 	 IMUupdate_1(&mpu6050.mpu6050_Data);
 	IMUupdate(&mpu6050.mpu6050_Data);
+
+	
+	
 	
 }

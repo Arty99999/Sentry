@@ -217,7 +217,8 @@ void  Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//½â°ü×ÔÃéÊý¾
 			
       Brain->Autoaim.fire_flag=0;
 			if (rc_Ctrl_et.rc.s2==2)
-			{ if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.4) Brain->Autoaim.fire_flag=1;else Brain->Autoaim.fire_flag=0;	
+			{ 
+				if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.4) Brain->Autoaim.fire_flag=1;else Brain->Autoaim.fire_flag=0;	
 		   	  Holder.Yaw1.Target_Angle=Brain->Autoaim.Use_Can_angle+Brain->Autoaim.Yaw_add;
 					Holder.Pitch.Target_Angle= Brain->Autoaim.Use_Gyro_angle+Brain->Autoaim.Pitch_add ;}
 

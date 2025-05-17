@@ -180,6 +180,7 @@ struct
   uint8_t defence_buff;  
   uint8_t vulnerability_buff; 
   uint16_t attack_buff; 
+	uint8_t remaining_energy;
 }buff;
 
 /*14. 空中机器人能量状态： 0x0205。 发送频率： 10Hz

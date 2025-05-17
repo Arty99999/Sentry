@@ -195,10 +195,13 @@ static int flag_hurt,cnt_hurt,cnt_hurt_reset,hurt_flag_doubt,blood,hurt_cnt,cnt_
 //	 }		 
 	 
 }
+#define h1 186
+#define h2 279
+#define c1 100
+#define c2 182.5
 float Target_Angle,yaw1_Angle;
 void Camare_control(Brain_t* brain,Holder_t* holder)
 {
-	
 	uint8_t Target=Choose_Target(brain);
 
 	Target_Angle=90+brain->All_See.Yaw_add[Target];
@@ -210,7 +213,8 @@ void Camare_control(Brain_t* brain,Holder_t* holder)
 		{if 		(0>(2*yaw1_Angle-5*Target_Angle+645)) {Holder.Yaw.Target_Angle-=(360-yaw1_Angle-Target_Angle)/3.5;Holder.Yaw1.Target_Angle-=(360-yaw1_Angle-Target_Angle)/3.5*2.5;}
 	else {Holder.Yaw.Target_Angle-=196-Target_Angle;Holder.Yaw1.Target_Angle=-74;}}
 			//Holder.Pitch.Target_Angle= - atan((brain->All_See.Distance[0]/1000.0*sin(-1*brain->All_See.Pitch_add[0]/57.3)-0.0725)/(0.06+brain->All_See.Distance[0]/1000.0*cos(-1*brain->All_See.Pitch_add[0]/57.3)))*57.3;
-	Holder.Pitch.Target_Angle= -15;
+	Holder.Pitch.Target_Angle=atan((c1+brain->All_See.Distance[0]*sin(brain->All_See.Pitch_add[0]/57.3)-h1)/(h2-(c2-brain->All_See.Distance[0]*cos(brain->All_See.Pitch_add[0]/57.3))))*57.3;
+//	Holder.Pitch.Target_Angle= -15;
 }
 
 uint8_t Choose_Target(Brain_t* brain)
