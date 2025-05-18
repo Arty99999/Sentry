@@ -276,12 +276,7 @@ if (Brain.Autoaim.Mode==Outpost)
 			
 			referee2022.map_command_t.cmd_keyboard=*(pdata+data_addr+8);
 			
-			if (referee2022.map_command_t.cmd_keyboard=='F'&&fabs(referee2022.map_command_t.target_position_y-8)<2) blue_3=1;
-			else blue_3=0;
-//			if(referee2022.map_command_t.cmd_keyboard!=0)
-//			{
-//			lidar_mode++;
-//			}
+
 			
 		}
 }
