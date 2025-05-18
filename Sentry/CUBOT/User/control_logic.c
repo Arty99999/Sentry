@@ -122,7 +122,7 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
  MotorCanOutput(can2, 0x200);
 //		if (referee2022.buff.remaining_energy!=0x32) k=referee2022.buff.remaining_energy;
 		
-		INS_attitude = INS_GetAttitude(IMU_data);
+		
 //		if (tim14.ClockTime%200==0)
 		UsartDmaPrintf("%d\r\n",tim14_FPS.Camera_FPS);
 	//UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
@@ -150,7 +150,7 @@ time_us = (float)cycles / SystemCoreClock * 1e6; // ×ª»»ÎªÎ¢Ãë/
 	 IMUupdate_1(&mpu6050.mpu6050_Data);
 	IMUupdate(&mpu6050.mpu6050_Data);
 
-	
+	INS_attitude = INS_GetAttitude(IMU_data);
 	
 	
 }
