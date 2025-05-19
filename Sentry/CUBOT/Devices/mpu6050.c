@@ -211,10 +211,11 @@ mpu6050_data->gyro[1]=0;
 }
 
 float q0_1 = 1.0f, q1_1 = 0.0f, q2_1 = 0.0f, q3_1 = 0.0f;
+int8_t YawRoundCount;
 void IMUupdate_1(IMU_InitData_t *mpu6050_data)
 {
 	MPU6050_t* mpu6050  =(MPU6050_t*)mpu6050_data ;
-    static int8_t YawRoundCount;
+   
    float  halfT,norm,vx,vy,vz,ex,ey,ez,tempq0,tempq1,tempq2,tempq3,now,dt;
 		static uint32_t DWT_Count = 0;
 	static float YawAngleLast;

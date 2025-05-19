@@ -208,7 +208,11 @@ void  Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//½â°ü×ÔÃéÊý¾
       Brain->Autoaim.fire_flag=0;
 			if (rc_Ctrl_et.rc.s2==2)
 			{ 
-				if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.8) Brain->Autoaim.fire_flag=1;else Brain->Autoaim.fire_flag=0;	
+				
+				
+				if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.8 && Brain->Autoaim.Mode==Outpost) Brain->Autoaim.fire_flag=1;
+				else if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.4 && Brain->Autoaim.Mode==Autoaim) Brain->Autoaim.fire_flag=1;
+				else Brain->Autoaim.fire_flag=0;	
 		   	  Holder.Yaw1.Target_Angle=Brain->Autoaim.Use_Can_angle+Brain->Autoaim.Yaw_add;
 					Holder.Pitch.Target_Angle= Brain->Autoaim.Use_Gyro_angle+Brain->Autoaim.Pitch_add ;}
 
@@ -369,10 +373,12 @@ if(tim14.ClockTime%2== 0) {RobotToBrain_Lidar(Brain);}
 	if(tim14.ClockTime%1== 0) {RobotToBrain_Autoaim(Holder.Yaw.GYRO_Angle,Brain);} 
 	
 }
+extern int8_t YawRoundCount;
 extern uint8_t referee_Fps;
 extern int hurt_flag;
 void Change_BrainMode(Brain_t* Brain)
 {
+	static int cnt_change,flag_change;
 if (referee_Fps==0)
 {	
 	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
@@ -380,8 +386,7 @@ if (referee_Fps==0)
 	else if (rc_Ctrl_et.rc.s2==3) Brain->Lidar.mode=Lidar_Patrol;
 	else Brain->Lidar.mode=Lidar_Outpost;
 	
-	
-		 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) Brain->Autoaim.Mode=Outpost;
+if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
 	 else Brain->Autoaim.Mode=Autoaim;
 
 }
@@ -397,7 +402,10 @@ if ((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_
 	else Brain->Lidar.mode=Lidar_Outpost;
 	}
 
-	 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) Brain->Autoaim.Mode=Outpost;
+	if (flag_change) cnt_change++;
+			 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1&&cnt_change==0) {Holder.Yaw.Target_Angle=YawRoundCount*360-69;flag_change=1;}
+				 
+	 else if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1&&cnt_change>=500) {cnt_change=500;Brain->Autoaim.Mode=Outpost;flag_change=0;}
 	 else Brain->Autoaim.Mode=Autoaim;
  }
 }

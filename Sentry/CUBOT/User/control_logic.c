@@ -119,20 +119,19 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 		if (tim14.ClockTime%4==0)
  MotorCanOutput(can2, 0x1ff);
  MotorCanOutput(can2, 0x200);
-//		if (referee2022.buff.remaining_energy!=0x32) k=referee2022.buff.remaining_energy;
+
 		if (fabs(INS_attitude->roll>=15)&&flag_roll==0) cntll++;else cntll=0;
 		if (cntll>200) {cntll=0;flag_roll=1;}
 		
 		
 		if (flag_roll==1) 
-			
 		{
 			for (int i=1;i<3;i++)
   MotorFillData(&(Holder.Motors6020.motor[i]),0);
 			cnt_refree++;
 		}
 		if (cnt_refree>=4000) {cnt_refree=0;flag_roll=0;}
-		INS_attitude = INS_GetAttitude(IMU_data);
+		
 //		if (tim14.ClockTime%200==0)
 		UsartDmaPrintf("%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Can_Angle,Holder.Yaw1.Target_Angle,Brain.Autoaim.Yaw_add);
 	//UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
@@ -149,7 +148,7 @@ void TIM13_Task(void)
 	MPU6050_Read_1(&mpu6050.mpu6050_Data);
 	IMUupdate_1(&mpu6050.mpu6050_Data);
 	IMUupdate(&mpu6050.mpu6050_Data);
-	
+	INS_attitude = INS_GetAttitude(IMU_data);
 }
 //start = DWT->CYCCNT;          // 记录开始周期
 ////INS_attitude = INS_GetAttitude(IMU_data);

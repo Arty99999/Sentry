@@ -48,7 +48,13 @@ typedef struct
 	float left_litmit;
 }Holder_t;
 
+typedef enum {
+    HURT_IDLE = 0,      
+    HURT_ATTACKED,     //3508下拉    
+    HURT_DOUBT,     //舵机合拢
 
+}
+Hurt_state;
 extern  Holder_t Holder;
 //void HolderYawChassisInit(Holder_t* holder, CanNumber canx);
 //void HolderReset(Holder_t* holder);

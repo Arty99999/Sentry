@@ -146,54 +146,38 @@ for (int i=0;i<3;i++)
   MotorFillData(&holder->Motors6020.motor[i], holder->Motors6020.motor[i].Data.Output);
 
 }
-
+Hurt_state hurt;
  int hurt_flag;
  void thinchicken_feedback_control()//Êİ¼¦·´À¡
  {
-	// hurt_id=referee2022.robot_hurt.armor_id;
-static int flag_hurt,cnt_hurt,cnt_hurt_reset,hurt_flag_doubt,blood,hurt_cnt,cnt_hurt_reset_;
-		 
-	 if (blood-referee2022.game_robot_status.remain_HP<=58&&blood-referee2022.game_robot_status.remain_HP>=8&&referee2022.robot_hurt.hurt_type==0) hurt_flag_doubt=1;
-	 if (hurt_flag_doubt==1) cnt_hurt_reset++;
-     if (cnt_hurt_reset>10&cnt_hurt_reset<500 && (blood-referee2022.game_robot_status.remain_HP>=8&&referee2022.robot_hurt.hurt_type==0)){hurt_flag=1;cnt_hurt_reset=0;hurt_flag_doubt=0;}
-	 else if (cnt_hurt_reset>1000) {hurt_flag=0;cnt_hurt_reset=0;hurt_flag_doubt=0;}
-    
-	 
-	 if ((blood-referee2022.game_robot_status.remain_HP>=90) && referee2022.robot_hurt.hurt_type==0) hurt_flag=1;
-	 if (hurt_flag==1&&Brain.Autoaim.mode==Cruise) cnt_hurt_reset_++;else cnt_hurt_reset_=0;
-		 
-	 
-	 
-	 if (cnt_hurt_reset_>2500) {hurt_flag=0;cnt_hurt_reset_=0;}
-	 
-	 
-		 blood=referee2022.game_robot_status.remain_HP;
+static int cnt_hurt_doubt,cnt_hurt_reset,blood;
+	switch (hurt) {
+        case HURT_IDLE:
+				{
+			     if ((blood-referee2022.game_robot_status.remain_HP>=90) && referee2022.robot_hurt.hurt_type==0) hurt=HURT_ATTACKED;
+           else if ((blood-referee2022.game_robot_status.remain_HP)<=58&&(blood-referee2022.game_robot_status.remain_HP)>=8&&referee2022.robot_hurt.hurt_type==0) hurt=HURT_DOUBT;
+				}
+       break;
 
+        case HURT_ATTACKED:
+             cnt_hurt_reset++;
+				if ((blood-referee2022.game_robot_status.remain_HP>=8) && referee2022.robot_hurt.hurt_type==0) cnt_hurt_reset=0;
+            if (cnt_hurt_reset>2000) {hurt=HURT_IDLE;cnt_hurt_reset=0;}
+          break;
+
+				 case HURT_DOUBT:
+         {
+            cnt_hurt_doubt++;
+     if (cnt_hurt_doubt>10&cnt_hurt_doubt<1000 && (blood-referee2022.game_robot_status.remain_HP>=8&&referee2022.robot_hurt.hurt_type==0)) hurt=HURT_ATTACKED;
+	 else if (cnt_hurt_doubt>1000) {hurt=HURT_IDLE;cnt_hurt_doubt=0;}
 	 
-//	 if(hurt_flag==1&&brain_flag==0)//×°¼×Ä£¿éÊÜµ¯Íè»÷´ò
-//	 {
-//		 if (hurt_id==2) Holder.Yaw.Target_Angle-=90;
-//		 else if (hurt_id==1)Holder.Yaw.Target_Angle+=90;
-//		 else if (hurt_id==4) Holder.Yaw.Target_Angle-=180;	
-//		 flag_hurt=1;
-//		 hurt_flag=0;
-//   }
-//	 if (flag_hurt) cnt_hurt++;
-//	
-//	 if (cnt_hurt==2500 && brain_flag==0)   
-//	 {
-//		 		 if (hurt_id==2) Holder.Yaw.Target_Angle+=90;
-//		 else if (hurt_id==1)Holder.Yaw.Target_Angle-=90;
-//		 else if (hurt_id==4) Holder.Yaw.Target_Angle+=180;	
-//		 cnt_hurt=0;
-//		 flag_hurt=0;
-//	 }
-//	 else if (cnt_hurt==2500 && brain_flag==1)  
-//	 {
-//cnt_hurt=0;
-//		 flag_hurt=0;
-//	 }		 
-	 
+         }
+          break;		
+								
+    }
+
+	 blood=referee2022.game_robot_status.remain_HP;
+
 }
 #define h1 186
 #define h2 279
