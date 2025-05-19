@@ -49,6 +49,7 @@ extern int Flag_Follow;
 extern float a222;
 float nmm;
 extern Hurt_state hurt;
+int speed_Fight,speed_Curise;
 float Change_angel(float vx,float vy,float Can_angle);
 void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotState,Brain_t* brain,RC_Ctrl_ET* rc_ctrl)
 {
@@ -57,7 +58,11 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 	band_time++;
   if(band_time%1000==0)band_number_ins++;
 	if(band_number_ins==20)band_number_ins=0;
-	speed1=3000+band_number[band_number_ins]*50;
+	speed_Fight=3000+band_number[band_number_ins]*50;
+	
+		speed_Curise=4000*sin(tim14.ClockTime*0.0005);
+	if (speed_Curise<2000 && speed_Curise>=0) speed_Curise=2000;
+	if (speed_Curise>-2000 && speed_Curise<0) speed_Curise=-2000;
 	
 				if(rc_ctrl->rc.s1==2)                         
 			{
@@ -76,7 +81,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					{
 	        chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-					chassis->Movement.Vomega=speed1;
+					chassis->Movement.Vomega=speed_Fight;
 						ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 					}
 				}
@@ -87,9 +92,9 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 				{
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-					if (hurt==1) chassis->Movement.Vomega=speed1;
+					if (hurt==1) chassis->Movement.Vomega=speed_Fight;
          else if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;//ÉÏ±¤ÀÝÍ£Ö¹	
-			else 	chassis->Movement.Vomega=-1500;;
+			else 	chassis->Movement.Vomega=speed_Curise;
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 					
 				}
@@ -99,10 +104,10 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					chassis->Movement.Vx=brain->Lidar.vx;
 					chassis->Movement.Vy=brain->Lidar.vy;
 					Check_Slope(&allchassis,&Holder);
-					if (hurt==1) chassis->Movement.Vomega=speed1;
+					if (hurt==1) chassis->Movement.Vomega=speed_Fight;
 					else if (flag000) chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
 			else 	if (chassis->Movement.Slope_Flag.flag_up_up_slope==1 ) chassis->Movement.Vomega=0;
-					else chassis->Movement.Vomega=-3000;
+					else chassis->Movement.Vomega=speed_Curise;
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
 				}
 
