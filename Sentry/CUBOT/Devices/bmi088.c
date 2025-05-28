@@ -419,6 +419,91 @@ static void BMI088_read_muli_reg(uint8_t reg, uint8_t *buf, uint8_t len)
         len--;
     }
 }
+float Q_B[4];
+void Bmi088_InitQuaternion()
+{
+    float acc_init[3]     = {0};
+    float gravity_norm[3] = {0, 0, 1}; // 导航系重力加速度矢量,归一化后为(0,0,1)
+    float axis_rot[3]     = {0};       // 旋转轴
+    // 读取100次加速度计数据,取平均值作为初始值
+    for (uint8_t i = 0; i < 100; ++i) {
+         BMI088_Read(&bmi088.bmi088_Data);
+        acc_init[X] += bmi088.bmi088_Data.accel[X];
+        acc_init[Y] += bmi088.bmi088_Data.accel[Y];
+        acc_init[Z] += bmi088.bmi088_Data.accel[Z];
+        DWT_Delay_s(0.001);
+    }
+    for (uint8_t i = 0; i < 3; ++i)
+        acc_init[i] /= 100;
+    Norm3d(acc_init);
+    // 计算原始加速度矢量和导航系重力加速度矢量的夹角
+    float angle = acosf(Dot3d(acc_init, gravity_norm));
+    Cross3d(acc_init, gravity_norm, axis_rot);
+    Norm3d(axis_rot);
+    Q_B[0] = cosf(angle / 2.0f);
+    for (uint8_t i = 0; i < 2; ++i)
+        Q_B[i + 1] = axis_rot[i] * sinf(angle / 2.0f); // 轴角公式,第三轴为0(没有z轴分量)
+}
+float Yaw,Pitch,Roll;
+void BMI088_IMUupdate(IMU_InitData_t *mpu6050_data)
+{
+    static int8_t YawRoundCount,exInt_1,eyInt_1,ezInt_1;
+   float  halfT,norm,vx,vy,vz,ex,ey,ez,tempq0,tempq1,tempq2,tempq3,now,dt;
+		static uint32_t DWT_Count_1 = 0;
+	static float YawAngleLast,a,b,c;
+	  dt =DWT_GetDeltaT(&DWT_Count_1); 
+	
+	    vx = 2.0f*(Q_B[1]*Q_B[3] - Q_B[0]*Q_B[2]);
+    vy = 2.0f*(Q_B[0]*Q_B[1] + Q_B[2]*Q_B[3]);
+    vz = Q_B[0]*Q_B[0] - Q_B[1]*Q_B[1] - Q_B[2]*Q_B[2] + Q_B[3]*Q_B[3];
+	    ex = (mpu6050_data->accel[1] * vz - mpu6050_data->accel[2] * vy);// + (my*wz - mz*wy);
+    ey = (mpu6050_data->accel[2] * vx - mpu6050_data->accel[0] * vz);// + (mz*wx - mx*wz);
+    ez = (mpu6050_data->accel[0] * vy - mpu6050_data->accel[1] * vx);// + (mx*wy - my*wx);
+	 a=mpu6050_data->gyro[0];
+	b=mpu6050_data->gyro[1];
+	c=mpu6050_data->gyro[2];
+	    if(fabs(mpu6050_data->Raw_gyro[1])<100&& fabs(mpu6050_data->Raw_gyro[2])<100&&fabs(mpu6050_data->Raw_gyro[0])<100)
+    {
+			exInt_1 = exInt_1 + ex * 0.1 *dt*0.5;
+			eyInt_1 = eyInt_1 + ey * 0.1  *dt*0.5;	
+			ezInt_1 = ezInt_1 + ez * 0.1  *dt*0.5;
+			// 用叉积误差来做PI修正陀螺零偏
+			mpu6050_data->gyro[0]+=0.5*ex ;
+			mpu6050_data->gyro[1]+=0.5*ey ;
+			mpu6050_data->gyro[2]+=0.5*ez ;
+		}
+    tempq0 = Q_B[0] + (-Q_B[1]*mpu6050_data->gyro[0] - Q_B[2]*mpu6050_data->gyro[1] - Q_B[3]*mpu6050_data->gyro[2])*dt*0.5;
+    tempq1 = Q_B[1] + (Q_B[0]*mpu6050_data->gyro[0] + Q_B[2]*mpu6050_data->gyro[2] - Q_B[3]*mpu6050_data->gyro[1])*dt*0.5;
+    tempq2 = Q_B[2] + (Q_B[0]*mpu6050_data->gyro[1] - Q_B[1]*mpu6050_data->gyro[2] + Q_B[3]*mpu6050_data->gyro[0])*dt*0.5;
+    tempq3 = Q_B[3] + (Q_B[0]*mpu6050_data->gyro[2] + Q_B[1]*mpu6050_data->gyro[1] - Q_B[2]*mpu6050_data->gyro[0])*dt*0.5;  
+
+    // 四元数规范化
+    norm = invSqrt(tempq0*tempq0 + tempq1*tempq1 + tempq2*tempq2 + tempq3*tempq3);
+    Q_B[0]= tempq0 * norm;
+    Q_B[1] = tempq1 * norm;
+    Q_B[2] = tempq2 * norm;
+    Q_B[3]= tempq3 * norm;
+
+
+
+
+		Yaw=-atan2(2 * Q_B[1] * Q_B[1]+ 2 * Q_B[0]* Q_B[2], -2 * Q_B[1]*Q_B[1]- 2 * Q_B[2] * Q_B[2] + 1)*57.329; // yaw        -pi----pi
+    Roll= -asin(-2 * Q_B[1] * Q_B[3]+ 2 * Q_B[0] * Q_B[2])*57.329; // pitch    -pi/2    --- pi/2 
+//		//>pitch轴角度
+    Pitch= -atan2(2 * Q_B[2]* Q_B[3] + 2 * Q_B[0]* Q_B[1], -2 * Q_B[1] * Q_B[1] - 2 * Q_B[2]* Q_B[2]+ 1)* 57.329; 
+
+//		    if (mpu6050->Yaw -YawAngleLast > 180.0f)
+//    {
+//        YawRoundCount--;
+//    }
+//    else if (mpu6050->Yaw -YawAngleLast < -180.0f)
+//    {
+//        YawRoundCount++;
+//    }
+//		mpu6050->Yaw_total_angle = 360.0f * YawRoundCount + mpu6050->Yaw;
+//		YawAngleLast = mpu6050->Yaw;
+		// roll       -pi-----pi        -pi-----pi 
+}	
 #elif defined(BMI088_USE_IIC)
 
 #endif

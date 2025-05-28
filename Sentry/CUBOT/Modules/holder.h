@@ -55,6 +55,12 @@ typedef enum {
 
 }
 Hurt_state;
+typedef enum {
+    SHOOT_IDLE = 0,      
+    SHOOT_ING,     //3508下拉    
+    SHOOT_DOUBT,     //舵机合拢
+}
+Shoot_state;
 extern  Holder_t Holder;
 //void HolderYawChassisInit(Holder_t* holder, CanNumber canx);
 //void HolderReset(Holder_t* holder);

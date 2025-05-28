@@ -41,7 +41,7 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 	holder->down_litmit=-35;//-35
 	
 	holder->right_litmit=-85;
-	holder->left_litmit=70;
+	holder->left_litmit=75;
 }
 uint8_t flag000;
 uint32_t m=0;
@@ -58,7 +58,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 	if(rc_ctrl->rc.s2!=1) holder->Yaw.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 	else if(rc_ctrl->rc.s2==1)holder->Yaw1.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 
-	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&& (referee_Fps==0 ||(referee2022.game_status.game_progress==4&&tim14_FPS.Vision_FPS>0)))
+	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&&tim14_FPS.Vision_FPS>0)
 			{
 //				if (brain->Autoaim.Last_mode!=Cruise)
 //				{
@@ -76,11 +76,11 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 				else if (m>15000) {m=0;}
 				else {holder->Cruise_Mode.pitch_time=0;holder->Cruise_Mode.yaw1_time=0;}
 				if (brain->Autoaim.Mode==Autoaim)
-				{Holder.Yaw1.Target_Angle = 85.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
+				{Holder.Yaw1.Target_Angle = 70.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
 			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
 				
 				else 
-				{Holder.Yaw1.Target_Angle = 65.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
+				{Holder.Yaw1.Target_Angle = 75.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
 			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
 			}
 			else m=0;
@@ -89,10 +89,10 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 			if (brain->Autoaim.mode==Cruise && brain->Autoaim.Mode==Outpost&&referee2022.game_status.game_progress==4) cntmm++;else cntmm=0;
 				
 				if (cntmm>3000) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
-				if (brain->Autoaim.mode==Cruise && hurt_flag==1) cntxx++;else cntxx=0;
-				if (cntxx>1500) {Holder.Yaw.Target_Angle-=180;cntxx=0;}
+//				if (brain->Autoaim.mode==Cruise && hurt_flag==1) cntxx++;else cntxx=0;
+//				if (cntxx>1500) {Holder.Yaw.Target_Angle-=180;cntxx=0;}
 				
-		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise)
+		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise&&brain->Autoaim.Mode==Autoaim)
 		{
 			brain->Autoaim.mode=Change;
 //
@@ -119,8 +119,8 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 
 	if(tim14.ClockTime%100==0&& holder->Yaw_Fllow_Mode.Flag_Fllow==0&&brain->Autoaim.mode!=Cruise)//´óÔÆÌ¨¸úËæ
 	{
-	if(holder->Yaw1.Target_Angle>70.0f) {holder->Yaw.Target_Angle+=60.0f;holder->Yaw_Fllow_Mode.Flag_Fllow=1;}			
-	else if(holder->Yaw1.Target_Angle<-75.0f)	{holder->Yaw.Target_Angle-=60.0f;holder->Yaw_Fllow_Mode.Flag_Fllow=1;}
+	if(holder->Yaw1.Target_Angle>(holder->left_litmit-10)) {holder->Yaw.Target_Angle+=60.0f;holder->Yaw_Fllow_Mode.Flag_Fllow=1;}			
+	else if(holder->Yaw1.Target_Angle<(holder->right_litmit+10))	{holder->Yaw.Target_Angle-=60.0f;holder->Yaw_Fllow_Mode.Flag_Fllow=1;}
 	}
 	if (holder->Yaw_Fllow_Mode.Flag_Fllow==1) holder->Yaw_Fllow_Mode.Lock_cnt++;
 	if (holder->Yaw_Fllow_Mode.Lock_cnt>=500)  {holder->Yaw_Fllow_Mode.Lock_cnt=0;holder->Yaw_Fllow_Mode.Flag_Fllow=0;}
@@ -147,10 +147,11 @@ for (int i=0;i<3;i++)
 
 }
 Hurt_state hurt;
+Shoot_state shoot;
  int hurt_flag;
  void thinchicken_feedback_control()//ÊÝ¼¦·´À¡
  {
-static int cnt_hurt_doubt,cnt_hurt_reset,blood;
+static int cnt_hurt_doubt,cnt_hurt_reset,blood,bullet,cnt_shoot_reset,cnt_shoot;
 	switch (hurt) {
         case HURT_IDLE:
 				{
@@ -175,29 +176,57 @@ static int cnt_hurt_doubt,cnt_hurt_reset,blood;
           break;		
 								
     }
+    	switch (shoot) {
+				
+        case SHOOT_IDLE:
+				{
+              if (bullet!=bullet_num_17mm)shoot=SHOOT_DOUBT;
+				}
+       break;
 
+        case SHOOT_ING:
+					{
+             cnt_shoot_reset++;
+			 if (bullet!=bullet_num_17mm) cnt_shoot++;
+            if (cnt_shoot_reset==1000) {if (cnt_shoot<=5) shoot=SHOOT_IDLE; cnt_shoot=0;cnt_shoot_reset=0;}
+					}
+          break;
+
+				 case SHOOT_DOUBT:
+         {
+            cnt_shoot_reset++;
+					  if (bullet!=bullet_num_17mm) cnt_shoot++;
+         if (cnt_shoot_reset==1000) {if (cnt_shoot>=2) shoot=SHOOT_ING;else shoot=SHOOT_IDLE; cnt_shoot_reset=0;cnt_shoot=0;}
+			 }
+          break;		
+								
+    }
 	 blood=referee2022.game_robot_status.remain_HP;
-
+   bullet=bullet_num_17mm;
 }
 #define h1 186
 #define h2 279
 #define c1 100
 #define c2 182.5
 float Target_Angle,yaw1_Angle;
+//int b;
 void Camare_control(Brain_t* brain,Holder_t* holder)
 {
 	uint8_t Target=Choose_Target(brain);
-
+//	b=brain->All_See.armorNumber[Target];
+if (brain->All_See.Yaw_add[Target]<=90&&brain->All_See.Yaw_add[Target]>=-90)
+{
 	Target_Angle=90+brain->All_See.Yaw_add[Target];
   yaw1_Angle=90-holder->Yaw1.Can_Angle;
 	if ((Target_Angle+yaw1_Angle)<180)
 	{if 		((5*Target_Angle)<2*yaw1_Angle-140) {Holder.Yaw.Target_Angle+=(yaw1_Angle+Target_Angle)/3.5;Holder.Yaw1.Target_Angle+=(yaw1_Angle+Target_Angle)/3.5*2.5;}
-	else {Holder.Yaw.Target_Angle+=Target_Angle+21;Holder.Yaw1.Target_Angle=69;}}
+	else {Holder.Yaw.Target_Angle+=Target_Angle+(115-holder->left_litmit);Holder.Yaw1.Target_Angle=holder->left_litmit-25;}}
 	else 
 		{if 		(0>(2*yaw1_Angle-5*Target_Angle+645)) {Holder.Yaw.Target_Angle-=(360-yaw1_Angle-Target_Angle)/3.5;Holder.Yaw1.Target_Angle-=(360-yaw1_Angle-Target_Angle)/3.5*2.5;}
-	else {Holder.Yaw.Target_Angle-=196-Target_Angle;Holder.Yaw1.Target_Angle=-74;}}
+	else {Holder.Yaw.Target_Angle-=(270+holder->right_litmit+25)-Target_Angle;Holder.Yaw1.Target_Angle=holder->right_litmit+25;}}
 			//Holder.Pitch.Target_Angle= - atan((brain->All_See.Distance[0]/1000.0*sin(-1*brain->All_See.Pitch_add[0]/57.3)-0.0725)/(0.06+brain->All_See.Distance[0]/1000.0*cos(-1*brain->All_See.Pitch_add[0]/57.3)))*57.3;
 	Holder.Pitch.Target_Angle=atan((c1+brain->All_See.Distance[0]*sin(brain->All_See.Pitch_add[0]/57.3)-h1)/(h2-(c2-brain->All_See.Distance[0]*cos(brain->All_See.Pitch_add[0]/57.3))))*57.3;
+}
 //	Holder.Pitch.Target_Angle= -15;
 }
 

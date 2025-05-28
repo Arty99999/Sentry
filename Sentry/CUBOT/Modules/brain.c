@@ -117,29 +117,19 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
 		
 	}
 }
-void Brain_Camera_DataUnpack_New(Brain_t* Brain ,uint8_t * recBuffer)//½â°üÀ×´ïÊý¾Ý
+void Brain_Camera_DataUnpack_New(Brain_t* Brain ,uint8_t * recBuffer)//½â°ü
 {
 	uint8_t k=0;
-	if(recBuffer[0]==0xAA  &&recBuffer[1]<5)
+	if(recBuffer[0]==0xAA  &&(recBuffer[recBuffer[1]*6+2])==0xDD&&tim14_FPS.Camera_FPS>5&&tim14_FPS.Camera_FPS<20)
 	{
 		Brain->All_See.Find_size=recBuffer[1];
-		if ( Brain->All_See.Find_size==0) 
-		{
-			memset(&Brain->All_See.Camera_Index, 0, 
-       sizeof(Brain->All_See.Camera_Index) + 
-       sizeof(Brain->All_See.armorNumber) + 
-       sizeof(Brain->All_See.Pitch_add) + 
-       sizeof(Brain->All_See.Yaw_add) + 
-       sizeof(Brain->All_See.Distance));
-		}
 		
-		
-		if	(Brain->All_See.mode!=Wait) Brain->All_See.mode=None;
 		
 for (int i=0;i< Brain->All_See.Find_size;i++)
 			{     
 				if	(Brain->All_See.mode!=Wait) Brain->All_See.mode_cnt[Found]++;else Brain->All_See.mode_cnt[Found]=0;
 				
+				if (recBuffer[i*6+2]>11) break;
 		  Brain->All_See.armorNumber[i] = recBuffer[i*6+2];
 
 			Brain->All_See.Distance[i]=10*recBuffer[i*6+7];
@@ -153,9 +143,10 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
 			else if((recBuffer[i*6+5] >> 7) == 1) 
 				Brain->All_See.Pitch_add[i] = (-1) * ((float)((recBuffer[i*6+5]&0x7f)*100 + recBuffer[i*6+6])/100);
        
-		}
 		
-	}
+		
+	    }
+   }
 }
 float a222;
 void Brain_Lidar_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//½â°üÀ×´ïÊý¾Ý
@@ -184,7 +175,7 @@ void  Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//½â°ü×ÔÃéÊý¾
 		Brain->Autoaim.Brain_Data.FrameType=recBuffer[1];
 		Brain->Autoaim.Brain_Data.FrameCoreID = recBuffer[2];
 		
-		if((Brain->Autoaim.Brain_Data.FrameType == BRAIN_TO_ROBOT_CMD) && recBuffer[13] == 0xDD)  //< ½âËãÆ«×ª½Ç
+		if((Brain->Autoaim.Brain_Data.FrameType == BRAIN_TO_ROBOT_CMD) && recBuffer[13] == 0xDD &&Brain->Autoaim.mode!=Change)  //< ½âËãÆ«×ª½Ç
 		{
 			Brain->Autoaim.mode_cnt[Cruise] = 0;
 			Brain->Autoaim.Use_Can_angle=Brain->Autoaim.Send_Can_angle[recBuffer[12]];
@@ -229,7 +220,7 @@ void  Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//½â°ü×ÔÃéÊý¾
 /**
   * @brief  ÏÂÎ»»úÏòÉÏÎ»»ú·¢ËÍÊ±¼ä´ÁÒÔ¼°ËÄÔªÊý
   */
-
+int cnt___;
 void RobotToBrain_Autoaim(float yaw,Brain_t* brain)//·¢¸ø×ÔÃé
 {
 	int16_t tmp0,tmp1,tmp2,tmp3,tmp4,cnt;
@@ -265,8 +256,13 @@ void RobotToBrain_Autoaim(float yaw,Brain_t* brain)//·¢¸ø×ÔÃé
 	RobotToBrainTimeBuffer[15] = tmp2 >> 8;
 	RobotToBrainTimeBuffer[16] = tmp3 & 0xFF;
 	RobotToBrainTimeBuffer[17] = tmp3 >> 8;  
-	RobotToBrainTimeBuffer[18] = tmp4 & 0xFF;
+	if (brain->Autoaim.mode==Cruise||brain->Autoaim.mode==Change) {brain->Autoaim.Stand=0;cnt___=0;}
+	else if (brain->Autoaim.mode==Lock) cnt___++;
+	if (cnt___>=250)  {brain->Autoaim.Stand=1;cnt___=250;}
+	
+	RobotToBrainTimeBuffer[18] = brain->Autoaim.Stand;//0ÊÇÔ¤²â 1ÊÇ¸úËæ
 	RobotToBrainTimeBuffer[19] = tmp4 >> 8; 
+	//RobotToBrainTimeBuffer[19] = tmp4 >> 8; 
 
 
 
@@ -288,6 +284,8 @@ void RobotToBrain_Autoaim(float yaw,Brain_t* brain)//·¢¸ø×ÔÃé
 
 int change_position; 
 uint8_t amm;
+int kkk,kk1;
+extern uint8_t referee_Fps;
 uint8_t lidar_station_flag;//2ÌÝ¸ß£¬1»·¸ß£¬0»ùµØÇ°Ãæ
 void RobotToBrain_Lidar(Brain_t* Brain)//·¢¸øÀ×´ï
 {
@@ -295,7 +293,7 @@ void RobotToBrain_Lidar(Brain_t* Brain)//·¢¸øÀ×´ï
 //	y = referee2022.map_command_t.target_position_y * 100;
 	RobotToBrainChassisTimeBuffer[0]  = 0xAA;
 
-	if (referee2022.game_status.game_progress==0&&referee2022.game_status.game_type==0)
+	if(referee_Fps==0)
   {RobotToBrainChassisTimeBuffer[1]  = 1;        
 	  RobotToBrainChassisTimeBuffer[2]  = 1;}
 	else if(referee2022.game_status.game_progress == 4) 
@@ -326,12 +324,12 @@ void RobotToBrain_Lidar(Brain_t* Brain)//·¢¸øÀ×´ï
 	//if(referee2022.buff.defence_buff>0)defense_flag=1;
 //	else defense_flag=0;
 	
-
+//change_position=kkk;
 	RobotToBrainChassisTimeBuffer[3]  = change_position;
 
 
 	//=Lidar_Fortress;
-	
+	//Brain->Lidar.mode=kk1;
 	RobotToBrainChassisTimeBuffer[4]  = Brain->Lidar.mode ;
 //	RobotToBrainChassisTimeBuffer[5]  = y&0xff;    
 //	RobotToBrainChassisTimeBuffer[6]  = y>>8;	
@@ -373,12 +371,11 @@ if(tim14.ClockTime%2== 0) {RobotToBrain_Lidar(Brain);}
 	if(tim14.ClockTime%1== 0) {RobotToBrain_Autoaim(Holder.Yaw.GYRO_Angle,Brain);} 
 	
 }
-extern int8_t YawRoundCount;
-extern uint8_t referee_Fps;
+
 extern int hurt_flag;
 void Change_BrainMode(Brain_t* Brain)
 {
-	static int cnt_change,flag_change;
+	static int cnt_change;
 if (referee_Fps==0)
 {	
 	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
@@ -395,17 +392,14 @@ if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.
 	 
 	 
 	 if (referee2022.game_robot_status.remain_HP<150||(referee2022.bullet_remaining.bullet_remaining_num<=50)) Brain->Lidar.mode=Lidar_home;
-	 else if (referee2022.map_command_t.cmd_keyboard=='F'&&fabs(referee2022.map_command_t.target_position_y-8)<2) Brain->Lidar.mode=Lidar_Fortress;
+	 else if ((referee2022.map_command_t.cmd_keyboard=='B'&&fabs(referee2022.map_command_t.target_position_y-8)<2) ||  (referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.blue_base_HP<=2500) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.red_base_HP<=2500)) Brain->Lidar.mode=Lidar_Fortress;
 	 else 	
 	{
-if ((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)) Brain->Lidar.mode=Lidar_Patrol;
+if ((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)||referee2022.game_status.stage_remain_time<=240) Brain->Lidar.mode=Lidar_Patrol;
 	else Brain->Lidar.mode=Lidar_Outpost;
 	}
 
-	if (flag_change) cnt_change++;
-			 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1&&cnt_change==0) {Holder.Yaw.Target_Angle=YawRoundCount*360-69;flag_change=1;}
-				 
-	 else if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1&&cnt_change>=500) {cnt_change=500;Brain->Autoaim.Mode=Outpost;flag_change=0;}
+if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
 	 else Brain->Autoaim.Mode=Autoaim;
  }
 }

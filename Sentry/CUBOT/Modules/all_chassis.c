@@ -20,13 +20,13 @@ float vtemp;//改VXVY用的
 float angle_to_holder;//（雷达）云台坐标系相对世界坐标系的角度
 float speed1=0;//自旋速度
 float chassis_feedforward=1;
-
+extern int flag_vxvy;
 uint32_t band_time;
 int band_number[20]={20,78,44,60,32,65,19,39,23,66,76,19,30,56,12,56,36,74,50,27};
 int band_number_ins;
 	
 void Speed_Poweroutput_Control_New(AllChassis* chassis);
-void ALLChassisSetSpeed(AllChassis* chassis, float canAngle);
+void ALLChassisSetSpeed(AllChassis* chassis, float canAngle,int flag);
 void ALLChassisSetSpeedTwo(AllChassis* chassis, float canAngle);
 
 	
@@ -49,6 +49,7 @@ extern int Flag_Follow;
 extern float a222;
 float nmm;
 extern Hurt_state hurt;
+extern Shoot_state shoot;
 int speed_Fight,speed_Curise;
 float Change_angel(float vx,float vy,float Can_angle);
 void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotState,Brain_t* brain,RC_Ctrl_ET* rc_ctrl)
@@ -58,7 +59,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 	band_time++;
   if(band_time%1000==0)band_number_ins++;
 	if(band_number_ins==20)band_number_ins=0;
-	speed_Fight=3000+band_number[band_number_ins]*50;
+	speed_Fight=4000+band_number[band_number_ins]*50;
 	
 		speed_Curise=4000*sin(tim14.ClockTime*0.0005);
 	if (speed_Curise<2000 && speed_Curise>=0) speed_Curise=2000;
@@ -73,16 +74,16 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					{
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-					chassis->Movement.Vomega=1500;
+					chassis->Movement.Vomega=3500;
 
-					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
+					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					}
 					else if(referee2022.game_status.game_progress==4)//比赛开始？
 					{
 	        chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-					chassis->Movement.Vomega=speed_Fight;
-						ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
+					chassis->Movement.Vomega=1500;
+						ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					}
 				}
 				else
@@ -95,20 +96,31 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					if (hurt==1) chassis->Movement.Vomega=speed_Fight;
          else if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;//上堡垒停止	
 			else 	chassis->Movement.Vomega=speed_Curise;
-					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
+					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					
 				}
 				else if(brain->Lidar.movemode == 1)//普通平移
 				{					
 					
+				if (Brain.Lidar.mode==Lidar_Patrol &&shoot==SHOOT_ING)
+				{
+					chassis->Movement.Vx=0;
+					chassis->Movement.Vy=065;
+				}
+					else 
+					{
 					chassis->Movement.Vx=brain->Lidar.vx;
 					chassis->Movement.Vy=brain->Lidar.vy;
+						
+						
+						
+					}
 					Check_Slope(&allchassis,&Holder);
 					if (hurt==1) chassis->Movement.Vomega=speed_Fight;
 					else if (flag000) chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
 			else 	if (chassis->Movement.Slope_Flag.flag_up_up_slope==1 ) chassis->Movement.Vomega=0;
 					else chassis->Movement.Vomega=speed_Curise;
-					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle);
+					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 				}
 
 			  }
@@ -117,24 +129,34 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 			{
 				brain->Lidar.angle_to_lidar=0;
 				angle_to_holder=0;
+				Check_Slope(&allchassis,&Holder);
 					chassis->Movement.Vx=-(rc_Ctrl_et.rc.ch0-1024)*5;
-					chassis->Movement.Vy=-(rc_Ctrl_et.rc.ch1-1024)*5;				
+					chassis->Movement.Vy=-(rc_Ctrl_et.rc.ch1-1024)*5;			
+				
 				chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
-				 ALLChassisSetSpeed(chassis, Holder.Motors6020.motor[0].Data.Angle);
+
+				 ALLChassisSetSpeed(chassis, Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 			}
 }
 
 
 
-void ALLChassisSetSpeed(AllChassis* chassis, float canAngle)
+void ALLChassisSetSpeed(AllChassis* chassis, float canAngle,int flag)
 {
 	float angle = -canAngle * AtR-Holder.Motors6020.motor[0].Data.SpeedRPM*0.0026;// * Holder.Motors6020.motor[0].Data.SpeedRPM*chassis_feedforward;
 //	raw_vx=chassis->Movement.Vx*cos(-angle_to_lidar)-chassis->Movement.Vy*sin(-angle_to_lidar);
 //	raw_vy=chassis->Movement.Vx*sin(-angle_to_lidar)+chassis->Movement.Vy*cos(-angle_to_lidar);//建图坐标系到世界坐标系，无用
+	
+	if (flag==0)
+	{
 	raw_vx_lidar=chassis->Movement.Vx*cos(-Brain.Lidar.angle_to_lidar)-chassis->Movement.Vy*sin(-Brain.Lidar.angle_to_lidar);
 	raw_vy_lidar=chassis->Movement.Vx*sin(-Brain.Lidar.angle_to_lidar)+chassis->Movement.Vy*cos(-Brain.Lidar.angle_to_lidar);//世界坐标系到雷达（云台）坐标系
-	
-	
+	}
+	else 
+		{
+	raw_vx_lidar=-chassis->Movement.Vx*cos(-Brain.Lidar.angle_to_lidar)+chassis->Movement.Vy*sin(-Brain.Lidar.angle_to_lidar);
+	raw_vy_lidar=-chassis->Movement.Vx*sin(-Brain.Lidar.angle_to_lidar)-chassis->Movement.Vy*cos(-Brain.Lidar.angle_to_lidar);//世界坐标系到雷达（云台）坐标系
+	}
 	
 	float rotated_vy = (raw_vx_lidar * sin(angle) + raw_vy_lidar * cos(angle));
 	float rotated_vx = (raw_vx_lidar * cos(angle) - raw_vy_lidar * sin(angle));//雷达（云台）坐标系到底盘坐标系
@@ -256,9 +278,10 @@ void AllChassisInit(AllChassis *chassis, BasePID_Object* run_pid,BasePID_Object*
 	chassis->Movement.Vy_Sensitivity     = 1;
 }
 float d;
+int Cnt_up_slope;
 void Check_Slope(AllChassis *chassis,Holder_t* holder)
 {
-	static int Cnt_stat,Cnt_up_slope,Cnt_down_slope;
+	static int Cnt_stat,Cnt_down_slope;
 //	if (holder->Pitch.GYRO_Angle-holder->Pitch.Can_Angle>5)  { Cnt_up_slope++  ;Cnt_stat=0;Cnt_down_slope=0;}
 //	else if (holder->Pitch.GYRO_Angle-holder->Pitch.Can_Angle<-5) {Cnt_down_slope++ ;Cnt_stat=0;Cnt_up_slope=0;}
 //	else {Cnt_up_slope=0 ;Cnt_down_slope=0;Cnt_stat++;}
@@ -280,7 +303,7 @@ void Check_Slope(AllChassis *chassis,Holder_t* holder)
 //	{Cnt_stat=100;chassis->Movement.Slope_Flag.flag_up_up_slope=0;chassis->Movement.Slope_Flag.flag_up_down_slope=0;chassis->Movement.Slope_Flag.flag_down_up_slope=0;chassis->Movement.Slope_Flag.flag_down_down_slope=0;chassis->Movement.Slope_Flag.flag_up_stat_slope=0;chassis->Movement.Slope_Flag.flag_down_stat_slope=0;}
 //		
 
-		if (pow(mpu6050.Pitch+1.5,2)+pow(mpu6050.Roll-2,2)>100) 
+		if ((pow(INS_attitude->pitch+Holder.Pitch.Can_Angle,2)+pow(INS_attitude->roll,2))>81) 
 			Cnt_up_slope++;else Cnt_up_slope--;
 		if (Cnt_up_slope>300)
 		{chassis->Movement.Slope_Flag.flag_up_up_slope=1;}else chassis->Movement.Slope_Flag.flag_up_up_slope=0;

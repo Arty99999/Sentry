@@ -207,7 +207,7 @@ void _Data_Diapcak(uint8_t *pdata)
 		BYTE1(referee2022.shoot_data.bullet_speed) = *(pdata+data_addr + 4);
 		BYTE2(referee2022.shoot_data.bullet_speed) = *(pdata+data_addr + 5);
 		BYTE3(referee2022.shoot_data.bullet_speed) = *(pdata+data_addr + 6);
-if (Brain.Autoaim.Mode==Outpost)
+if (Brain.Autoaim.Mode!=Outpost)
     bullet_num_17mm++;
 	}
 	if(cmd_id==0x0208)
@@ -264,6 +264,7 @@ if (Brain.Autoaim.Mode==Outpost)
 	}
 	   if(cmd_id==0x0303)
 		{
+
 			BYTE0(referee2022.map_command_t.target_position_x)=*(pdata+data_addr);
 			BYTE1(referee2022.map_command_t.target_position_x)=*(pdata+data_addr+1);
 			BYTE2(referee2022.map_command_t.target_position_x)=*(pdata+data_addr+2);

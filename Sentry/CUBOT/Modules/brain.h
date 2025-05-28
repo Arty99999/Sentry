@@ -62,7 +62,7 @@ typedef struct
 	struct{
 		Brain_Autoaim_mode mode;
 		Brain_Autoaim_mode Last_mode;
-		uint16_t mode_cnt[2];
+		uint16_t mode_cnt[3];
 		CubotBrain_t Brain_Data;
 		Brain_mode  Mode;
 		float Pitch_add;
@@ -79,6 +79,7 @@ typedef struct
 		float Send_Gyro_angle[256];
 		uint8_t Ignore_armorNumber;
 			uint8_t IsFire;
+		uint8_t Stand;
 	}Autoaim;
 	 struct{
 		Brain_Lidar_mode mode;

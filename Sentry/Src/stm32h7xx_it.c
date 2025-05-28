@@ -615,7 +615,7 @@ UART_Idle_Handler(&huart7);
 void UART8_IRQHandler(void)
 {
   /* USER CODE BEGIN UART8_IRQn 0 */
-UART_Idle_Handler(&huart8);
+//UART_Idle_Handler(&huart8);
   /* USER CODE END UART8_IRQn 0 */
   HAL_UART_IRQHandler(&huart8);
   /* USER CODE BEGIN UART8_IRQn 1 */

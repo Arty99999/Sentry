@@ -258,24 +258,22 @@ void MPU6050_Read_1(IMU_InitData_t *mpu6050_data)
 	static uint8_t Buf[14];
 	static int16_t mpu6050_raw_temp;
 	MPU6050_t* mpu6050  =(MPU6050_t*)mpu6050_data ;
-	MPU6050_ReadData_1(MPU6050_ACC_OUT, Buf, 14,mpu6050->mpu6050_Data.i2cHandler);
-	mpu6050_raw_temp       = (int16_t)(Buf[0] << 8) | Buf[1];
-	mpu6050_data->accel[0] = mpu6050_raw_temp * MPU6050_ACCEL_SEN * mpu6050_data->accel_scale;
-	mpu6050_raw_temp       = (int16_t)(Buf[2] << 8) | Buf[3];
-	mpu6050_data->accel[1] = mpu6050_raw_temp * MPU6050_ACCEL_SEN * mpu6050_data->accel_scale;
-	mpu6050_raw_temp       = (int16_t)(Buf[4] << 8) | Buf[5];
-	mpu6050_data->accel[2] = mpu6050_raw_temp * MPU6050_ACCEL_SEN * mpu6050_data->accel_scale;
+//	MPU6050_ReadData_1(MPU6050_ACC_OUT, Buf, 14,mpu6050->mpu6050_Data.i2cHandler);
+//	mpu6050_raw_temp       = (int16_t)(Buf[0] << 8) | Buf[1];
+//	mpu6050_data->accel[0] = mpu6050_raw_temp * MPU6050_ACCEL_SEN * mpu6050_data->accel_scale;
+//	mpu6050_raw_temp       = (int16_t)(Buf[2] << 8) | Buf[3];
+//	mpu6050_data->accel[1] = mpu6050_raw_temp * MPU6050_ACCEL_SEN * mpu6050_data->accel_scale;
+//	mpu6050_raw_temp       = (int16_t)(Buf[4] << 8) | Buf[5];
+//	mpu6050_data->accel[2] = mpu6050_raw_temp * MPU6050_ACCEL_SEN * mpu6050_data->accel_scale;
 
-	mpu6050_data->temperature=(int16_t)(Buf[6]<<8|Buf[7])/340.0+36.53;
+//	mpu6050_data->temperature=(int16_t)(Buf[6]<<8|Buf[7])/340.0+36.53;
+MPU6050_ReadData(MPU6050_GYRO_OUT+4, Buf, 2,mpu6050_data->i2cHandler);
 
-	mpu6050_raw_temp      = (int16_t)(Buf[8] << 8) | Buf[9];
-mpu6050_data->Raw_gyro[0]=mpu6050_raw_temp ;
-	mpu6050_data->gyro[0] = mpu6050_raw_temp * MPU6050_GYRO_SEN - mpu6050_data->gyro_offset[0];
+	mpu6050_data->gyro[0] = 0;
 
-	mpu6050_raw_temp      = (int16_t)(Buf[10] << 8) | Buf[11];
-mpu6050_data->Raw_gyro[1]=mpu6050_raw_temp ;
-	mpu6050_data->gyro[1] = mpu6050_raw_temp * MPU6050_GYRO_SEN - mpu6050_data->gyro_offset[1];
-	mpu6050_raw_temp      = (int16_t)(Buf[12] << 8) | Buf[13];
+
+	mpu6050_data->gyro[1] = 0;
+	mpu6050_raw_temp      = (int16_t)(Buf[0] << 8) | Buf[1];
 mpu6050_data->Raw_gyro[2]=mpu6050_raw_temp ;
 
 	mpu6050_data->gyro[2] = mpu6050_raw_temp * MPU6050_GYRO_SEN - mpu6050_data->gyro_offset[2];
