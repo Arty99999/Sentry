@@ -163,9 +163,9 @@ void HardwareConfig(void)
 	CAN_Open(&can2);
 	
 
-	 MPU6050_Init(&mpu6050.mpu6050_Data);
+
 	INS_Init(&bmi088.bmi088_Data); // 
- 
+ 	 MPU6050_Init(&mpu6050.mpu6050_Data);
 //		UsarttoWifi("+++");
 //	HAL_Delay(1000);
 //		UsarttoWifi("+++");

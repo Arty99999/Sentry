@@ -46,6 +46,7 @@ AllChassis allchassis={
   */
 extern uint8_t flag000;
 extern int Flag_Follow;
+extern int cnth;
 extern float a222;
 float nmm;
 extern Hurt_state hurt;
@@ -64,7 +65,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 		speed_Curise=4000*sin(tim14.ClockTime*0.0005);
 	if (speed_Curise<2000 && speed_Curise>=0) speed_Curise=2000;
 	if (speed_Curise>-2000 && speed_Curise<0) speed_Curise=-2000;
-	
+	speed_Curise=2400;
 				if(rc_ctrl->rc.s1==2)                         
 			{
 				if(CheckRobotState->Check_Usart.Check_lidar==0)//雷达离线
@@ -78,6 +79,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					}
+					
 					else if(referee2022.game_status.game_progress==4)//比赛开始？
 					{
 	        chassis->Movement.Vx=0;
@@ -95,29 +97,30 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					chassis->Movement.Vy=0;
 					if (hurt==1) chassis->Movement.Vomega=speed_Fight;
          else if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;//上堡垒停止	
-			else 	chassis->Movement.Vomega=speed_Curise;
+			else 	chassis->Movement.Vomega=4000*sin(tim14.ClockTime*0.0005);
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					
 				}
 				else if(brain->Lidar.movemode == 1)//普通平移
 				{					
 					
-				if (Brain.Lidar.mode==Lidar_Patrol &&shoot==SHOOT_ING)
+				if (Brain.Lidar.mode==Lidar_Patrol && shoot==SHOOT_ING)
 				{
 					chassis->Movement.Vx=0;
-					chassis->Movement.Vy=065;
+					chassis->Movement.Vy=0;
 				}
 					else 
 					{
 					chassis->Movement.Vx=brain->Lidar.vx;
 					chassis->Movement.Vy=brain->Lidar.vy;
-						
-						
-						
 					}
+					if (flag000&&Brain.Lidar.mode==4)
+					{chassis->Movement.Vx=0;
+					chassis->Movement.Vy=0;}
+					
 					Check_Slope(&allchassis,&Holder);
 					if (hurt==1) chassis->Movement.Vomega=speed_Fight;
-					else if (flag000) chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
+					else if (flag000||cnth==1) chassis->Movement.Vomega = BasePID_SpeedControl(&chassis->Motors.FollowPID, 0, -Holder.Motors6020.motor[0].Data.Angle);
 			else 	if (chassis->Movement.Slope_Flag.flag_up_up_slope==1 ) chassis->Movement.Vomega=0;
 					else chassis->Movement.Vomega=speed_Curise;
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);

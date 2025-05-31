@@ -45,6 +45,7 @@ uint8_t Referee_callback(uint8_t * recBuffer, uint16_t len)
   Referee_Data_Diapcak(recBuffer,len);
 	return 0;
 }
+
 int blue_3=0;
 extern uint8_t referee_cnt;
 /******************************************************************
@@ -109,7 +110,9 @@ void _Data_Diapcak(uint8_t *pdata)
 		referee2022.game_robot_hp.blue_robot_HP_last[i]=referee2022.game_robot_hp.blue_robot_HP[i];
 		referee2022.game_robot_hp.red_robot_HP_last[i]=referee2022.game_robot_hp.red_robot_HP[i];
 		}
-			
+	
+		
+		
 	}
 	
 	
@@ -199,6 +202,7 @@ void _Data_Diapcak(uint8_t *pdata)
 	
 	if(cmd_id==0x0207)
 	{
+		
 		referee2022.shoot_data.bullet_type=*(pdata+data_addr);
 		referee2022.shoot_data.shooter_id =	*(pdata+data_addr + 1);		
 		referee2022.shoot_data.bullet_freq=*(pdata+data_addr + 2);
@@ -207,8 +211,7 @@ void _Data_Diapcak(uint8_t *pdata)
 		BYTE1(referee2022.shoot_data.bullet_speed) = *(pdata+data_addr + 4);
 		BYTE2(referee2022.shoot_data.bullet_speed) = *(pdata+data_addr + 5);
 		BYTE3(referee2022.shoot_data.bullet_speed) = *(pdata+data_addr + 6);
-if (Brain.Autoaim.Mode!=Outpost)
-    bullet_num_17mm++;
+if (Brain.Autoaim.Mode!=Outpost) {bullet_num_17mm++;Brain.Autoaim.Attack_state.shoot_num++;}
 	}
 	if(cmd_id==0x0208)
 	{

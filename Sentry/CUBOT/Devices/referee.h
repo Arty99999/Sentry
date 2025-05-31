@@ -56,7 +56,9 @@ struct
 	uint16_t blue_base_HP;
 	
 	uint16_t red_robot_HP_last[8];
+	uint8_t red_robot_Hurt[8];
   uint16_t blue_robot_HP_last[8];
+	uint8_t blue_robot_Hurt[8];
 	
 	uint8_t red_robot_revge[8];
   uint8_t blue_robot_revge[8];

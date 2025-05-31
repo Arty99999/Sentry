@@ -55,7 +55,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
     
     if(referee2022.power_heat_data.shooter_id1_17mm_cooling_heat >= referee2022.game_robot_status.shooter_id1_17mm_cooling_limit - ammo_booster->Shoot_Plate.Fire_Margin-70 )
 			ammo_booster->Shoot_Plate.Fire_Divider=125;else if (Brain.Autoaim.Mode==Outpost)ammo_booster->Shoot_Plate.Fire_Divider=40;	else ammo_booster->Shoot_Plate.Fire_Divider=50;
-     	if (referee2022.game_status.game_progress!=4) ammo_booster->Shoot_Plate.Fire_Divider=100;
+//     	if (referee2022.game_status.game_progress!=4) ammo_booster->Shoot_Plate.Fire_Divider=100;
 		if (ammo_booster->Shoot_Plate.Shoot_rest_flag) ammo_booster->Shoot_Plate.Shoot_Cut++;
  		if (ammo_booster->Shoot_Plate.Shoot_Cut%ammo_booster->Shoot_Plate.Fire_Divider==0) ammo_booster->Shoot_Plate.Shoot_rest_flag=0;
 		

@@ -16,46 +16,60 @@
 #include "control_logic.h"
 #include "hardware_config.h"
 
-
-
+int  flag_ppp,cntppp;
 extern int flag00,flag01;
 extern int FLAG_1,FLAG_Send;
-
+uint8_t flag_change_last;
 uint8_t referee_cnt,referee_Fps;
-
+extern Shoot_state shoot;
 int16_t ThisSecond =0;
 	int cnt_heat,flag_fallover,cnt_fallover;
 //extern	float init_quaternion[4];
 	extern float angle;
 extern float a222;
 extern int flag000;
-extern int change_position;
+extern int change_position,cnt_shoot;
 int cnt000;
 extern int m00;
 int cnt_change,flag_change,cnt_vxvy,flag_vxvy;
 
 int cntll,flag_roll,cnt_refree;
+int cnth;
 void TIM14_Task(void)
 {
 	
 		tim14.ClockTime++;
 	
-
+  if (flag000==1) cnth++;
+	if (cnth>=1000) {cnth=1;flag000=0;}
 	if(tim14.ClockTime%5000==0) 
 	{referee_Fps=referee_cnt;
 		referee_cnt=0;
 	}
 	
-	if (Brain.Lidar.mode==3&&Brain.Lidar.Arrive==1) cnt_change++;else cnt_change=0;
-	if(flag_change==1&&change_position==0)  {change_position=1;flag_change=0;}
-	else if(flag_change==1&& change_position==1)  {change_position=2;flag_change=0;}
-	else if(flag_change==1&&change_position==2)  {change_position=0;flag_change=0;}
-	if (cnt_change>1500)  {flag_change=1;cnt_change=0;}
+	if (Brain.Lidar.mode==3) cnt_change++;else cnt_change=0;
+	if (cnt_change>8500)  {flag_change=1;cnt_change=0;}
+	if(flag_change==1&&change_position==0 )  {flag_change_last=change_position;change_position=2;flag_change=0;}
+	else if(flag_change==1&&change_position==2&&flag_change_last==0 )  {flag_change_last=change_position;change_position=1;flag_change=0;}
+	else if(flag_change==1&& change_position==2&&flag_change_last==1)  {flag_change_last=change_position;change_position=0;flag_change=0;}
+	else if(flag_change==1&&change_position==1)  {flag_change_last=change_position;change_position=2;flag_change=0;}
 	
-		if(tim14.ClockTime%1000==0) FPS_Check(&tim14_FPS);
-	if (Brain.Lidar.mode!=4) {flag000=0;a222=0;}
+	
 	
 
+	
+		if(tim14.ClockTime%1000==0) FPS_Check(&tim14_FPS);
+	if (Brain.Lidar.mode!=4) {flag000=0;a222=0;cnth=0;}
+	if(tim14.ClockTime%2000==0)
+	{
+		for (int i=0;i<8;i++)
+		{
+			if (referee2022.game_robot_hp.blue_robot_HP[i]<referee2022.game_robot_hp.blue_robot_HP_last[i])referee2022.game_robot_hp.blue_robot_Hurt[i]=1;else referee2022.game_robot_hp.blue_robot_Hurt[i]=0;
+		if (referee2022.game_robot_hp.red_robot_HP[i]<referee2022.game_robot_hp.red_robot_HP_last[i])referee2022.game_robot_hp.red_robot_Hurt[i]=1;else referee2022.game_robot_hp.red_robot_Hurt[i]=0;
+		}
+	
+	}
+//thinchicken_feedback_control();
 		
 	if (rc_Ctrl_et.rc.s2==1) cnt_vxvy++;else cnt_vxvy=0;
 		if (cnt_vxvy>=7000) {flag_vxvy=!flag_vxvy;cnt_vxvy=0;}
@@ -68,12 +82,14 @@ void TIM14_Task(void)
 	if ((Brain.Autoaim.mode_cnt[Cruise]>40&&Brain.Autoaim.Mode==Autoaim)|| (Brain.Autoaim.mode_cnt[Cruise]>100&&Brain.Autoaim.Mode==Outpost) ) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
 	
 		if (Brain.All_See.mode_cnt[Wait]>2000) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;}
+		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
 		if (Brain.All_See.mode_cnt[Found]>=2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
+	//		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
 		//	rc_Ctrl_et.rc.s2=2;
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
 		  ShootPlateControl(&AmmoBooster,&Brain);
-	//	Brain.Autoaim.Mode=Outpost;
+	//	Brain.Autoaim.Mode=Au;
 				HolderGetRemoteData(&Holder, &rc_Ctrl_et,&Brain);
 
 	
@@ -136,12 +152,14 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 		
 		
 if (referee2022.game_robot_status.mains_power_gimbal_output==0) MotorFillData(&Holder.Motors6020.motor[0],0);
-//if (allchassis.Motors.motor[0].Data.Online_check.FPS<500||allchassis.Motors.motor[1].Data.Online_check.FPS<500||allchassis.Motors.motor[2].Data.Online_check.FPS<500||allchassis.Motors.motor[3].Data.Online_check.FPS<500)
-//{
-//	for (int i=0;i<4;i++)
-//	MotorFillData(&allchassis.Motors.motor[i],0);
-//}
-
+if ((allchassis.Motors.motor[0].Data.Online_check.FPS<500||allchassis.Motors.motor[1].Data.Online_check.FPS<500||allchassis.Motors.motor[2].Data.Online_check.FPS<500||allchassis.Motors.motor[3].Data.Online_check.FPS<500) &&flag_ppp==0)
+{
+	for (int i=0;i<4;i++)
+	MotorFillData(&allchassis.Motors.motor[i],0);
+	cntppp++;
+}
+else cntppp=0;
+if (cntppp>10000){flag_ppp=1;cntppp=0;}
 
  MotorCanOutput(can1, 0x1ff);
  MotorCanOutput(can1, 0x200);
@@ -153,7 +171,7 @@ if (referee2022.game_robot_status.mains_power_gimbal_output==0) MotorFillData(&H
 		
 //		if (tim14.ClockTime%200==0)
 		
-		UsartDmaPrintf("%.2f\r\n",referee2022.shoot_data.bullet_speed);
+//		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
 	//UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
 //  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
 	//UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Yaw.Target_Angle,Holder.Yaw.GYRO_Angle);

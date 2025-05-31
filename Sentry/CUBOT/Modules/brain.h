@@ -68,7 +68,6 @@ typedef struct
 		float Pitch_add;
 		float Yaw_add;
 		float Distance;
-		uint8_t camara_num;
 		uint8_t fire_flag;
 		float Limit;
 		
@@ -80,6 +79,11 @@ typedef struct
 		uint8_t Ignore_armorNumber;
 			uint8_t IsFire;
 		uint8_t Stand;
+		struct{
+			uint8_t  camara_num;
+			uint16_t shoot_num;
+			uint16_t hp;
+		}Attack_state;
 	}Autoaim;
 	 struct{
 		Brain_Lidar_mode mode;
