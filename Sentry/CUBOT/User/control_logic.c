@@ -1,18 +1,13 @@
 #include "ins.h"
 #include "mpu6050.h"
 #include "bmi088.h"
-
 #include "ET08.h"
-
 #include "holder.h"
 #include "shoot.h"
 #include "all_chassis.h"
-
 #include "brain.h"
-
 #include "referee.h"
 #include "check.h"
-
 #include "control_logic.h"
 #include "hardware_config.h"
 
@@ -48,13 +43,18 @@ void TIM14_Task(void)
 	}
 	
 	if (Brain.Lidar.mode==3) cnt_change++;else cnt_change=0;
-	if (cnt_change>8500)  {flag_change=1;cnt_change=0;}
-	if(flag_change==1&&change_position==0 )  {flag_change_last=change_position;change_position=2;flag_change=0;}
-	else if(flag_change==1&&change_position==2&&flag_change_last==0 )  {flag_change_last=change_position;change_position=1;flag_change=0;}
-	else if(flag_change==1&& change_position==2&&flag_change_last==1)  {flag_change_last=change_position;change_position=0;flag_change=0;}
-	else if(flag_change==1&&change_position==1)  {flag_change_last=change_position;change_position=2;flag_change=0;}
-	
-	
+	if (cnt_change>2500)  {flag_change=1;cnt_change=0;}
+//	if(flag_change==1&&change_position==0 )  {flag_change_last=change_position;change_position=2;flag_change=0;}
+//	else if(flag_change==1&&change_position==2&&flag_change_last==0 )  {flag_change_last=change_position;change_position=1;flag_change=0;}
+//	else if(flag_change==1&& change_position==2&&flag_change_last==1)  {flag_change_last=change_position;change_position=0;flag_change=0;}
+//	else if(flag_change==1&&change_position==1)  {flag_change_last=change_position;change_position=2;flag_change=0;}
+	if(flag_change==1&&change_position==0 )  {change_position=1;flag_change=0;}
+	else if(flag_change==1&&change_position==1)  {change_position=0;flag_change=0;}
+	else if(flag_change==1&&change_position==2 )  {change_position=3;flag_change=0;}
+	else if(flag_change==1&&change_position==3)  {change_position=2;flag_change=0;}
+
+	if ((referee2022.game_status.stage_remain_time<=360||((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)))&&referee2022.game_status.game_progress==4&&change_position!=2&&change_position!=3) change_position=2;
+	if (referee2022.game_status.game_progress!=4)change_position=0;
 	
 
 	
@@ -69,7 +69,7 @@ void TIM14_Task(void)
 		}
 	
 	}
-//thinchicken_feedback_control();
+
 		
 	if (rc_Ctrl_et.rc.s2==1) cnt_vxvy++;else cnt_vxvy=0;
 		if (cnt_vxvy>=7000) {flag_vxvy=!flag_vxvy;cnt_vxvy=0;}
@@ -84,12 +84,12 @@ void TIM14_Task(void)
 		if (Brain.All_See.mode_cnt[Wait]>2000) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;}
 		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
 		if (Brain.All_See.mode_cnt[Found]>=2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
-	//		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
-		//	rc_Ctrl_et.rc.s2=2;
+
+
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
 		  ShootPlateControl(&AmmoBooster,&Brain);
-	//	Brain.Autoaim.Mode=Au;
+
 				HolderGetRemoteData(&Holder, &rc_Ctrl_et,&Brain);
 
 	
@@ -97,7 +97,7 @@ void TIM14_Task(void)
 		}
    if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
-//	
+
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
 
 		 if(tim14.ClockTime%200==0)  sentry_decision_control();
@@ -117,9 +117,6 @@ void TIM14_Task(void)
 		else 
 		{	
 			ET08Init(&rc_Ctrl_et);
-//			referee2022.map_command_t.cmd_keyboard=0;
-//			referee2022.map_command_t.target_position_y=0;
-//			referee2022.map_command_t.target_position_x=0;
 			MotorFillData(&Holder.Motors6020.motor[0],0);
 			MotorFillData(&Holder.Motors6020.motor[1],0);
 			MotorFillData(&Holder.Motors6020.motor[2],0);
@@ -156,7 +153,7 @@ if ((allchassis.Motors.motor[0].Data.Online_check.FPS<500||allchassis.Motors.mot
 {
 	for (int i=0;i<4;i++)
 	MotorFillData(&allchassis.Motors.motor[i],0);
-	cntppp++;
+	if (referee2022.game_robot_status.mains_power_chassis_output==1)cntppp++;else cntppp=0;
 }
 else cntppp=0;
 if (cntppp>10000){flag_ppp=1;cntppp=0;}

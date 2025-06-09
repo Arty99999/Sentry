@@ -226,7 +226,7 @@ void Speed_Poweroutput_Control_New(AllChassis* chassis)
 if (referee2022.buff.remaining_energy==50||referee2022.buff.remaining_energy==0)
 chassis->Power.refereeData.max_power=referee2022.game_robot_status.chassis_power_limit+(referee2022.power_heat_data.chassis_power_buffer-40)*2;
 		else chassis->Power.refereeData.max_power=3*referee2022.buff.remaining_energy+2;
-		
+		//chassis->Power.refereeData.max_power=150;
 		chassis->Power.scaling_ratio =chassis->Power.refereeData.max_power	 / chassis->Power.target_require_power_sum;
     chassis->Power.scaling_ratio = LIMIT(chassis->Power.scaling_ratio, 0, 1);
 	

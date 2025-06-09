@@ -201,97 +201,67 @@
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>mzz,0x0A</ItemText>
+          <ItemText>AmmoBooster,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AmmoBooster,0x0A</ItemText>
+          <ItemText>INS_attitude</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>blue_3,0x0A</ItemText>
+          <ItemText>rc_Ctrl_et,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>1</WinNumber>
-          <ItemText>m11l,0x0A</ItemText>
+          <ItemText>QEKF_INS,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>INS_attitude</ItemText>
+          <ItemText>uart4</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>1</WinNumber>
-          <ItemText>m00,0x0A</ItemText>
+          <ItemText>bmi088,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>1</WinNumber>
-          <ItemText>rc_Ctrl_et,0x0A</ItemText>
+          <ItemText>AmmoBooster,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>1</WinNumber>
-          <ItemText>QEKF_INS,0x0A</ItemText>
+          <ItemText>can1</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>1</WinNumber>
-          <ItemText>uart4</ItemText>
+          <ItemText>txBuffer0x200forCAN1</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>1</WinNumber>
-          <ItemText>bmi088,0x0A</ItemText>
+          <ItemText>txBuffer0x200forCAN2</ItemText>
         </Ww>
         <Ww>
           <count>19</count>
           <WinNumber>1</WinNumber>
-          <ItemText>AmmoBooster,0x0A</ItemText>
+          <ItemText>cntppp,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>20</count>
           <WinNumber>1</WinNumber>
-          <ItemText>shoot</ItemText>
+          <ItemText>change_position,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>21</count>
           <WinNumber>1</WinNumber>
-          <ItemText>hurt</ItemText>
-        </Ww>
-        <Ww>
-          <count>22</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>shoot_1</ItemText>
-        </Ww>
-        <Ww>
-          <count>23</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>kk1,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>24</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>kkk,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>25</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>hurt,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>26</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>change_position,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>27</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>cnt_change,0x0A</ItemText>
+          <ItemText>\\H7_Base\../CUBOT/Devices/referee.c\referee2022</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -299,6 +269,11 @@
           <count>0</count>
           <WinNumber>2</WinNumber>
           <ItemText>\\H7_Base\../CUBOT/Modules/ins.c\INS_attitude-&gt;pitch</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>can1</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

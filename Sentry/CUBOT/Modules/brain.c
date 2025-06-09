@@ -375,9 +375,10 @@ if(tim14.ClockTime%2== 0) {RobotToBrain_Lidar(Brain);}
 }
 
 extern int hurt_flag;
+
 void Change_BrainMode(Brain_t* Brain)
 {
-	static int cnt_change;
+	static int cnt_change,flag_Outpose;
 if (referee_Fps==0)
 {	
 	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
@@ -391,19 +392,26 @@ if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.
 }
  else if (referee2022.game_status.game_progress==4)
  {
-	 
-	 
+	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=800) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=800))&&referee2022.game_status.stage_remain_time<=360) flag_Outpose=1;
+   if ((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)) flag_Outpose=0;
+	
+	
 	 if (referee2022.game_robot_status.remain_HP<=150||(referee2022.bullet_remaining.bullet_remaining_num<=50)) Brain->Lidar.mode=Lidar_home;
+	else if (referee2022.buff.recovery_buff>=10&&referee2022.game_robot_status.remain_HP!=400) Brain->Lidar.mode=Lidar_home;
 	 else if ((referee2022.map_command_t.cmd_keyboard=='B'&&fabs(referee2022.map_command_t.target_position_y-8)<2) ||  (referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.blue_base_HP<=2500) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.red_base_HP<=2500)) Brain->Lidar.mode=Lidar_Fortress;
-		 else 	
+	else 
 	{
-if ((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)||referee2022.game_status.stage_remain_time<=240) Brain->Lidar.mode=Lidar_Patrol;
-	else Brain->Lidar.mode=Lidar_Outpost;
+				if (flag_Outpose) Brain->Lidar.mode=Lidar_Outpost;
+	else Brain->Lidar.mode=Lidar_Patrol;
+
+
 	}
 
 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
 	 else Brain->Autoaim.Mode=Autoaim;
  }
+ if (referee2022.game_status.game_progress!=4 ||referee2022.game_status.stage_remain_time<=240) flag_Outpose=0;
+ 
 }
 void Armor_Ignore(Brain_t* brain)
 {
