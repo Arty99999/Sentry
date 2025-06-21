@@ -75,7 +75,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					{
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-					chassis->Movement.Vomega=3500;
+					chassis->Movement.Vomega=-8000;
 
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					}
