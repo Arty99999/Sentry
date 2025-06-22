@@ -49,7 +49,7 @@ uint16_t aff;
 uint8_t Brain_Autoaim_callback(uint8_t * recBuffer, uint16_t len)
 {
 	check_robot_state.Check_Usart.Check_vision_cnt=0;
-	tim14_FPS.Vision_cnt++;
+//	tim14_FPS.Vision_cnt++;
   Brain_Autoaim_DataUnpack(&Brain,recBuffer);
 	return 0;
 }
@@ -170,27 +170,27 @@ void Brain_Lidar_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//解包雷达数据
 
 void  Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//解包自瞄数据
 {
-	if(recBuffer[0] == 0xAB)
+	
+	if(recBuffer[0] == 0xAA)
 	{
-		Brain->Autoaim.Brain_Data.FrameType=recBuffer[1];
-		Brain->Autoaim.Brain_Data.FrameCoreID = recBuffer[2];
+
 		
-		if((Brain->Autoaim.Brain_Data.FrameType == BRAIN_TO_ROBOT_CMD) && recBuffer[13] == 0xDD &&Brain->Autoaim.mode!=Change)  //< 解算偏转角
+		if(recBuffer[7] == 0xDD )  //< 解算偏转角
 		{
+			tim14_FPS.Vision_cnt++;
 			Brain->Autoaim.mode_cnt[Cruise] = 0;
-			Brain->Autoaim.Use_Can_angle=Brain->Autoaim.Send_Can_angle[recBuffer[12]];
-			Brain->Autoaim.Use_Gyro_angle=Brain->Autoaim.Send_Gyro_angle[recBuffer[12]];
+
 			
 			Brain->Autoaim.mode=Lock;
 			
-      Brain->Autoaim.Yaw_add = ((recBuffer[3] >> 6) == 0 ? 1 : -1) * ((float)((recBuffer[3] & 0x3f) * 100 + recBuffer[4]) / 100);
-      Brain->Autoaim.Pitch_add =((recBuffer[5] >> 6) == 0 ? 1 : -1)* ((float)((recBuffer[5] & 0x3f) * 100 + recBuffer[6]) / 100);
+      Brain->Autoaim.Yaw_add = ((recBuffer[1] >> 6) == 0 ? 1 : -1) * ((float)((recBuffer[1] & 0x3f) * 100 + recBuffer[2]) / 100);
+      Brain->Autoaim.Pitch_add =((recBuffer[3] >> 6) == 0 ? 1 : -1)* ((float)((recBuffer[3] & 0x3f) * 100 + recBuffer[4]) / 100);
 			
 
-			Brain->Autoaim.Distance = (float)(recBuffer[7])/10;
-      Brain->Autoaim.IsFire = ((float)(recBuffer[8]));
-			Brain->Autoaim.Attack_state.camara_num=recBuffer[11];
-			if (Brain->Autoaim.Attack_state.camara_num>=9) Brain->Autoaim.Attack_state.camara_num-=9;
+			Brain->Autoaim.Distance = (float)(recBuffer[5])/10;
+      Brain->Autoaim.IsFire = ((float)(recBuffer[6]));
+		//	Brain->Autoaim.Attack_state.camara_num=recBuffer[11];
+		//	if (Brain->Autoaim.Attack_state.camara_num>=9) Brain->Autoaim.Attack_state.camara_num-=9;
 
 //			Brain->All_See.armorNumber[0] = Brain->Autoaim.camara_num;
 //			Brain->All_See.Distance[0]=Brain->Autoaim.Distance*100;
@@ -236,49 +236,34 @@ void RobotToBrain_Autoaim(float yaw,Brain_t* brain)//发给自瞄
 	
 	if(tmp4 > 18000)tmp4 = tmp4 - 36000;else if(tmp4 < -18000) tmp4 = 36000 + tmp4;
 									
-	RobotToBrainTimeBuffer[0]  = 0xAB;
-	RobotToBrainTimeBuffer[1]  = 0x07;                      //Type ;  //固定为0x07
-	RobotToBrainTimeBuffer[2]  = 0x01;                      //coreID;  //目前固定为0x01
-	RobotToBrainTimeBuffer[3]  = (ThisSecond >> 8) ;        //索引，int16_t型
-	RobotToBrainTimeBuffer[4]  = (ThisSecond &0xff);
+	RobotToBrainTimeBuffer[0]  = 0xAA;
+
 	
-	RobotToBrainTimeBuffer[5]  = ( tim14.ClockTime >>24);    //定时器时间，int32_t型
-	RobotToBrainTimeBuffer[6]  = ((tim14.ClockTime >>16)&0xff);
-	RobotToBrainTimeBuffer[7]  = ((tim14.ClockTime >>8)&0xff);
-	RobotToBrainTimeBuffer[8]  = ((tim14.ClockTime &0xff));
+	RobotToBrainTimeBuffer[1]  = ( tim14.ClockTime >>24);    //定时器时间，int32_t型
+	RobotToBrainTimeBuffer[2]  = ((tim14.ClockTime >>16)&0xff);
+	RobotToBrainTimeBuffer[3]  = ((tim14.ClockTime >>8)&0xff);
+	RobotToBrainTimeBuffer[4]  = ((tim14.ClockTime &0xff));
 	
-  RobotToBrainTimeBuffer[9] = (referee2022.game_robot_status.robot_id > 10) ? 0 : 1;
+  RobotToBrainTimeBuffer[5] = (referee2022.game_robot_status.robot_id > 10) ? 0 : 1;
             
-	RobotToBrainTimeBuffer[10] = tmp0 & 0xFF;                   //四元数q0，float型
-	RobotToBrainTimeBuffer[11] = tmp0 >> 8;
-	RobotToBrainTimeBuffer[12] = tmp1 & 0xFF;
-	RobotToBrainTimeBuffer[13] = tmp1 >> 8;  
-	RobotToBrainTimeBuffer[14] = tmp2 & 0xFF;                   //四元数q1，float型
-	RobotToBrainTimeBuffer[15] = tmp2 >> 8;
-	RobotToBrainTimeBuffer[16] = tmp3 & 0xFF;
-	RobotToBrainTimeBuffer[17] = tmp3 >> 8;  
-	if (brain->Autoaim.mode==Cruise||brain->Autoaim.mode==Change) {brain->Autoaim.Stand=0;cnt___=0;}
-	else if (brain->Autoaim.mode==Lock) cnt___++;
-	if (cnt___>=250)  {brain->Autoaim.Stand=1;cnt___=250;}
+	RobotToBrainTimeBuffer[6] = tmp0 & 0xFF;                   //四元数q0，float型
+	RobotToBrainTimeBuffer[7] = tmp0 >> 8;
+	RobotToBrainTimeBuffer[8] = tmp1 & 0xFF;
+	RobotToBrainTimeBuffer[9] = tmp1 >> 8;  
+	RobotToBrainTimeBuffer[10] = tmp2 & 0xFF;                   //四元数q1，float型
+	RobotToBrainTimeBuffer[11] = tmp2 >> 8;
+	RobotToBrainTimeBuffer[12] = tmp3 & 0xFF;
+	RobotToBrainTimeBuffer[13] = tmp3 >> 8;  
+
+
+	RobotToBrainTimeBuffer[14] = brain->Autoaim.Mode;//1 是前哨站 0是普通
+
+
+
+	RobotToBrainTimeBuffer[15] = 0xDD;
+	RobotToBrainTimeBuffer[16] = 0xDD;
 	
-	RobotToBrainTimeBuffer[18] = brain->Autoaim.Stand;//0是预测 1是跟随
-	RobotToBrainTimeBuffer[19] = tmp4 >> 8; 
-	//RobotToBrainTimeBuffer[19] = tmp4 >> 8; 
-
-
-
-	RobotToBrainTimeBuffer[20] = brain->Autoaim.Mode;//1 是前哨站 0是普通
-  Armor_Ignore(brain);
-  RobotToBrainTimeBuffer[21] = brain->Autoaim.Ignore_armorNumber;//忽略装甲板
-
-
-	RobotToBrainTimeBuffer[22] = 0xDD;
-	RobotToBrainTimeBuffer[23] = 0xDD;
-
-  brain->Autoaim.Send_Can_angle[RobotToBrainTimeBuffer[8]]=Holder.Yaw1.Can_Angle;
-  brain->Autoaim.Send_Gyro_angle[RobotToBrainTimeBuffer[8]]=Holder.Pitch.GYRO_Angle;
-	
-	HAL_UART_Transmit_DMA(&huart2 , RobotToBrainTimeBuffer, 24);
+	HAL_UART_Transmit_DMA(&huart2 , RobotToBrainTimeBuffer, 17);
 }
 
 

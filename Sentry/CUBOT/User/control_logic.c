@@ -82,20 +82,20 @@ void TIM14_Task(void)
 	if ((Brain.Autoaim.mode_cnt[Cruise]>40&&Brain.Autoaim.Mode==Autoaim)|| (Brain.Autoaim.mode_cnt[Cruise]>100&&Brain.Autoaim.Mode==Outpost) ) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
 	
 		if (Brain.All_See.mode_cnt[Wait]>2000) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;}
-		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
+//		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
 		if (Brain.All_See.mode_cnt[Found]>=2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
 
 
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
-		  ShootPlateControl(&AmmoBooster,&Brain);
+		//  ShootPlateControl(&AmmoBooster,&Brain);
 
 				HolderGetRemoteData(&Holder, &rc_Ctrl_et,&Brain);
 
 	
 			Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
 		}
-   if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
+   //if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
@@ -168,7 +168,7 @@ if (cntppp>10000){flag_ppp=1;cntppp=0;}
 		
 //		if (tim14.ClockTime%200==0)
 		
-//		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
+		UsartDmaPrintf("%.2f\r\n",Brain.Autoaim.Yaw_add);
 	//UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
 //  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
 	//UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Yaw.Target_Angle,Holder.Yaw.GYRO_Angle);

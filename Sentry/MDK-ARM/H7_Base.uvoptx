@@ -263,6 +263,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>\\H7_Base\../CUBOT/Devices/referee.c\referee2022</ItemText>
         </Ww>
+        <Ww>
+          <count>22</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>uart2</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>RobotToBrainTimeBuffer</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
