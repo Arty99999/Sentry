@@ -78,6 +78,7 @@ typedef struct
 		float Send_Gyro_angle[256];
 		uint8_t Ignore_armorNumber;
 			uint8_t IsFire;
+		uint8_t vison_mode;
 		uint8_t Stand;
 		struct{
 			uint8_t  camara_num;

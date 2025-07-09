@@ -113,8 +113,8 @@ void HardwareConfig(void)
 		BasePID_Init(&pid_yaw1_angle, 6,0.02,0,  2);//7
 	BasePID_Init(&pid_yaw1_speed, 2000, 10, 0,  10);//6
 	
-	BasePID_Init(&pid_pitch_angle, 6, 0.04, 0, 2.5);//2
-	BasePID_Init(&pid_pitch_speed,1000,0, 0,0);//3
+	BasePID_Init(&pid_pitch_angle, 13, 0.04, 0, 2.5);//2
+	BasePID_Init(&pid_pitch_speed,1100,0, 0,0);//3
 	
 	BasePID_Init(&run_pid,5,0,0,0);
 
