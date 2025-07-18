@@ -123,7 +123,7 @@ void HardwareConfig(void)
   HolderInit(&Holder,&pid_pitch,&pid_yaw,&pid_yaw1,CAN1);
   AllChassisInit(&allchassis,&run_pid,&pid_follow,&pid_base);
 	AmmoBoosterInit(&AmmoBooster,&pid_friction,&pid_friction1,&pid_load);
-	
+	Behind_camera_Init();
 	
 	UARTx_Init(&huart2, Brain_Autoaim_callback);
 	

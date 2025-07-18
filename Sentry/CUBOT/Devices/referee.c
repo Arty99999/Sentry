@@ -248,16 +248,16 @@ if (Brain.Autoaim.Mode!=Outpost) {bullet_num_17mm++;Brain.Autoaim.Attack_state.s
 		BYTE1(referee2022.ext_student_interactive_header_data.receiver_ID) = *(pdata+data_addr + 5);
 		// 颠倒 为什么？  问学长   和雷达通信本质是通过裁判系统
 		
-		referee2022.ext_student_interactive_header_data.data[0] = *(pdata+data_addr + 6);
-		referee2022.ext_student_interactive_header_data.data[1] = *(pdata+data_addr + 7);
-		referee2022.ext_student_interactive_header_data.data[2] = *(pdata+data_addr + 8);
-		referee2022.ext_student_interactive_header_data.data[3] = *(pdata+data_addr + 9);
-		referee2022.ext_student_interactive_header_data.data[4] = *(pdata+data_addr + 10);
+	 for (int i=0;i<36;i++)
+		referee2022.ext_student_interactive_header_data.data[i] = *(pdata+data_addr + i+6);
+
 		
-		lidar_station_id=referee2022.ext_student_interactive_header_data.data[0];
-		lidar_station_x=(referee2022.ext_student_interactive_header_data.data[1]+(float)(referee2022.ext_student_interactive_header_data.data[2])/100);
-		lidar_station_y=(referee2022.ext_student_interactive_header_data.data[3]+(float)(referee2022.ext_student_interactive_header_data.data[4])/100);
+//		lidar_station_id=referee2022.ext_student_interactive_header_data.data[0];
+	//	lidar_station_x=(referee2022.ext_student_interactive_header_data.data[0]+(referee2022.ext_student_interactive_header_data.data[1])*256);
+	//	lidar_station_y=(referee2022.ext_student_interactive_header_data.data[2]+(float)(referee2022.ext_student_interactive_header_data.data[3])*256);
 		
+				lidar_station_x=(referee2022.ext_student_interactive_header_data.data[24]+(referee2022.ext_student_interactive_header_data.data[25])*256);
+		lidar_station_y=(referee2022.ext_student_interactive_header_data.data[26]+(float)(referee2022.ext_student_interactive_header_data.data[27])*256);
 		//referee2022.ext_student_interactive_header_data.data[5] = *(pdata+data_addr + 11);
 		//referee2022.ext_student_interactive_header_data.data[6] = *(pdata+data_addr + 12);
 		

@@ -10,7 +10,7 @@
 #include "check.h"
 #include "control_logic.h"
 #include "hardware_config.h"
-
+int n1;
 int  flag_ppp,cntppp;
 extern int flag00,flag01;
 extern int FLAG_1,FLAG_Send;
@@ -43,18 +43,18 @@ void TIM14_Task(void)
 	}
 	
 	if (Brain.Lidar.mode==3) cnt_change++;else cnt_change=0;
-	if (cnt_change>2500)  {flag_change=1;cnt_change=0;}
+	if (cnt_change>7500)  {flag_change=1;cnt_change=0;}
 //	if(flag_change==1&&change_position==0 )  {flag_change_last=change_position;change_position=2;flag_change=0;}
 //	else if(flag_change==1&&change_position==2&&flag_change_last==0 )  {flag_change_last=change_position;change_position=1;flag_change=0;}
 //	else if(flag_change==1&& change_position==2&&flag_change_last==1)  {flag_change_last=change_position;change_position=0;flag_change=0;}
 //	else if(flag_change==1&&change_position==1)  {flag_change_last=change_position;change_position=2;flag_change=0;}
 	if(flag_change==1&&change_position==0 )  {change_position=1;flag_change=0;}
-	else if(flag_change==1&&change_position==1)  {change_position=0;flag_change=0;}
+	else if(flag_change==1&&change_position==1)  {change_position=2;flag_change=0;}
 	else if(flag_change==1&&change_position==2 )  {change_position=3;flag_change=0;}
-	else if(flag_change==1&&change_position==3)  {change_position=2;flag_change=0;}
+	else if(flag_change==1&&change_position==3)  {change_position=0;flag_change=0;}
 
-	if ((referee2022.game_status.stage_remain_time<=360||((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)))&&referee2022.game_status.game_progress==4&&change_position!=2&&change_position!=3) change_position=2;
-	if (referee2022.game_status.game_progress!=4)change_position=0;
+//	if ((referee2022.game_status.stage_remain_time<=360||((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)))&&referee2022.game_status.game_progress==4&&change_position!=2&&change_position!=3) change_position=2;
+	//if (referee2022.game_status.game_progress!=4)change_position=0;
 	
 
 	
@@ -69,7 +69,7 @@ void TIM14_Task(void)
 		}
 	
 	}
-
+ // Brain.Autoaim.Mode=2;
 		
 	if (rc_Ctrl_et.rc.s2==1) cnt_vxvy++;else cnt_vxvy=0;
 		if (cnt_vxvy>=7000) {flag_vxvy=!flag_vxvy;cnt_vxvy=0;}
@@ -79,12 +79,20 @@ void TIM14_Task(void)
 	
     if(tim14.ClockTime%10==0 &&Brain.Autoaim.mode!=Change) Brain.Autoaim.mode_cnt[Cruise]++;
 	if (Brain.All_See.mode==Wait) Brain.All_See.mode_cnt[Wait]++;
-	if ((Brain.Autoaim.mode_cnt[Cruise]>40&&Brain.Autoaim.Mode==Autoaim)|| (Brain.Autoaim.mode_cnt[Cruise]>100&&Brain.Autoaim.Mode==Outpost) ) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
+	if ((Brain.Autoaim.mode_cnt[Cruise]>40&&Brain.Autoaim.Mode==Autoaim)|| (Brain.Autoaim.mode_cnt[Cruise]>100&&Brain.Autoaim.Mode==Outpost) || (Brain.Autoaim.mode_cnt[Cruise]>150&&Brain.Autoaim.Mode==Single) ) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
 	
 		if (Brain.All_See.mode_cnt[Wait]>2000) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;}
 //		UsartDmaPrintf("%d,%d,%d\r\n",Brain.All_See.mode,Brain.Autoaim.mode,Brain.All_See.mode_cnt[1]);
 		if (Brain.All_See.mode_cnt[Found]>=2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
-
+	// Brain.Autoaim.Mode=2;
+	if (rc_Ctrl_et.isOnline == 1 && Behind_camera.reset_Flag==0)
+	{
+		Behind_camera_Reset();
+	}
+		if (rc_Ctrl_et.isOnline == 1 && Behind_camera.reset_Flag==1)
+	{
+	Behind_camera_control();
+	}
 //	UsartDmaPrintf("%d,%.2f,%.2f\r\n",Brain.Autoaim.fire_flag,Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle);
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
@@ -95,14 +103,13 @@ void TIM14_Task(void)
 	
 			Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
 		}
-   if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
+		   if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
-
 		 if(tim14.ClockTime%200==0)  sentry_decision_control();
 	Change_BrainMode(&Brain);
-	//	Brain.Autoaim.Mode=Outpost;
+	//Brain.Autoaim.Mode=2;
 	RobotToBrain(&Brain);
 		
 		
@@ -116,6 +123,10 @@ void TIM14_Task(void)
 		if(rc_Ctrl_et.isOnline == 1 && flag_fallover==0) {;}
 		else 
 		{	
+			Behind_camera.reset_Flag=0;
+			Behind_camera.reset_index=0;
+			Behind_camera.reset_Target=-200;
+			MotorFillData(&Behind_camera.Behind_camera_motor,0 );
 			ET08Init(&rc_Ctrl_et);
 			MotorFillData(&Holder.Motors6020.motor[0],0);
 			MotorFillData(&Holder.Motors6020.motor[1],0);
@@ -168,10 +179,10 @@ if (cntppp>10000){flag_ppp=1;cntppp=0;}
 		
 //		if (tim14.ClockTime%200==0)
 		
-	//	UsartDmaPrintf("%d,%.2f,%.2f\r\n",Brain.Autoaim.fire_flag,Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle);
+//		UsartDmaPrintf("%.2f,%d\r\n",-(Behind_camera.Behind_camera_motor.Data.TotalAngle-Behind_camera.deltaAngle-90),Behind_camera.Behind_camera_motor.Data.SpeedRPM);
 	//UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
 //  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
-	//UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Yaw.Target_Angle,Holder.Yaw.GYRO_Angle);
+//	UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Pitch.GYRO_Angle,Holder.Pitch.Target_Angle);
 	//	UsartDmaPrintf("%d\r\n",Holder.Motors6020.motor[0].Data.Output);
 	//	UsartDmaPrintf("%d,%.2f,%.2f,%d\r\n",AmmoBooster.Friction_Wheel.motor3508[0].Data.SpeedRPM,AmmoBooster.Shoot_Plate.Plate_Angle,AmmoBooster.Shoot_Plate.Target_Angle,AmmoBooster.Shoot_Plate.motor2006.Data.Output);
 	//UsartDmaPrintf("%d\r\n",Brain.Autoaim.mode);

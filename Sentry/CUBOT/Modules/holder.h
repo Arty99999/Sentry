@@ -48,6 +48,21 @@ typedef struct
 	float left_litmit;
 }Holder_t;
 
+typedef struct{
+	Motor Behind_camera_motor;
+	BasePID_Object Bcamera_motor_pid;
+	BasePID_Object Bcamera_motor_Inpid;
+	BasePID_Object Reset_pid;
+	uint32_t index_camera;
+	uint8_t camera_turnFlag;
+	int16_t reset_Target;
+	uint8_t reset_Flag;
+	uint32_t reset_index;
+	float deltaAngle;
+}Behind_camera_t;
+
+
+extern Behind_camera_t Behind_camera;
 typedef enum {
     HURT_IDLE = 0,      
     HURT_ATTACKED,     //3508ÏÂÀ­    

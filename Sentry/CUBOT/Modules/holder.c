@@ -8,9 +8,10 @@
 #include <mpu6050.h>
 #include "hardware_config.h"
 #include "all_chassis.h"
- 
+
 #define abs(x) ((x)>0? (x):(-(x)))
 
+Behind_camera_t Behind_camera={.index_camera=0,.camera_turnFlag=0,.reset_Flag=0,.reset_index=0};
 Hurt_state hurt=HURT_IDLE;
 Shoot_state shoot=SHOOT_IDLE;
 Holder_t Holder;
@@ -27,7 +28,7 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 {
 	MotorInit(&holder->Motors6020.motor[0],9400 ,Motor6020,CAN2,0x205);   
 	MotorInit(&holder->Motors6020.motor[1], 6993 ,Motor6020,canx,0x206);
-	MotorInit(&holder->Motors6020.motor[2], 5924 ,Motor6020,canx,0x205);   
+	MotorInit(&holder->Motors6020.motor[2], 5626 ,Motor6020,canx,0x205);   
 
 	DualPID_Init(&holder->Pitch.PID,pitch_pid->ShellPID,pitch_pid->CorePID);
   DualPID_Init(&holder->Yaw.PID,yaw_pid->ShellPID,yaw_pid->CorePID);
@@ -82,7 +83,6 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 				if (brain->Autoaim.Mode==Autoaim)
 				{Holder.Yaw1.Target_Angle = 70.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
 			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
-				
 				else 
 				{Holder.Yaw1.Target_Angle = 75.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
 			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
@@ -97,8 +97,8 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 				if (cntmm>3000) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
 //				if (brain->Autoaim.mode==Cruise && hurt_flag==1) cntxx++;else cntxx=0;
 //				if (cntxx>1500) {Holder.Yaw.Target_Angle-=180;cntxx=0;}
-				
-		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise&&brain->Autoaim.Mode==Autoaim && referee2022.game_status.game_progress==4&&referee2022.game_status.stage_remain_time<=400)
+				//		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise&&brain->Autoaim.Mode==Autoaim && referee2022.game_status.game_progress==4&&referee2022.game_status.stage_remain_time<=400)
+		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise&&brain->Autoaim.Mode==Autoaim )
 		{
 			brain->Autoaim.mode=Change;
 //
@@ -228,9 +228,12 @@ void Camare_control(Brain_t* brain,Holder_t* holder)
 {
 	uint8_t Target=Choose_Target(brain);
 //	b=brain->All_See.armorNumber[Target];
-if (brain->All_See.Yaw_add[Target]<=90&&brain->All_See.Yaw_add[Target]>=-90)
-{
-	Target_Angle=90+brain->All_See.Yaw_add[Target];
+	float a=brain->All_See.Yaw_add[Target];
+//if (a-(Behind_camera.Behind_camera_motor.Data.TotalAngle-Behind_camera.deltaAngle-90)&&a-(Behind_camera.Behind_camera_motor.Data.TotalAngle-Behind_camera.deltaAngle-90)>=-90)
+//{
+//	UsartDmaPrintf("%.2f\r\n",Target_Angle);
+	Target_Angle=90+a+(Behind_camera.Behind_camera_motor.Data.TotalAngle-Behind_camera.deltaAngle-90);
+	UsartDmaPrintf("%.2f\r\n",Target_Angle);
   yaw1_Angle=90-holder->Yaw1.Can_Angle;
 	if ((Target_Angle+yaw1_Angle)<180)
 	{if 		((5*Target_Angle)<2*yaw1_Angle-140) {Holder.Yaw.Target_Angle+=(yaw1_Angle+Target_Angle)/3.5;Holder.Yaw1.Target_Angle+=(yaw1_Angle+Target_Angle)/3.5*2.5;}
@@ -240,7 +243,7 @@ if (brain->All_See.Yaw_add[Target]<=90&&brain->All_See.Yaw_add[Target]>=-90)
 	else {Holder.Yaw.Target_Angle-=(270+holder->right_litmit+25)-Target_Angle;Holder.Yaw1.Target_Angle=holder->right_litmit+25;}}
 			//Holder.Pitch.Target_Angle= - atan((brain->All_See.Distance[0]/1000.0*sin(-1*brain->All_See.Pitch_add[0]/57.3)-0.0725)/(0.06+brain->All_See.Distance[0]/1000.0*cos(-1*brain->All_See.Pitch_add[0]/57.3)))*57.3;
 	Holder.Pitch.Target_Angle=atan((c1+brain->All_See.Distance[0]*sin(brain->All_See.Pitch_add[0]/57.3)-h1)/(h2-(c2-brain->All_See.Distance[0]*cos(brain->All_See.Pitch_add[0]/57.3))))*57.3;
-}
+//}
 //	Holder.Pitch.Target_Angle= -15;
 }
 
@@ -294,6 +297,64 @@ uint8_t Choose_Target(Brain_t* brain)
 		
     return best_index;
 		
+}
+void Behind_camera_Init(void)
+{
+	MotorInit(&Behind_camera.Behind_camera_motor,0,Motor3508,CAN1,0x204);
+	BasePID_Init(&Behind_camera.Bcamera_motor_pid, 20, 0, 0,  10);
+	BasePID_Init(&Behind_camera.Bcamera_motor_Inpid, 5, 0, -30,  10);
+	BasePID_Init(&Behind_camera.Reset_pid, 50, 0, 0,  10);
+	Behind_camera.Behind_camera_motor.Data.Target=0;
+	Behind_camera.reset_Target=-200;
+}
+void Behind_camera_Reset(void)
+{
+	Behind_camera.reset_index++;
+	Behind_camera.Behind_camera_motor.Data.Output=BasePID_SpeedControl(&Behind_camera.Reset_pid,
+			Behind_camera.reset_Target,Behind_camera.Behind_camera_motor.Data.SpeedRPM);
+	if(Behind_camera.Behind_camera_motor.Data.SpeedRPM==0 && Behind_camera.reset_index>100)
+	{
+		Behind_camera.reset_Target=0;
+		Behind_camera.reset_Flag=1;
+		Behind_camera.deltaAngle=Behind_camera.Behind_camera_motor.Data.TotalAngle;
 		
+	}
+	MotorFillData(&Behind_camera.Behind_camera_motor,Behind_camera.Behind_camera_motor.Data.Output );
+}
 
+int i=0;
+
+void Behind_camera_control(void)
+{
+	
+	Behind_camera.index_camera++;
+	if(Behind_camera.index_camera%500==0 && Behind_camera.camera_turnFlag==0)
+	{
+		Behind_camera.Behind_camera_motor.Data.Target=0;
+		Behind_camera.camera_turnFlag=1;
+	}else if(Behind_camera.index_camera%500==0 && Behind_camera.camera_turnFlag==1)
+	{
+		Behind_camera.Behind_camera_motor.Data.Target=60;
+		Behind_camera.camera_turnFlag=2;
+	}else if(Behind_camera.index_camera%500==0 && Behind_camera.camera_turnFlag==2)
+	{
+		Behind_camera.Behind_camera_motor.Data.Target=120;
+		Behind_camera.camera_turnFlag=3;
+	}else if(Behind_camera.index_camera%500==0 && Behind_camera.camera_turnFlag==3)
+	{
+		Behind_camera.Behind_camera_motor.Data.Target=180;
+		Behind_camera.camera_turnFlag=4;
+	}else if(Behind_camera.index_camera%500==0 && Behind_camera.camera_turnFlag==4)
+	{
+		Behind_camera.Behind_camera_motor.Data.Target=120;
+		Behind_camera.camera_turnFlag=5;
+	}else if(Behind_camera.index_camera%500==0 && Behind_camera.camera_turnFlag==5)
+	{
+		Behind_camera.Behind_camera_motor.Data.Target=60;
+		Behind_camera.camera_turnFlag=0;
+	}
+	Behind_camera.Behind_camera_motor.Data.Output=BasePID_SpeedControl(&Behind_camera.Bcamera_motor_pid,
+		BasePID_AngleControl(&Behind_camera.Bcamera_motor_Inpid,Behind_camera.Behind_camera_motor.Data.Target,
+		Behind_camera.Behind_camera_motor.Data.TotalAngle-Behind_camera.deltaAngle),Behind_camera.Behind_camera_motor.Data.SpeedRPM);
+	MotorFillData(&Behind_camera.Behind_camera_motor,Behind_camera.Behind_camera_motor.Data.Output );
 }

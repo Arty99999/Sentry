@@ -19,7 +19,7 @@ typedef struct
 		float Plate_Out;
 		uint32_t Shoot_Cut;
 		uint16_t Fire_Rate;
-		uint8_t  Fire_Divider;
+		uint16_t  Fire_Divider;
 		uint8_t  Fire_Margin;
 
 		int16_t ShootNum;

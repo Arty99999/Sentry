@@ -447,7 +447,7 @@ void Bmi088_InitQuaternion()
 float Yaw,Pitch,Roll;
 void BMI088_IMUupdate(IMU_InitData_t *mpu6050_data)
 {
-    static int8_t YawRoundCount,exInt_1,eyInt_1,ezInt_1;
+    static int16_t YawRoundCount,exInt_1,eyInt_1,ezInt_1;
    float  halfT,norm,vx,vy,vz,ex,ey,ez,tempq0,tempq1,tempq2,tempq3,now,dt;
 		static uint32_t DWT_Count_1 = 0;
 	static float YawAngleLast,a,b,c;

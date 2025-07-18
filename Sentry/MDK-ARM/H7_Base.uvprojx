@@ -2014,6 +2014,11 @@
               <FilePath>..\CUBOT\Modules\ammo_booster.c</FilePath>
             </File>
             <File>
+              <FileName>shoot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\Modules\shoot.c</FilePath>
+            </File>
+            <File>
               <FileName>brain.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\CUBOT\Modules\brain.c</FilePath>
@@ -2027,11 +2032,6 @@
               <FileName>ins.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\CUBOT\Modules\ins.c</FilePath>
-            </File>
-            <File>
-              <FileName>shoot.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CUBOT\Modules\shoot.c</FilePath>
             </File>
             <File>
               <FileName>all_chassis.c</FileName>

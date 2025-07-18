@@ -23,11 +23,18 @@ typedef enum
 	ROBOT_TO_BRAIN_LOG   = 4,	 //< 0b0100
 	ROBOT_TO_BRAIN_CMD   = 5
 }BrainFrameType;
+typedef enum {
+    Single_IDLE = 0,   
+    Single_Arrive,	
+    Single_Find,    
+    Single_Exit,    
+}Singe_state;
+
 typedef enum
 {
-	Autoaim   = 0,             
-  Outpost =1
-
+	Autoaim= 0,             
+  Outpost=1,
+  Single=2
 }
 Brain_mode;
 typedef enum
@@ -71,11 +78,7 @@ typedef struct
 		uint8_t fire_flag;
 		float Limit;
 		
-		float Use_Can_angle;
-		float Send_Can_angle[256];
-		
-		float Use_Gyro_angle;
-		float Send_Gyro_angle[256];
+
 		uint8_t Ignore_armorNumber;
 			uint8_t IsFire;
 		uint8_t vison_mode;

@@ -269,7 +269,7 @@ struct
 
  struct //0x0301 ¿Í»§¶ËÄÚÈİid 0xd180
 {
-	uint8_t data[30];
+	uint8_t data[50];
 	uint8_t data_cmd_id[2];
 	uint8_t sender_ID[2];
 	uint8_t receiver_ID[2];
