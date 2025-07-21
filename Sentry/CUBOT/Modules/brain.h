@@ -128,5 +128,7 @@ extern 	UART_RxBuffer uart2_buffer;
 extern 	UART_RxBuffer uart5_buffer;
 void RobotToBrain_Lidar(Brain_t* Brain);//·¢¸øÀ×´ï
 void Change_BrainMode(Brain_t* Brain);
+void Behind_camera_control(void);
+void Behind_camera_Reset(void);
 #endif
 

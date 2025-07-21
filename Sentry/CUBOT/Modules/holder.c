@@ -27,7 +27,7 @@ void Camare_control(Brain_t* brain,Holder_t* holder);
 void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_pid,DualPID_Object* yaw1_pid,CanNumber canx)
 {
 	MotorInit(&holder->Motors6020.motor[0],9400 ,Motor6020,CAN2,0x205);   
-	MotorInit(&holder->Motors6020.motor[1], 6993 ,Motor6020,canx,0x206);
+	MotorInit(&holder->Motors6020.motor[1], 8167 ,Motor6020,canx,0x206);
 	MotorInit(&holder->Motors6020.motor[2], 5626 ,Motor6020,canx,0x205);   
 
 	DualPID_Init(&holder->Pitch.PID,pitch_pid->ShellPID,pitch_pid->CorePID);
@@ -40,7 +40,7 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 	holder->Yaw.MouseSensitivity=0.006f;
 	holder->Cruise_Mode.yaw1_sense=0.00325;
 	holder->Cruise_Mode.pitch_sense=0.0065;
-	holder->up_litmit=29;
+	holder->up_litmit=40;
 	holder->down_litmit=-35;//-35
 	
 	holder->right_litmit=-85;
@@ -146,14 +146,17 @@ thinchicken_feedback_control();
 	BasePID_SpeedControl(holder->Pitch.PID.CorePID , 
 	BasePID_AngleControl(holder->Pitch.PID.ShellPID , holder->Pitch.Target_Angle , holder->Pitch.GYRO_Angle)  ,holder->Pitch.GYRO_Angle_speed);
 
-	if (Brain.Autoaim.vison_mode==1)  holder->Yaw1.PID.ShellPID->Kp=13;
-		else holder->Yaw1.PID.ShellPID->Kp=8.5;
-	
+//	if (Brain.Autoaim.vison_mode==1)  holder->Yaw1.PID.ShellPID->Kp=13;
+//		else holder->Yaw1.PID.ShellPID->Kp=8.5;
+//	if (Brain.Autoaim.vison_mode==1)  holder->Yaw1.PID.ShellPID->Kp=13;
+//		else
+			holder->Yaw1.PID.ShellPID->Kp=2;
 	holder->Motors6020.motor[2].Data.Output =
 	BasePID_SpeedControl(holder->Yaw1.PID.CorePID ,
 	BasePID_AngleControl(holder->Yaw1.PID.ShellPID , holder->Yaw1.Target_Angle , holder->Yaw1.Can_Angle)  ,-holder->Yaw1.GYRO_Angle_speed);
 	
 for (int i=0;i<3;i++)
+if (i!=2)
   MotorFillData(&holder->Motors6020.motor[i], holder->Motors6020.motor[i].Data.Output);
 
 }
@@ -312,7 +315,7 @@ void Behind_camera_Reset(void)
 	Behind_camera.reset_index++;
 	Behind_camera.Behind_camera_motor.Data.Output=BasePID_SpeedControl(&Behind_camera.Reset_pid,
 			Behind_camera.reset_Target,Behind_camera.Behind_camera_motor.Data.SpeedRPM);
-	if(Behind_camera.Behind_camera_motor.Data.SpeedRPM==0 && Behind_camera.reset_index>100)
+	if(Behind_camera.Behind_camera_motor.Data.SpeedRPM==0 && Behind_camera.reset_index>50)
 	{
 		Behind_camera.reset_Target=0;
 		Behind_camera.reset_Flag=1;

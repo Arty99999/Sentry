@@ -50,7 +50,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 	  ammo_booster->Shoot_Plate.Plate_Angle += ammo_booster->Shoot_Plate.Delta_Angle;
 	
 
-	if(rc_Ctrl_et.isOnline == 1&&ammo_booster->Shoot_Plate.heat_status==1)   ///
+	if(referee2022.game_robot_status.mains_power_shooter_output==1  &&ammo_booster->Shoot_Plate.heat_status==1)   ///
 	{
     
     if(referee2022.power_heat_data.shooter_id1_17mm_cooling_heat >= referee2022.game_robot_status.shooter_id1_17mm_cooling_limit - ammo_booster->Shoot_Plate.Fire_Margin-70 )
@@ -64,6 +64,13 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 				if((rc_Ctrl_et.rc.s1==1||(referee2022.game_status.game_progress==4&&referee2022.bullet_remaining.bullet_remaining_num>=20))&&rc_Ctrl_et.rc.s2 ==2&&brain->Autoaim.fire_flag==1&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0 &&brain->Autoaim.IsFire==1)
 				{
 					ammo_booster->Shoot_Plate.Target_Angle  += 45;
+					ammo_booster->Shoot_Plate.ShootNum++;
+					ammo_booster->Shoot_Plate.Shoot_rest_flag=1;
+					ammo_booster->Shoot_Plate.Shoot_Cut=0;
+				}
+				else if (rc_Ctrl_et.rc.s1 ==1&&rc_Ctrl_et.rc.s2 !=2&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0 &&Brain.Autoaim.Mode==Single &&ammo_booster->Shoot_Plate.Target_Angle - ammo_booster->Shoot_Plate.Plate_Angle >5)
+				{
+				ammo_booster->Shoot_Plate.Target_Angle  += 45;
 					ammo_booster->Shoot_Plate.ShootNum++;
 					ammo_booster->Shoot_Plate.Shoot_rest_flag=1;
 					ammo_booster->Shoot_Plate.Shoot_Cut=0;

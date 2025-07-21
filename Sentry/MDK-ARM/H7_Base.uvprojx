@@ -1963,11 +1963,6 @@
               <FileType>1</FileType>
               <FilePath>..\CUBOT\User\hardware_config.c</FilePath>
             </File>
-            <File>
-              <FileName>control_logic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CUBOT\User\control_logic.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2008,6 +2003,11 @@
         <Group>
           <GroupName>Cubot/Modules</GroupName>
           <Files>
+            <File>
+              <FileName>control_logic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CUBOT\User\control_logic.c</FilePath>
+            </File>
             <File>
               <FileName>ammo_booster.c</FileName>
               <FileType>1</FileType>

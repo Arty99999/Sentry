@@ -353,4 +353,23 @@ angle = atan2(vx, vy) ;  // 使用更精确的弧度转角度系数
    else if (min(abs1,min(abs2,min(abs3,abs4)))==abs3)return a3*57.3;
 	else return a4*57.3;
 }
-
+uint8_t Judege_fall(double roll,RC_Ctrl_ET* rc_ctrl)
+{
+	static int cnt_fallover;
+		if (fabs(roll)>=40) cnt_fallover++;else cnt_fallover--;
+ cnt_fallover=int16_constrain(cnt_fallover ,0, 4000);
+		if (cnt_fallover>=2500) return 1; else  return 0;
+}
+void  Judege_Motor(Referee2022* referee,AllChassis *chassis)
+{
+	static int cntppp=0;
+	static uint8_t flag_ppp;
+if ((chassis->Motors.motor[0].Data.Online_check.FPS<500||chassis->Motors.motor[1].Data.Online_check.FPS<500||chassis->Motors.motor[2].Data.Online_check.FPS<500||chassis->Motors.motor[3].Data.Online_check.FPS<500) &&flag_ppp==0)
+{
+	for (int i=0;i<4;i++)
+	MotorFillData(&chassis->Motors.motor[i],0);
+	if (referee->game_robot_status.mains_power_chassis_output==1)cntppp++;else cntppp=0;
+}
+else cntppp=0;
+if (cntppp>10000){flag_ppp=1;cntppp=0;}
+}

@@ -62,6 +62,8 @@ extern float speed1; // ×ÔÐýËÙ¶È
 void AllChassisInit(AllChassis *chassis, BasePID_Object *run_pid, BasePID_Object *follow_pid, BasePID_Object *base_pid);
 void Lidar_Allchassis_control(AllChassis *chassis, Check_Robot_State *CheckRobotState, Brain_t *brain, RC_Ctrl_ET *rc_ctrl);
 void Check_Slope(AllChassis *chassis, Holder_t *holder);
+uint8_t Judege_fall(double roll,RC_Ctrl_ET* rc_ctrl);
+void  Judege_Motor(Referee2022* referee,AllChassis *chassis);
 extern float angle_to_holder;
 extern AllChassis allchassis;
 #endif
