@@ -62,7 +62,7 @@ void TIM14_Task(void)
 		if(tim14.ClockTime%1000==0) FPS_Check(&tim14_FPS);
 	if (Brain.Lidar.mode!=4) {flag000=0;a222=0;cnth=0;}
 	
-//  Brain.Autoaim.Mode=2;
+ // Brain.Autoaim.Mode=2;
 		
 	if (rc_Ctrl_et.rc.s2==1) cnt_vxvy++;else cnt_vxvy=0;
 		if (cnt_vxvy>=7000) {flag_vxvy=!flag_vxvy;cnt_vxvy=0;}
@@ -99,13 +99,13 @@ void TIM14_Task(void)
 	
 			Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
 		}
-		//   if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
+		  if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0 || referee2022.game_robot_status.mains_power_shooter_output==0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
 		 if(tim14.ClockTime%200==0)  sentry_decision_control();
 	Change_BrainMode(&Brain);
-	//Brain.Autoaim.Mode=2;
+//	Brain.Autoaim.Mode=2;
 	RobotToBrain(&Brain);
 		
 		

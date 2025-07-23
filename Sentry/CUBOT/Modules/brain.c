@@ -230,13 +230,13 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
 			
 			
       Brain->Autoaim.fire_flag=0;
-			if (rc_Ctrl_et.rc.s2==2)
+			if (rc_Ctrl_et.rc.s2==2 ||rc_Ctrl_et.rc.s2==1)
 			{ 
 				
 				
 				if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.8 && Brain->Autoaim.Mode==Outpost) Brain->Autoaim.fire_flag=1;
 				else if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.8 && Brain->Autoaim.Mode==Autoaim) Brain->Autoaim.fire_flag=1;
-								else if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.3 && Brain->Autoaim.Mode==2&&fabs(Holder.Pitch.GYRO_Angle-Holder.Pitch.Target_Angle)<0.3) Brain->Autoaim.fire_flag=1;
+								else if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.2 && Brain->Autoaim.Mode==2&&fabs(Holder.Pitch.GYRO_Angle-Holder.Pitch.Target_Angle)<0.2) Brain->Autoaim.fire_flag=1;
 				else Brain->Autoaim.fire_flag=0;	
 //		   	  Holder.Yaw1.Target_Angle=Brain->Autoaim.Use_Can_angle+Brain->Autoaim.Yaw_add;
 //					Holder.Pitch.Target_Angle= Brain->Autoaim.Use_Gyro_angle+Brain->Autoaim.Pitch_add ;
@@ -274,7 +274,7 @@ void Single_Mode(Brain_t* Brain)
          case Single_Find: 
 					 
 				 Find_cnt++;
-				  if (Find_cnt>=5000) {single=Single_Exit;}
+				  if (Find_cnt>=7000) {single=Single_Exit;}
 					else if (Brain->Autoaim.mode==Cruise) Find_cnt+=2;
 				 
           break;
@@ -439,8 +439,8 @@ if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.
 //	else if (rc_Ctrl_et.rc.s2==3) Brain->Lidar.mode=Lidar_Patrol;
 //	else Brain->Lidar.mode=Lidar_Outpost;
 	
-if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
-	else 	 Brain->Autoaim.Mode=Autoaim;
+//if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
+//	else 	 Brain->Autoaim.Mode=Autoaim;
 }
  else if (referee2022.game_status.game_progress==4)
  {
@@ -477,12 +477,22 @@ void Armor_Ignore(Brain_t* brain)
 //	if (brain->Autoaim.Attack_state.shoot_num>=50 && referee2022.game_robot_hp.blue_robot_Hurt[brain->Autoaim.Attack_state.]=0;)
 	if (referee2022.game_status.stage_remain_time>=360) brain->Autoaim.Ignore_armorNumber|=0x02;
 	
-	 if (referee2022.game_robot_hp.blue_robot_revge[1]==2) brain->Autoaim.Ignore_armorNumber|=0x01;
+	if (referee2022.game_robot_status.robot_id>10)
+	{
+		if (referee2022.game_robot_hp.red_robot_revge[1]==2) brain->Autoaim.Ignore_armorNumber|=0x01;
+	 if (referee2022.game_robot_hp.red_robot_revge[2]==2) brain->Autoaim.Ignore_armorNumber|=0x02;
+	 if (referee2022.game_robot_hp.red_robot_revge[3]==2) brain->Autoaim.Ignore_armorNumber|=0x04;
+	 if (referee2022.game_robot_hp.red_robot_revge[4]==2) brain->Autoaim.Ignore_armorNumber|=0x08;
+	 if (referee2022.game_robot_hp.red_robot_revge[7]==2) brain->Autoaim.Ignore_armorNumber|=0x10;
+	}
+else 
+	{
+		if (referee2022.game_robot_hp.blue_robot_revge[1]==2) brain->Autoaim.Ignore_armorNumber|=0x01;
 	 if (referee2022.game_robot_hp.blue_robot_revge[2]==2) brain->Autoaim.Ignore_armorNumber|=0x02;
 	 if (referee2022.game_robot_hp.blue_robot_revge[3]==2) brain->Autoaim.Ignore_armorNumber|=0x04;
 	 if (referee2022.game_robot_hp.blue_robot_revge[4]==2) brain->Autoaim.Ignore_armorNumber|=0x08;
-
-	
+	 if (referee2022.game_robot_hp.blue_robot_revge[7]==2) brain->Autoaim.Ignore_armorNumber|=0x10;
+	}
 }	
 
 

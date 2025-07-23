@@ -27,7 +27,7 @@ void Camare_control(Brain_t* brain,Holder_t* holder);
 void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_pid,DualPID_Object* yaw1_pid,CanNumber canx)
 {
 	MotorInit(&holder->Motors6020.motor[0],9400 ,Motor6020,CAN2,0x205);   
-	MotorInit(&holder->Motors6020.motor[1], 8167 ,Motor6020,canx,0x206);
+	MotorInit(&holder->Motors6020.motor[1], 165 ,Motor6020,canx,0x206);
 	MotorInit(&holder->Motors6020.motor[2], 5626 ,Motor6020,canx,0x205);   
 
 	DualPID_Init(&holder->Pitch.PID,pitch_pid->ShellPID,pitch_pid->CorePID);
@@ -40,8 +40,8 @@ void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_
 	holder->Yaw.MouseSensitivity=0.006f;
 	holder->Cruise_Mode.yaw1_sense=0.00325;
 	holder->Cruise_Mode.pitch_sense=0.0065;
-	holder->up_litmit=40;
-	holder->down_litmit=-35;//-35
+	holder->up_litmit=41;
+	holder->down_litmit=-33;//-35
 	
 	holder->right_litmit=-85;
 	holder->left_litmit=75;
@@ -63,7 +63,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 	if(rc_ctrl->rc.s2!=1) holder->Yaw.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 	else if(rc_ctrl->rc.s2==1)holder->Yaw1.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 
-	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&&tim14_FPS.Vision_FPS>0)
+	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||rc_Ctrl_et.rc.s2==1 ||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait)
 			{
 //				if (brain->Autoaim.Last_mode!=Cruise)
 //				{
@@ -82,17 +82,17 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 				else {holder->Cruise_Mode.pitch_time=0;holder->Cruise_Mode.yaw1_time=0;}
 				if (brain->Autoaim.Mode==Autoaim)
 				{Holder.Yaw1.Target_Angle = 70.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
-			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
+			Holder.Pitch.Target_Angle = 5-abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*35.0f;}
 				else 
 				{Holder.Yaw1.Target_Angle = 75.0f*sin(holder->Cruise_Mode.yaw1_time*holder->Cruise_Mode.yaw1_sense);
-			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*25.0f;}
+			Holder.Pitch.Target_Angle = 5+abs(sin(holder->Cruise_Mode.pitch_time*holder->Cruise_Mode.pitch_sense))*35.0f;}
 				
 			
 			}
 			else m=0;
 			if (a222!=0 && flag000==0&&Brain.Lidar.mode==4&&cnth==0) {  if (a222>180&&a222<=270) Holder.Yaw.Target_Angle-=(a222-360)*57.3;else if (a222>=-90&&a222<0) Holder.Yaw.Target_Angle-=a222*57.3;flag000=1;}
 
-			if (brain->Autoaim.mode==Cruise && brain->Autoaim.Mode==Outpost&&referee2022.game_status.game_progress==4) cntmm++;else cntmm=0;
+			if (brain->Autoaim.mode==Cruise && (brain->Autoaim.Mode==Outpost ||brain->Autoaim.Mode==2)&&referee2022.game_status.game_progress==4) cntmm++;else cntmm=0;
 				
 				if (cntmm>3000) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
 //				if (brain->Autoaim.mode==Cruise && hurt_flag==1) cntxx++;else cntxx=0;
@@ -108,7 +108,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 		else if (brain->All_See.mode==Found) Brain.All_See.mode=None;
 //		else brain->All_See.mode=None;
 			
-		if (holder->Yaw1.Can_Angle>61) holder->down_litmit=-19;else holder->down_litmit=-35;
+		if (holder->Yaw1.Can_Angle>61) holder->down_litmit=-19;else holder->down_litmit=-33;
 	
 	holder->Yaw.Can_Angle = holder->Motors6020.motor[0].Data.Angle;
 	holder->Pitch.Can_Angle = holder->Motors6020.motor[1].Data.Angle;
@@ -146,17 +146,14 @@ thinchicken_feedback_control();
 	BasePID_SpeedControl(holder->Pitch.PID.CorePID , 
 	BasePID_AngleControl(holder->Pitch.PID.ShellPID , holder->Pitch.Target_Angle , holder->Pitch.GYRO_Angle)  ,holder->Pitch.GYRO_Angle_speed);
 
-//	if (Brain.Autoaim.vison_mode==1)  holder->Yaw1.PID.ShellPID->Kp=13;
-//		else holder->Yaw1.PID.ShellPID->Kp=8.5;
-//	if (Brain.Autoaim.vison_mode==1)  holder->Yaw1.PID.ShellPID->Kp=13;
-//		else
-			holder->Yaw1.PID.ShellPID->Kp=2;
+	if (Brain.Autoaim.vison_mode==1)  holder->Yaw1.PID.ShellPID->Kp=13;
+		else holder->Yaw1.PID.ShellPID->Kp=8.5;
+
 	holder->Motors6020.motor[2].Data.Output =
 	BasePID_SpeedControl(holder->Yaw1.PID.CorePID ,
 	BasePID_AngleControl(holder->Yaw1.PID.ShellPID , holder->Yaw1.Target_Angle , holder->Yaw1.Can_Angle)  ,-holder->Yaw1.GYRO_Angle_speed);
 	
 for (int i=0;i<3;i++)
-if (i!=2)
   MotorFillData(&holder->Motors6020.motor[i], holder->Motors6020.motor[i].Data.Output);
 
 }

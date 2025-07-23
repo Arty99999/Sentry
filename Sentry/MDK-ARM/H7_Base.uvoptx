@@ -206,7 +206,7 @@
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>rc_Ctrl_et</ItemText>
+          <ItemText>rc_Ctrl_et,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
@@ -247,6 +247,11 @@
           <count>18</count>
           <WinNumber>1</WinNumber>
           <ItemText>cnt_fallover</ItemText>
+        </Ww>
+        <Ww>
+          <count>19</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>single,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>

@@ -99,7 +99,6 @@ void _Data_Diapcak(uint8_t *pdata)
 		BYTE1(referee2022.game_robot_hp.blue_base_HP) = *(pdata+data_addr + 31);
 		
 		for (int i=0;i<8;i++)
-		
 		{
 		if (referee2022.game_robot_hp.blue_robot_HP_last[i]>0&&referee2022.game_robot_hp.blue_robot_HP[i]==0) referee2022.game_robot_hp.blue_robot_revge[i]=0;
 		if (referee2022.game_robot_hp.blue_robot_HP_last[i]==0&&referee2022.game_robot_hp.blue_robot_HP[i]>0 &&  referee2022.game_robot_hp.blue_robot_revge[i]==0) referee2022.game_robot_hp.blue_robot_revge[i]=2;
