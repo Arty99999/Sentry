@@ -55,9 +55,12 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
     
     if(referee2022.power_heat_data.shooter_id1_17mm_cooling_heat >= referee2022.game_robot_status.shooter_id1_17mm_cooling_limit - ammo_booster->Shoot_Plate.Fire_Margin-70 )
 			ammo_booster->Shoot_Plate.Fire_Divider=125; 
-		 else if (Brain.Autoaim.Mode==Single)ammo_booster->Shoot_Plate.Fire_Divider=300;
-		else if (Brain.Autoaim.Mode==Outpost)ammo_booster->Shoot_Plate.Fire_Divider=50;	else ammo_booster->Shoot_Plate.Fire_Divider=50;
-     	if (referee2022.game_status.game_progress!=4) ammo_booster->Shoot_Plate.Fire_Divider=300;
+		 else if (Brain.Autoaim.Mode==Single&&Brain.Autoaim.Distance>=5000)ammo_booster->Shoot_Plate.Fire_Divider=450;
+		else if (Brain.Autoaim.Mode==Single&&Brain.Autoaim.Distance<5000)ammo_booster->Shoot_Plate.Fire_Divider=300;
+		else if (Brain.Autoaim.Mode==Outpost)ammo_booster->Shoot_Plate.Fire_Divider=50;	
+		else if (Brain.Autoaim.Distance>=4500)ammo_booster->Shoot_Plate.Fire_Divider=200;
+		else ammo_booster->Shoot_Plate.Fire_Divider=50;
+    // 	if (referee2022.game_status.game_progress!=4) ammo_booster->Shoot_Plate.Fire_Divider=100;
 		if (ammo_booster->Shoot_Plate.Shoot_rest_flag) ammo_booster->Shoot_Plate.Shoot_Cut++;
  		if (ammo_booster->Shoot_Plate.Shoot_Cut%ammo_booster->Shoot_Plate.Fire_Divider==0) ammo_booster->Shoot_Plate.Shoot_rest_flag=0;
 		
@@ -77,7 +80,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 				}
 				else if (rc_Ctrl_et.rc.s1 ==1&&rc_Ctrl_et.rc.s2 !=2&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0)
 				{
-				ammo_booster->Shoot_Plate.Target_Angle  += 22.5;
+				ammo_booster->Shoot_Plate.Target_Angle  += 45;
 					ammo_booster->Shoot_Plate.ShootNum++;
 					ammo_booster->Shoot_Plate.Shoot_rest_flag=1;
 					ammo_booster->Shoot_Plate.Shoot_Cut=0;

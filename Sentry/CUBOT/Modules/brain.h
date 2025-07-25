@@ -29,7 +29,9 @@ typedef enum {
     Single_Find,    
     Single_Exit,    
 }Singe_state;
-
+//typedef enum {
+//    Brain    
+//}Brain_state;
 typedef enum
 {
 	Autoaim= 0,             
@@ -95,7 +97,8 @@ typedef struct
 		CubotBrain_t Brain_Data;
 		uint8_t	movemode;
 		int16_t vx;
-    int16_t vy;	
+        int16_t vy;
+        uint8_t change_position;
     float angle_to_lidar;
     uint8_t Arrive;
 	}Lidar;

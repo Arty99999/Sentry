@@ -215,7 +215,7 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
       Brain->Autoaim.Pitch_add =((recBuffer[4] >> 6) == 0 ? 1 : -1)* ((float)((recBuffer[4] & 0x3f) * 100 + recBuffer[5]) / 100);
 			
 
-			Brain->Autoaim.Distance = (float)(recBuffer[6])/10;
+			Brain->Autoaim.Distance = (float)(recBuffer[6])*100;
 			
       Brain->Autoaim.IsFire = recBuffer[7];
 			Brain->Autoaim.IsFire =1;
@@ -230,17 +230,14 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
 			
 			
       Brain->Autoaim.fire_flag=0;
-			if (rc_Ctrl_et.rc.s2==2 ||rc_Ctrl_et.rc.s2==1)
+			if (rc_Ctrl_et.rc.s2==2 )
 			{ 
-				
 				
 				if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.8 && Brain->Autoaim.Mode==Outpost) Brain->Autoaim.fire_flag=1;
 				else if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.8 && Brain->Autoaim.Mode==Autoaim) Brain->Autoaim.fire_flag=1;
-								else if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.2 && Brain->Autoaim.Mode==2&&fabs(Holder.Pitch.GYRO_Angle-Holder.Pitch.Target_Angle)<0.2) Brain->Autoaim.fire_flag=1;
+				else if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.2 && Brain->Autoaim.Mode==2&&fabs(Holder.Pitch.GYRO_Angle-Holder.Pitch.Target_Angle)<0.2) Brain->Autoaim.fire_flag=1;
 				else Brain->Autoaim.fire_flag=0;	
-//		   	  Holder.Yaw1.Target_Angle=Brain->Autoaim.Use_Can_angle+Brain->Autoaim.Yaw_add;
-//					Holder.Pitch.Target_Angle= Brain->Autoaim.Use_Gyro_angle+Brain->Autoaim.Pitch_add ;
-					   	  Holder.Yaw1.Target_Angle=Holder.Yaw1.Can_Angle+Brain->Autoaim.Yaw_add;
+					Holder.Yaw1.Target_Angle=Holder.Yaw1.Can_Angle+Brain->Autoaim.Yaw_add;
 					Holder.Pitch.Target_Angle= Holder.Pitch.GYRO_Angle+Brain->Autoaim.Pitch_add ;
 			}
 	
@@ -263,7 +260,7 @@ void Single_Mode(Brain_t* Brain)
 		      switch (single) {
          case Single_IDLE: 
 					 
-				// if (Brain->Lidar.mode==Lidar_Patrol && change_position==4&& Brain->Lidar.Arrive==1) {single=Single_Arrive;}
+				 if (Brain->Lidar.mode==Lidar_Patrol && change_position==4&& Brain->Lidar.Arrive==1) {single=Single_Arrive;}
 				 {single=Single_Arrive;}
 					 break;
 				 case Single_Arrive:
@@ -445,24 +442,24 @@ if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.
  else if (referee2022.game_status.game_progress==4)
  {
 //	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=800) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=800))&&referee2022.game_status.stage_remain_time<=360) flag_Outpose=1;
-	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=0))) flag_Outpose=1;
-			
-   if ((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)) flag_Outpose=0;
-	
-	
+	 
+			if (referee2022.game_status.stage_remain_time<=330 &&referee2022.game_status.stage_remain_time>=328)single=Single_IDLE;//ÖØÖÃ
+	else if (referee2022.game_status.stage_remain_time<=300 &&referee2022.game_status.stage_remain_time>=298)single=Single_Exit;
 	 if (referee2022.game_robot_status.remain_HP<=150||(referee2022.bullet_remaining.bullet_remaining_num<=50)) Brain->Lidar.mode=Lidar_home;
 	else if (referee2022.buff.recovery_buff>=10&&referee2022.game_robot_status.remain_HP!=400) Brain->Lidar.mode=Lidar_home;
 	else 
 	{
-		
-	if (flag_Outpose) Brain->Lidar.mode=Lidar_Outpost;
+		Single_Mode(Brain);
+		if (single!=Single_Exit)  {Brain->Lidar.mode=Lidar_Patrol;Brain->Lidar.change_position=4;}
+	else if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=0))) Brain->Lidar.mode=Lidar_Outpost;
 	else Brain->Lidar.mode=Lidar_Patrol;
 
 
 	}
 
 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
-	 else Brain->Autoaim.Mode=Autoaim;
+if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}	 
+else Brain->Autoaim.Mode=Autoaim;
  }
  if (referee2022.game_status.game_progress!=4 ||referee2022.game_status.stage_remain_time<=240) flag_Outpose=0;
  

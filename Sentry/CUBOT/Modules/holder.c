@@ -63,7 +63,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 	if(rc_ctrl->rc.s2!=1) holder->Yaw.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 	else if(rc_ctrl->rc.s2==1)holder->Yaw1.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 
-	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2||rc_Ctrl_et.rc.s2==1 ||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait)
+	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2 ||referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait)
 			{
 //				if (brain->Autoaim.Last_mode!=Cruise)
 //				{
