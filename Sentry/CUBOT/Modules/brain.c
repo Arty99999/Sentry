@@ -230,7 +230,7 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
 			
 			
       Brain->Autoaim.fire_flag=0;
-			if (rc_Ctrl_et.rc.s2==2 ||rc_Ctrl_et.rc.s2==1)
+			if (rc_Ctrl_et.rc.s2==2 )
 			{ 
 				
 				if (fabs(Holder.Yaw1.Target_Angle-Holder.Yaw1.Can_Angle)<0.8 && Brain->Autoaim.Mode==Outpost) Brain->Autoaim.fire_flag=1;
@@ -260,7 +260,7 @@ void Single_Mode(Brain_t* Brain)
 		      switch (single) {
          case Single_IDLE: 
 					 
-				 if (Brain->Lidar.mode==Lidar_Patrol && Brain->Lidar.change_position==4&& Brain->Lidar.Arrive==1) {single=Single_Arrive;}
+				 if (Brain->Lidar.mode==Lidar_Patrol && (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1)&& Brain->Lidar.Arrive==1) {single=Single_Arrive;}
 
 					 break;
 				 case Single_Arrive:
@@ -417,11 +417,12 @@ if(tim14.ClockTime%2== 0) {RobotToBrain_Lidar(Brain);}
 }
 
 extern int hurt_flag;
-
+#define Text
 void Change_BrainMode(Brain_t* Brain)
 {
 	static int cnt_change,flag_Outpose;
-if (referee_Fps==0&&referee2022.game_status.game_progress!=4)
+#ifndef Text 
+if (referee_Fps==0)
 {	
 	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
 	else if (rc_Ctrl_et.rc.s2==1) {Single_Mode(Brain);Brain->Lidar.mode=Lidar_Fortress;}
@@ -461,7 +462,38 @@ if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.
 if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}	 
 else Brain->Autoaim.Mode=Autoaim;
  }
- if (referee2022.game_status.game_progress!=4 ||referee2022.game_status.stage_remain_time<=240) flag_Outpose=0;
+#else 
+	 
+ if (referee2022.game_status.game_progress==4)
+ {
+//	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=800) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=800))&&referee2022.game_status.stage_remain_time<=360) flag_Outpose=1;
+	 
+			if (referee2022.game_status.stage_remain_time<=330 &&referee2022.game_status.stage_remain_time>=328)single=Single_IDLE;//ÖØÖÃ
+	else if (referee2022.game_status.stage_remain_time<=300 &&referee2022.game_status.stage_remain_time>=298)single=Single_Exit;
+	 if (referee2022.game_robot_status.remain_HP<=150) Brain->Lidar.mode=Lidar_home;
+	else if (referee2022.buff.recovery_buff>=10&&referee2022.game_robot_status.remain_HP!=400) Brain->Lidar.mode=Lidar_home;
+	else 
+	{
+		Single_Mode(Brain);
+		if (single!=Single_Exit)  {
+		
+		Brain->Lidar.mode=Lidar_Patrol;
+		if (referee2022.game_status.stage_remain_time>=400)
+		Brain->Lidar.change_position=0;
+		else Brain->Lidar.change_position=1	;
+		
+		}
+	else if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>0))) Brain->Lidar.mode=Lidar_Outpost;
+	else {Brain->Lidar.mode=Lidar_Patrol;if (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1) Brain->Lidar.change_position=2;}
+
+
+	}
+
+if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
+if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}	 
+else Brain->Autoaim.Mode=Autoaim;
+ }
+ #endif 
  
 }
 void Armor_Ignore(Brain_t* brain)

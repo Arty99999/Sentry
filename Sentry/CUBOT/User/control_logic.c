@@ -28,7 +28,7 @@ extern int change_position,cnt_shoot;
 int cnt000;
 extern int m00;
 int cnt_change,flag_change,cnt_vxvy,flag_vxvy;
-
+int cnt_referee=0;
 int cntll,flag_roll,cnt_refree;
 int cnth;
 void TIM14_Task(void)
@@ -43,12 +43,14 @@ void TIM14_Task(void)
 		referee_cnt=0;
 	}
 
-//	if (rc_Ctrl_et.rc.s2 ==2 && rc_Ctrl_et.rc.s1 ==2&&tim14.ClockTime%1000==0)
+//	if (rc_Ctrl_et.rc.s2 ==2&&tim14.ClockTime%1000==0)
 //	{
-//		
-//		referee2022.game_status.game_progress=4;
+//		cnt_referee++;
+//		if (cnt_referee>=5)  
+//		{referee2022.game_status.game_progress=4;
+//			referee2022.bullet_remaining.bullet_remaining_num=300;
 //		if (referee2022.game_status.stage_remain_time==0) referee2022.game_status.stage_remain_time=420;
-//		else referee2022.game_status.stage_remain_time--;
+//		else referee2022.game_status.stage_remain_time--;cnt_referee=5;}
 //	}
 	if (Brain.Lidar.mode==3) cnt_change++;else cnt_change=0;
 	if (cnt_change>7500)  {flag_change=1;cnt_change=0;}
@@ -56,11 +58,10 @@ void TIM14_Task(void)
 //	else if(flag_change==1&&change_position==2&&flag_change_last==0 )  {flag_change_last=change_position;change_position=1;flag_change=0;}
 //	else if(flag_change==1&& change_position==2&&flag_change_last==1)  {flag_change_last=change_position;change_position=0;flag_change=0;}
 //	else if(flag_change==1&&change_position==1)  {flag_change_last=change_position;change_position=2;flag_change=0;}
-	if(flag_change==1&&Brain.Lidar.change_position==0 )  {Brain.Lidar.change_position=1;flag_change=0;}
-	else if(flag_change==1&&Brain.Lidar.change_position==1)  {Brain.Lidar.change_position=2;flag_change=0;}
-	else if(flag_change==1&&Brain.Lidar.change_position==2 )  {Brain.Lidar.change_position=3;flag_change=0;}
-	else if(flag_change==1&&Brain.Lidar.change_position==3)  {Brain.Lidar.change_position=0;flag_change=0;}
-	
+	if(flag_change==1&&Brain.Lidar.change_position==2 )  {Brain.Lidar.change_position=3;flag_change=0;}
+	else if(flag_change==1&&Brain.Lidar.change_position==3)  {Brain.Lidar.change_position=4;flag_change=0;}
+	else if(flag_change==1&&Brain.Lidar.change_position==4 )  {Brain.Lidar.change_position=2;flag_change=0;}
+
 	if(flag_change==1&&Brain.Lidar.change_position==5 )  {Brain.Lidar.change_position=6;flag_change=0;}
 	else if(flag_change==1&&Brain.Lidar.change_position==6)  {Brain.Lidar.change_position=5;flag_change=0;}
 //	if ((referee2022.game_status.stage_remain_time<=360||((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)))&&referee2022.game_status.game_progress==4&&change_position!=2&&change_position!=3) change_position=2;
@@ -71,7 +72,7 @@ void TIM14_Task(void)
 		if(tim14.ClockTime%1000==0) FPS_Check(&tim14_FPS);
 	if (Brain.Lidar.mode!=4) {flag000=0;a222=0;cnth=0;}
 	
-  Brain.Autoaim.Mode=2;
+ // Brain.Autoaim.Mode=2;
 		
 	if (rc_Ctrl_et.rc.s2==1) cnt_vxvy++;else cnt_vxvy=0;
 		if (cnt_vxvy>=7000) {flag_vxvy=!flag_vxvy;cnt_vxvy=0;}
@@ -83,7 +84,7 @@ void TIM14_Task(void)
 	if ((Brain.Autoaim.mode_cnt[Cruise]>40&&Brain.Autoaim.Mode==Autoaim)|| (Brain.Autoaim.mode_cnt[Cruise]>100&&Brain.Autoaim.Mode==Outpost) || (Brain.Autoaim.mode_cnt[Cruise]>150&&Brain.Autoaim.Mode==Single) ) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
 		if (Brain.All_See.mode_cnt[Wait]>2000) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;}
 		if (Brain.All_See.mode_cnt[Found]>=2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
-	 Brain.Autoaim.Mode=2;
+//	 Brain.Autoaim.Mode=2;
 		
 	if (rc_Ctrl_et.isOnline == 1 && rc_Ctrl_et.rc.s2==2)
 	{
@@ -101,20 +102,19 @@ void TIM14_Task(void)
 //	UsartDmaPrintf("%d,%.2f,%.2f\r\n",Brain.Autoaim.fire_flag,Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle);
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
-	//	  ShootPlateControl(&AmmoBooster,&Brain);
+		  ShootPlateControl(&AmmoBooster,&Brain);
 
-				HolderGetRemoteData(&Holder, &rc_Ctrl_et,&Brain);
-
+			HolderGetRemoteData(&Holder, &rc_Ctrl_et,&Brain);
 	
 			Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
 		}
-		//  if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
+		  if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0 || referee2022.game_robot_status.mains_power_shooter_output==0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	
 
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
 		 if(tim14.ClockTime%200==0)  sentry_decision_control();
 	Change_BrainMode(&Brain);
-	Brain.Autoaim.Mode=2;
+//	Brain.Autoaim.Mode=2;
 	RobotToBrain(&Brain);
 		
 		
@@ -163,7 +163,7 @@ Brain.Autoaim.Last_mode=Brain.Autoaim.mode;
 		
 //		if (tim14.ClockTime%200==0)
 		
-		UsartDmaPrintf("%d\r\n",AmmoBooster.Shoot_Plate.ShootNum);
+		UsartDmaPrintf("%d,%d,%d,%d,%d\r\n",Brain.Lidar.mode,Brain.Lidar.change_position,referee2022.game_status.stage_remain_time,cnt_change,flag_change);
 	//UsartDmaPrintf("%d,%d\r\n",Brain.Autoaim.IsFire,Brain.Autoaim.fire_flag);
 //  UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n",a1,a2,a3,a4,abs1,abs2,abs3,abs4,Holder.Motors6020.motor[0].Data.Angle);
 //	UsartDmaPrintf("%.2f,%.2f,%.2f,%.2f\r\n",Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle,Holder.Pitch.GYRO_Angle,Holder.Pitch.Target_Angle);

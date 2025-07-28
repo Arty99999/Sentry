@@ -79,6 +79,7 @@ Shoot_state;
 extern  Holder_t Holder;
 //void HolderYawChassisInit(Holder_t* holder, CanNumber canx);
 //void HolderReset(Holder_t* holder);
+void Behind_camera_Init(void);
 void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_pid,DualPID_Object* yaw1_pid,CanNumber canx);
 void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain) ;
 void thinchicken_feedback_control(void);

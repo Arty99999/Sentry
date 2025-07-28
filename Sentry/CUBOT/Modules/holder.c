@@ -63,7 +63,7 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 	if(rc_ctrl->rc.s2!=1) holder->Yaw.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 	else if(rc_ctrl->rc.s2==1)holder->Yaw1.Target_Angle += ((rc_ctrl->rc.ch2 -1024)* holder->Yaw.Sensitivity);
 
-	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2 ||rc_Ctrl_et.rc.s2==1|| referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait)
+	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2 || referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&&tim14_FPS.Vision_FPS>10)
 			{
 //				if (brain->Autoaim.Last_mode!=Cruise)
 //				{
@@ -312,7 +312,7 @@ void Behind_camera_Reset(void)
 	Behind_camera.reset_index++;
 	Behind_camera.Behind_camera_motor.Data.Output=BasePID_SpeedControl(&Behind_camera.Reset_pid,
 			Behind_camera.reset_Target,Behind_camera.Behind_camera_motor.Data.SpeedRPM);
-	if(abs(Behind_camera.Behind_camera_motor.Data.SpeedRPM<25)&& Behind_camera.reset_index>50)
+	if(abs(Behind_camera.Behind_camera_motor.Data.SpeedRPM<5)&& Behind_camera.reset_index>100)
 	{
 		Behind_camera.reset_Target=0;
 		Behind_camera.reset_Flag=1;

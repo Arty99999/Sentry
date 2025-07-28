@@ -93,6 +93,8 @@ static void MotorEcdtoAngle(Motor *motor)
 				
 				
     } else {
+			if (motor->Param.CanId != 0x204 || motor->Param.CanNumber != CAN1)
+			{
         if ((&motor->Param)->EcdOffset < ((&motor->Param)->EcdFullRange / 2)) {
             if (motor->Data.Ecd > (motor->Param.EcdOffset + motor->Param.EcdFullRange / 2))
                 motor->Data.Ecd -= motor->Param.EcdFullRange;
@@ -107,7 +109,22 @@ static void MotorEcdtoAngle(Motor *motor)
 				else if (b < -3996 && b >= -4096 && a < 4096 && a >3096)
 				motor->Data.RoundCnt--;
 	
-        motor->Data.Angle = K_ECD_TO_ANGLE * (motor->Data.Ecd - motor->Param.EcdOffset);
+        motor->Data.Angle = K_ECD_TO_ANGLE * (motor->Data.Ecd - motor->Param.EcdOffset);}
+				else {
+				        if ((&motor->Param)->EcdOffset < ((&motor->Param)->EcdFullRange / 2)) {
+            if (motor->Data.Ecd > (motor->Param.EcdOffset + motor->Param.EcdFullRange / 2))
+                motor->Data.Ecd -= motor->Param.EcdFullRange;
+        } else {
+            if (motor->Data.Ecd < (motor->Param.EcdOffset - motor->Param.EcdFullRange / 2))
+                motor->Data.Ecd += motor->Param.EcdFullRange;
+        }
+	if (motor->Data.LastEcd<8192 && motor->Data.RawEcd>=0&& motor->Data.LastEcd>5000 && motor->Data.RawEcd<3000) (&motor->Data)->RoundCnt++;
+	else if (motor->Data.LastEcd<3000 && motor->Data.RawEcd<8192 && motor->Data.LastEcd>=0&& motor->Data.RawEcd>5000) (&motor->Data)->RoundCnt--;
+	
+        motor->Data.Angle = K_ECD_TO_ANGLE * (motor->Data.RawEcd - motor->Param.EcdOffset);
+				
+				}
+				
     }
 		motor->Data.TotalAngle=360*motor->Data.RoundCnt+motor->Data.Angle;
 		
