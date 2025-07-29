@@ -65,7 +65,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 		speed_Curise=4000*sin(tim14.ClockTime*0.0005);
 	if (speed_Curise<2000 && speed_Curise>=0) speed_Curise=2000;
 	if (speed_Curise>-2000 && speed_Curise<0) speed_Curise=-2000;
-	speed_Curise=0;
+	speed_Curise=2400;
 				if(rc_ctrl->rc.s1==2)                         
 			{
 				if(CheckRobotState->Check_Usart.Check_lidar==0)//À×´ïÀëÏß
@@ -75,7 +75,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					{
 					chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-					chassis->Movement.Vomega=-8000;
+					chassis->Movement.Vomega=2500;
 
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					}
@@ -84,7 +84,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					{
 	        chassis->Movement.Vx=0;
 					chassis->Movement.Vy=0;
-					chassis->Movement.Vomega=1500;
+					chassis->Movement.Vomega=2500;
 						ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					}
 				}

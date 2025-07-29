@@ -32,10 +32,10 @@ void AmmoBoosterInit(Ammo_Booster *ammo_booster,BasePID_Object* friction_pid, Ba
 	
 
 	ammo_booster->Friction_Wheel.Friction_Start = 0;
-	ammo_booster->Friction_Wheel.Friction_Speed[0] = -5600;
-	ammo_booster->Friction_Wheel.Friction_Speed[1] =-5590;
-//		ammo_booster->Friction_Wheel.Friction_Speed[0] = -5200;
-//	ammo_booster->Friction_Wheel.Friction_Speed[1] =-5200;
+//	ammo_booster->Friction_Wheel.Friction_Speed[0] = -5600;
+//	ammo_booster->Friction_Wheel.Friction_Speed[1] =-5590;
+		ammo_booster->Friction_Wheel.Friction_Speed[0] = -5200;
+	ammo_booster->Friction_Wheel.Friction_Speed[1] =-5200;
 
 }
 
@@ -62,8 +62,9 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 		else if (Brain.Autoaim.Mode==Outpost)ammo_booster->Shoot_Plate.Fire_Divider=50;	
 		else if (Brain.Autoaim.Distance>=4500)ammo_booster->Shoot_Plate.Fire_Divider=200;
 		else ammo_booster->Shoot_Plate.Fire_Divider=50;
-     	//if (referee2022.game_status.game_progress!=4) 
-				ammo_booster->Shoot_Plate.Fire_Divider=1000;
+ //    	if (referee2022.game_status.game_progress!=4) 
+				ammo_booster->Shoot_Plate.Fire_Divider=90;
+
 		if (ammo_booster->Shoot_Plate.Shoot_rest_flag) ammo_booster->Shoot_Plate.Shoot_Cut++;
  		if (ammo_booster->Shoot_Plate.Shoot_Cut%ammo_booster->Shoot_Plate.Fire_Divider==0) ammo_booster->Shoot_Plate.Shoot_rest_flag=0;
 		
@@ -74,8 +75,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 					ammo_booster->Shoot_Plate.Shoot_rest_flag=1;
 					ammo_booster->Shoot_Plate.Shoot_Cut=0;
 				}
-				
-				else if((rc_Ctrl_et.rc.s1==1||(referee2022.game_status.game_progress==4&&referee2022.bullet_remaining.bullet_remaining_num>=20))&&rc_Ctrl_et.rc.s2 ==2&&brain->Autoaim.fire_flag==1&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0 &&brain->Autoaim.IsFire==1 &&ammo_booster->Shoot_Plate.Target_Angle - ammo_booster->Shoot_Plate.Plate_Angle<60)
+				else if((rc_Ctrl_et.rc.s1==1||(referee2022.game_status.game_progress==4&&referee2022.bullet_remaining.bullet_remaining_num>=20))&&rc_Ctrl_et.rc.s2 ==2&&brain->Autoaim.fire_flag==1&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0 &&brain->Autoaim.IsFire==1)
 				{
 					ammo_booster->Shoot_Plate.Target_Angle  += 22.5;
 					ammo_booster->Shoot_Plate.ShootNum++;
@@ -89,7 +89,7 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 //					ammo_booster->Shoot_Plate.Shoot_rest_flag=1;
 //					ammo_booster->Shoot_Plate.Shoot_Cut=0;
 //				}
-				else if (rc_Ctrl_et.rc.s1 ==1&&rc_Ctrl_et.rc.s2 !=2&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0)
+				else if (rc_Ctrl_et.rc.s1 ==1&&rc_Ctrl_et.rc.s2 !=2&&ammo_booster->Shoot_Plate.Shoot_rest_flag==0)//ÆÕÍ¨´òµ¯
 				{
 				ammo_booster->Shoot_Plate.Target_Angle  += 45;
 					ammo_booster->Shoot_Plate.ShootNum++;

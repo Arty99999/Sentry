@@ -27,7 +27,7 @@ void Camare_control(Brain_t* brain,Holder_t* holder);
 void HolderInit(Holder_t* holder,DualPID_Object* pitch_pid ,DualPID_Object* yaw_pid,DualPID_Object* yaw1_pid,CanNumber canx)
 {
 	MotorInit(&holder->Motors6020.motor[0],9400 ,Motor6020,CAN2,0x205);   
-	MotorInit(&holder->Motors6020.motor[1], 165 ,Motor6020,canx,0x206);
+	MotorInit(&holder->Motors6020.motor[1], 8130 ,Motor6020,canx,0x206);
 	MotorInit(&holder->Motors6020.motor[2], 5626 ,Motor6020,canx,0x205);   
 
 	DualPID_Init(&holder->Pitch.PID,pitch_pid->ShellPID,pitch_pid->CorePID);

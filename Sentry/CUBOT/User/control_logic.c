@@ -62,8 +62,8 @@ void TIM14_Task(void)
 	else if(flag_change==1&&Brain.Lidar.change_position==3)  {Brain.Lidar.change_position=4;flag_change=0;}
 	else if(flag_change==1&&Brain.Lidar.change_position==4 )  {Brain.Lidar.change_position=2;flag_change=0;}
 
-	if(flag_change==1&&Brain.Lidar.change_position==5 )  {Brain.Lidar.change_position=6;flag_change=0;}
-	else if(flag_change==1&&Brain.Lidar.change_position==6)  {Brain.Lidar.change_position=5;flag_change=0;}
+//	if(flag_change==1&&Brain.Lidar.change_position==5 )  {Brain.Lidar.change_position=6;flag_change=0;}
+	//else if(flag_change==1&&Brain.Lidar.change_position==6)  {Brain.Lidar.change_position=5;flag_change=0;}
 //	if ((referee2022.game_status.stage_remain_time<=360||((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP==0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP==0)))&&referee2022.game_status.game_progress==4&&change_position!=2&&change_position!=3) change_position=2;
 	//if (referee2022.game_status.game_progress!=4)change_position=0;
 	
@@ -84,7 +84,7 @@ void TIM14_Task(void)
 	if ((Brain.Autoaim.mode_cnt[Cruise]>40&&Brain.Autoaim.Mode==Autoaim)|| (Brain.Autoaim.mode_cnt[Cruise]>100&&Brain.Autoaim.Mode==Outpost) || (Brain.Autoaim.mode_cnt[Cruise]>150&&Brain.Autoaim.Mode==Single) ) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
 		if (Brain.All_See.mode_cnt[Wait]>2000) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;}
 		if (Brain.All_See.mode_cnt[Found]>=2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
-//	 Brain.Autoaim.Mode=2;
+//  Brain.Autoaim.Mode=2;
 		
 	if (rc_Ctrl_et.isOnline == 1 && rc_Ctrl_et.rc.s2==2)
 	{
@@ -114,7 +114,7 @@ void TIM14_Task(void)
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
 		 if(tim14.ClockTime%200==0)  sentry_decision_control();
 	Change_BrainMode(&Brain);
-//	Brain.Autoaim.Mode=2;
+	//Brain.Autoaim.Mode=2;
 	RobotToBrain(&Brain);
 		
 		

@@ -38,7 +38,7 @@ uint8_t RobotToBrainQuestBuffer_Velocity[5] ;
 
 
 Brain_t Brain={.Lidar.mode=Lidar_Outpost};
-Singe_state single;
+Singe_state single=Single_IDLE;
 void Brain_DataUnpack(Brain_t* brain, uint8_t* recBuffer);
 
 /**
@@ -339,7 +339,8 @@ void RobotToBrain_Lidar(Brain_t* Brain)//发给雷达
 	if(referee_Fps==0)
   {RobotToBrainChassisTimeBuffer[1]  = 1;        
 	  RobotToBrainChassisTimeBuffer[2]  = 1;}
-	else if(referee2022.game_status.game_progress == 4) 
+	else 
+		if(referee2022.game_status.game_progress == 4) 
 	{
 		RobotToBrainChassisTimeBuffer[1]  = referee2022.game_status.stage_remain_time & 0xff;        //referee2022.game_status.stage_remain_time
 	 RobotToBrainChassisTimeBuffer[2]  = referee2022.game_status.stage_remain_time >> 8;
@@ -351,6 +352,10 @@ void RobotToBrain_Lidar(Brain_t* Brain)//发给雷达
 	}
 		if (rc_Ctrl_et.rc.s2==1)
 		{	RobotToBrainChassisTimeBuffer[1]  = 1;        //referee2022.game_status.stage_remain_time
+	 RobotToBrainChassisTimeBuffer[2]  = 1;}
+		
+	 if (rc_Ctrl_et.isOnline==0)
+		 		{	RobotToBrainChassisTimeBuffer[1]  = 1;        //referee2022.game_status.stage_remain_time
 	 RobotToBrainChassisTimeBuffer[2]  = 1;}
   //if(referee2022.game_robot_status.robot_id==0x07)
  // {
@@ -371,7 +376,7 @@ void RobotToBrain_Lidar(Brain_t* Brain)//发给雷达
 //change_position=kkk;
 	RobotToBrainChassisTimeBuffer[3]  = Brain->Lidar.change_position;
 
-//Brain->Lidar.mode=kk1;
+//Brain->Lidar.mode=3;
 	//=Lidar_Fortress;
 	//Brain->Lidar.mode=kk1;
 	RobotToBrainChassisTimeBuffer[4]  = Brain->Lidar.mode ;
@@ -417,20 +422,19 @@ if(tim14.ClockTime%2== 0) {RobotToBrain_Lidar(Brain);}
 }
 
 extern int hurt_flag;
-#define Text
+//#define Text
 void Change_BrainMode(Brain_t* Brain)
 {
 	static int cnt_change,flag_Outpose;
-#ifndef Text 
+//#ifndef Text 
 if (referee_Fps==0)
 {	
 	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
-	else if (rc_Ctrl_et.rc.s2==1) {Single_Mode(Brain);Brain->Lidar.mode=Lidar_Fortress;}
+	else if (rc_Ctrl_et.rc.s2==1) {Brain->Lidar.mode=Lidar_Fortress;}
 	else if (rc_Ctrl_et.rc.s2==3) Brain->Lidar.mode=Lidar_Patrol;
 	else Brain->Lidar.mode=Lidar_Outpost;
 	
 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
-	 else if (single!=Single_IDLE&&single!=Single_Exit)  Brain->Autoaim.Mode=Single;
 	else 	 Brain->Autoaim.Mode=Autoaim;
 //	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
 //	else if (rc_Ctrl_et.rc.s2==1) {Brain->Lidar.mode=Lidar_Fortress;}
@@ -444,56 +448,66 @@ if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.
  {
 //	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=800) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=800))&&referee2022.game_status.stage_remain_time<=360) flag_Outpose=1;
 	 
-			if (referee2022.game_status.stage_remain_time<=380 &&referee2022.game_status.stage_remain_time>=378)single=Single_IDLE;//重置
-	else if (referee2022.game_status.stage_remain_time<=300 &&referee2022.game_status.stage_remain_time>=298)single=Single_Exit;
-	 if (referee2022.game_robot_status.remain_HP<=150) Brain->Lidar.mode=Lidar_home;
-	else if (referee2022.buff.recovery_buff>=10&&referee2022.game_robot_status.remain_HP!=400) Brain->Lidar.mode=Lidar_home;
-	else 
-	{
-		Single_Mode(Brain);
-		if (single!=Single_Exit)  {Brain->Lidar.mode=Lidar_Patrol;Brain->Lidar.change_position=4;}
-	else if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>0))) Brain->Lidar.mode=Lidar_Outpost;
-	else {Brain->Lidar.mode=Lidar_Patrol;if (Brain->Lidar.change_position==4) Brain->Lidar.change_position=5;}
-
-
-	}
-
-if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
-if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}	 
-else Brain->Autoaim.Mode=Autoaim;
- }
-#else 
-	 
- if (referee2022.game_status.game_progress==4)
- {
-//	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=800) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=800))&&referee2022.game_status.stage_remain_time<=360) flag_Outpose=1;
-	 
 			if (referee2022.game_status.stage_remain_time<=330 &&referee2022.game_status.stage_remain_time>=328)single=Single_IDLE;//重置
 	else if (referee2022.game_status.stage_remain_time<=300 &&referee2022.game_status.stage_remain_time>=298)single=Single_Exit;
-	 if (referee2022.game_robot_status.remain_HP<=150) Brain->Lidar.mode=Lidar_home;
-	else if (referee2022.buff.recovery_buff>=10&&referee2022.game_robot_status.remain_HP!=400) Brain->Lidar.mode=Lidar_home;
+	 else if (referee2022.game_status.stage_remain_time<=395 &&referee2022.game_status.stage_remain_time>=393)single=Single_Exit;
+	 
+	 if (referee2022.game_robot_status.remain_HP<=150||referee2022.bullet_remaining.bullet_remaining_num<=50) Brain->Lidar.mode=Lidar_home;
+	else if (referee2022.buff.recovery_buff>=4&&referee2022.game_robot_status.remain_HP!=400) Brain->Lidar.mode=Lidar_home;
 	else 
 	{
 		Single_Mode(Brain);
 		if (single!=Single_Exit)  {
 		
 		Brain->Lidar.mode=Lidar_Patrol;
-		if (referee2022.game_status.stage_remain_time>=400)
+//		if (referee2022.game_status.stage_remain_time>=400)
+//		Brain->Lidar.change_position=0;
+//		else Brain->Lidar.change_position=1	;
 		Brain->Lidar.change_position=0;
-		else Brain->Lidar.change_position=1	;
-		
 		}
 	else if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>0))) Brain->Lidar.mode=Lidar_Outpost;
-	else {Brain->Lidar.mode=Lidar_Patrol;if (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1) Brain->Lidar.change_position=2;}
-
+	else {Brain->Lidar.mode=Lidar_Patrol;if (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1) Brain->Lidar.change_position=5;}
+	//else {Brain->Lidar.mode=Lidar_Patrol;if (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1) Brain->Lidar.change_position=2;}
 
 	}
 
 if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
-if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}	 
+else if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}	 
 else Brain->Autoaim.Mode=Autoaim;
  }
- #endif 
+ else single=Single_IDLE;
+//#else 
+//	 
+// if (referee2022.game_status.game_progress==4)
+// {
+////	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=800) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=800))&&referee2022.game_status.stage_remain_time<=360) flag_Outpose=1;
+//	 
+//			if (referee2022.game_status.stage_remain_time<=330 &&referee2022.game_status.stage_remain_time>=328)single=Single_IDLE;//重置
+//	else if (referee2022.game_status.stage_remain_time<=300 &&referee2022.game_status.stage_remain_time>=298)single=Single_Exit;
+//	 if (referee2022.game_robot_status.remain_HP<=150) Brain->Lidar.mode=Lidar_home;
+//	else if (referee2022.buff.recovery_buff>=10&&referee2022.game_robot_status.remain_HP!=400) Brain->Lidar.mode=Lidar_home;
+//	else 
+//	{
+//		Single_Mode(Brain);
+//		if (single!=Single_Exit)  {
+//		
+//		Brain->Lidar.mode=Lidar_Patrol;
+//		if (referee2022.game_status.stage_remain_time>=400)
+//		Brain->Lidar.change_position=0;
+//		else Brain->Lidar.change_position=1	;
+//		
+//		}
+//	else if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>0))) Brain->Lidar.mode=Lidar_Outpost;
+//	else {Brain->Lidar.mode=Lidar_Patrol;if (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1) Brain->Lidar.change_position=2;}
+
+
+//	}
+
+//if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
+//if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}	 
+//else Brain->Autoaim.Mode=Autoaim;
+// }
+// #endif 
  
 }
 void Armor_Ignore(Brain_t* brain)
@@ -512,7 +526,7 @@ void Armor_Ignore(Brain_t* brain)
 	 if (referee2022.game_robot_hp.red_robot_revge[2]==2) brain->Autoaim.Ignore_armorNumber|=0x02;
 	 if (referee2022.game_robot_hp.red_robot_revge[3]==2) brain->Autoaim.Ignore_armorNumber|=0x04;
 	 if (referee2022.game_robot_hp.red_robot_revge[4]==2) brain->Autoaim.Ignore_armorNumber|=0x08;
-	 if (referee2022.game_robot_hp.red_robot_revge[7]==2) brain->Autoaim.Ignore_armorNumber|=0x10;
+	 if (referee2022.game_robot_hp.red_robot_HP[7]==40) brain->Autoaim.Ignore_armorNumber|=0x10;
 	}
 else 
 	{
@@ -520,7 +534,7 @@ else
 	 if (referee2022.game_robot_hp.blue_robot_revge[2]==2) brain->Autoaim.Ignore_armorNumber|=0x02;
 	 if (referee2022.game_robot_hp.blue_robot_revge[3]==2) brain->Autoaim.Ignore_armorNumber|=0x04;
 	 if (referee2022.game_robot_hp.blue_robot_revge[4]==2) brain->Autoaim.Ignore_armorNumber|=0x08;
-	 if (referee2022.game_robot_hp.blue_robot_revge[7]==2) brain->Autoaim.Ignore_armorNumber|=0x10;
+	 if (referee2022.game_robot_hp.blue_robot_HP[7]==40) brain->Autoaim.Ignore_armorNumber|=0x10;
 	}
 }	
 
