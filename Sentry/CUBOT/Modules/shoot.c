@@ -62,7 +62,8 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 		else if (Brain.Autoaim.Mode==Outpost)ammo_booster->Shoot_Plate.Fire_Divider=50;	
 		else if (Brain.Autoaim.Distance>=4500)ammo_booster->Shoot_Plate.Fire_Divider=200;
 		else ammo_booster->Shoot_Plate.Fire_Divider=50;
- //    	if (referee2022.game_status.game_progress!=4) 
+ 
+		if (referee2022.game_status.game_progress!=4) 
 				ammo_booster->Shoot_Plate.Fire_Divider=90;
 
 		if (ammo_booster->Shoot_Plate.Shoot_rest_flag) ammo_booster->Shoot_Plate.Shoot_Cut++;

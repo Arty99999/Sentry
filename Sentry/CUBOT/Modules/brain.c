@@ -260,8 +260,8 @@ void Single_Mode(Brain_t* Brain)
 		      switch (single) {
          case Single_IDLE: 
 					 
-				 if (Brain->Lidar.mode==Lidar_Patrol && (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1)&& Brain->Lidar.Arrive==1) {single=Single_Arrive;}
-
+		//		 if (Brain->Lidar.mode==Lidar_Patrol && (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1)&& Brain->Lidar.Arrive==1) {single=Single_Arrive;}
+single=Single_Arrive;
 					 break;
 				 case Single_Arrive:
 					Arrive_cnt++;
@@ -427,24 +427,24 @@ void Change_BrainMode(Brain_t* Brain)
 {
 	static int cnt_change,flag_Outpose;
 //#ifndef Text 
-if (referee_Fps==0)
-{	
-	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
-	else if (rc_Ctrl_et.rc.s2==1) {Brain->Lidar.mode=Lidar_Fortress;}
-	else if (rc_Ctrl_et.rc.s2==3) Brain->Lidar.mode=Lidar_Patrol;
-	else Brain->Lidar.mode=Lidar_Outpost;
-	
-if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
-	else 	 Brain->Autoaim.Mode=Autoaim;
+//if (referee_Fps==0)
+//{	
 //	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
 //	else if (rc_Ctrl_et.rc.s2==1) {Brain->Lidar.mode=Lidar_Fortress;}
 //	else if (rc_Ctrl_et.rc.s2==3) Brain->Lidar.mode=Lidar_Patrol;
 //	else Brain->Lidar.mode=Lidar_Outpost;
-	
+//	
 //if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
 //	else 	 Brain->Autoaim.Mode=Autoaim;
-}
- else if (referee2022.game_status.game_progress==4)
+////	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
+////	else if (rc_Ctrl_et.rc.s2==1) {Brain->Lidar.mode=Lidar_Fortress;}
+////	else if (rc_Ctrl_et.rc.s2==3) Brain->Lidar.mode=Lidar_Patrol;
+////	else Brain->Lidar.mode=Lidar_Outpost;
+//	
+////if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
+////	else 	 Brain->Autoaim.Mode=Autoaim;
+//}
+ if (referee2022.game_status.game_progress==4)
  {
 //	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=800) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=800))&&referee2022.game_status.stage_remain_time<=360) flag_Outpose=1;
 	 
