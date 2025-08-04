@@ -65,6 +65,8 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 
 	if(brain->Autoaim.mode==Cruise&&(rc_Ctrl_et.rc.s2==2 || referee2022.game_status.game_progress==4 )&&brain->All_See.mode!=Wait&&tim14_FPS.Vision_FPS>10)
 			{
+				if (brain->Autoaim.Mode==Single)		holder->Cruise_Mode.yaw1_sense=0.0020;
+				else 	holder->Cruise_Mode.yaw1_sense=0.00325;
 //				if (brain->Autoaim.Last_mode!=Cruise)
 //				{
 //					holder->Cruise_Mode.yaw1_time=asin(holder->Yaw.Can_Angle/85)/holder->Cruise_Mode.yaw1_sense;
@@ -95,11 +97,12 @@ void HolderGetRemoteData(Holder_t* holder, RC_Ctrl_ET* rc_ctrl,Brain_t* brain)
 
 			if (brain->Autoaim.mode==Cruise && (brain->Autoaim.Mode==Outpost ||brain->Autoaim.Mode==2)&&referee2022.game_status.game_progress==4) cntmm++;else cntmm=0;
 				
-				if (cntmm>3000) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
+				if (cntmm>3000&&brain->Autoaim.Mode==Outpost) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
+				else if (cntmm>5000&&brain->Autoaim.Mode==2) {Holder.Yaw.Target_Angle-=180;cntmm=0;}
 //				if (brain->Autoaim.mode==Cruise && hurt_flag==1) cntxx++;else cntxx=0;
 //				if (cntxx>1500) {Holder.Yaw.Target_Angle-=180;cntxx=0;}
 				//		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise&&brain->Autoaim.Mode==Autoaim && referee2022.game_status.game_progress==4&&referee2022.game_status.stage_remain_time<=400)
-		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise&&brain->Autoaim.Mode==Autoaim )
+		if (brain->All_See.mode==Found && brain->Autoaim.mode==Cruise&&brain->Autoaim.Mode==Autoaim &&referee2022.game_status.game_progress==4 )
 		{
 			brain->Autoaim.mode=Change;
 //

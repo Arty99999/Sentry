@@ -39,19 +39,20 @@ void TIM14_Task(void)
   if (flag000==1) cnth++;
 	if (cnth>=1000) {cnth=1;flag000=0;}
 	if(tim14.ClockTime%5000==0) 
-	{referee_Fps=referee_cnt;
+	{
+		referee_Fps=referee_cnt;
 		referee_cnt=0;
 	}
 
-	if (rc_Ctrl_et.rc.s2 ==2&&tim14.ClockTime%1000==0)
-	{
-		cnt_referee++;
-		if (cnt_referee>=5)  
-		{referee2022.game_status.game_progress=4;
-			referee2022.bullet_remaining.bullet_remaining_num=300;
-		if (referee2022.game_status.stage_remain_time==0) referee2022.game_status.stage_remain_time=420;
-		else referee2022.game_status.stage_remain_time--;cnt_referee=5;}
-	}
+//	if (rc_Ctrl_et.rc.s2 ==2&&tim14.ClockTime%1000==0)
+//	{
+//		cnt_referee++;
+//		if (cnt_referee>=5)  
+//		{referee2022.game_status.game_progress=4;
+//			referee2022.bullet_remaining.bullet_remaining_num=300;
+//		if (referee2022.game_status.stage_remain_time==0) referee2022.game_status.stage_remain_time=420;
+//		else referee2022.game_status.stage_remain_time--;cnt_referee=5;}
+//	}
 	if (Brain.Lidar.mode==3) cnt_change++;else cnt_change=0;
 	if (cnt_change>7500)  {flag_change=1;cnt_change=0;}
 //	if(flag_change==1&&change_position==0 )  {flag_change_last=change_position;change_position=2;flag_change=0;}
@@ -106,7 +107,7 @@ void TIM14_Task(void)
 
 			HolderGetRemoteData(&Holder, &rc_Ctrl_et,&Brain);
 	
-		//	Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
+			Lidar_Allchassis_control(&allchassis,&check_robot_state,&Brain, &rc_Ctrl_et);
 		}
 		  if (tim14.ClockTime>500) FrictionWheelControl(&AmmoBooster);
 		if(rc_Ctrl_et.isOnline == 0 || referee2022.game_robot_status.mains_power_shooter_output==0) 	AmmoBooster.Shoot_Plate.Target_Angle = AmmoBooster.Shoot_Plate.Plate_Angle;	

@@ -60,12 +60,12 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 	band_time++;
   if(band_time%1000==0)band_number_ins++;
 	if(band_number_ins==20)band_number_ins=0;
-	speed_Fight=4000+band_number[band_number_ins]*50;
+	speed_Fight=3000+band_number[band_number_ins]*50;
 	
 		speed_Curise=4000*sin(tim14.ClockTime*0.0005);
 	if (speed_Curise<2000 && speed_Curise>=0) speed_Curise=2000;
 	if (speed_Curise>-2000 && speed_Curise<0) speed_Curise=-2000;
-	speed_Curise=2400;
+	speed_Curise=2000;
 				if(rc_ctrl->rc.s1==2)                         
 			{
 				if(CheckRobotState->Check_Usart.Check_lidar==0)//À×´ïÀëÏß
@@ -97,7 +97,7 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 					chassis->Movement.Vy=0;
 					if (hurt==1) chassis->Movement.Vomega=speed_Fight;
          else if  (Brain.Lidar.mode==4) chassis->Movement.Vomega=0;//ÉÏ±¤ÀİÍ£Ö¹	
-			else 	chassis->Movement.Vomega=4000*sin(tim14.ClockTime*0.0005);
+			else 	chassis->Movement.Vomega=500;
 					ALLChassisSetSpeed(chassis,Holder.Motors6020.motor[0].Data.Angle,flag_vxvy);
 					
 				}
@@ -111,8 +111,8 @@ void Lidar_Allchassis_control(AllChassis* chassis,Check_Robot_State *CheckRobotS
 				}
 					else 
 					{
-					chassis->Movement.Vx=brain->Lidar.vx;
-					chassis->Movement.Vy=brain->Lidar.vy;
+					chassis->Movement.Vx=1.25*brain->Lidar.vx;
+					chassis->Movement.Vy=1.25*brain->Lidar.vy;
 					}
 					if (flag000&&Brain.Lidar.mode==4)
 					{chassis->Movement.Vx=0;
