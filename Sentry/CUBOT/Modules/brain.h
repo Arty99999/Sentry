@@ -39,6 +39,7 @@ typedef enum
   Single=2
 }
 Brain_mode;
+//三种模式，切换相关一部分在回调函数中，一部分在contro_logic中
 typedef enum
 {
 	Cruise   = 0,             

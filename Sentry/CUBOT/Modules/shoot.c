@@ -34,8 +34,7 @@ void AmmoBoosterInit(Ammo_Booster *ammo_booster,BasePID_Object* friction_pid, Ba
 	ammo_booster->Friction_Wheel.Friction_Start = 0;
 	ammo_booster->Friction_Wheel.Friction_Speed[0] = -5600;
 	ammo_booster->Friction_Wheel.Friction_Speed[1] =-5590;
-//		ammo_booster->Friction_Wheel.Friction_Speed[0] = -5200;
-//	ammo_booster->Friction_Wheel.Friction_Speed[1] =-5200;
+
 
 }
 
@@ -121,15 +120,6 @@ void ShootPlateControl(Ammo_Booster *ammo_booster,Brain_t* brain)
 			if(kadan > 1600) kadan = 0;
 				
 		}	
-//				kadan++;
-//		if(kadan >= 1500)
-//		{
-//			ammo_booster->Shoot_Plate.Target_Angle = ammo_booster->Shoot_Plate.Plate_Angle+6;
-//			kadan++;
-//			ammo_booster->Shoot_Plate.Plate_Out = BasePID_SpeedControl(&ammo_booster->Shoot_Plate.RunPID, -2000, ammo_booster->Shoot_Plate.motor2006.Data.SpeedRPM);
-//			if(kadan > 2500) kadan = 0;
-//				
-//		}	
 	}
 	else kadan=0;
 	

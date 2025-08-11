@@ -537,7 +537,7 @@ void sentry_send_meseage()//上发哨兵决策信息
 	HAL_UART_Transmit_DMA(&huart3,Data_Pack,19);
 	
 }
-
+//判断车辆复活无敌有关代码
 void Judege_reverge()
 {
 	static uint16_t cnt[16];

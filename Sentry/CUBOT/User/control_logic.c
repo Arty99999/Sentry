@@ -73,7 +73,6 @@ void TIM14_Task(void)
 		if(tim14.ClockTime%1000==0) FPS_Check(&tim14_FPS);
 	if (Brain.Lidar.mode!=4) {flag000=0;a222=0;cnth=0;}
 	
- // Brain.Autoaim.Mode=2;
 		
 	if (rc_Ctrl_et.rc.s2==1) cnt_vxvy++;else cnt_vxvy=0;
 		if (cnt_vxvy>=7000) {flag_vxvy=!flag_vxvy;cnt_vxvy=0;}
@@ -85,7 +84,6 @@ void TIM14_Task(void)
 	if ((Brain.Autoaim.mode_cnt[Cruise]>40&&Brain.Autoaim.Mode==Autoaim)|| (Brain.Autoaim.mode_cnt[Cruise]>100&&Brain.Autoaim.Mode==Outpost) || (Brain.Autoaim.mode_cnt[Cruise]>150&&Brain.Autoaim.Mode==Single) ) {Brain.Autoaim.mode=Cruise;Brain.Autoaim.mode_cnt[Cruise]=10;}
 		if (Brain.All_See.mode_cnt[Wait]>2000) {Brain.All_See.mode=None;Brain.All_See.mode_cnt[Wait]=0;}
 		if (Brain.All_See.mode_cnt[Found]>=2){Brain.All_See.mode=Found;Brain.All_See.mode_cnt[Found]=0;}
-  //Brain.Autoaim.Mode=2;
 		
 	if (rc_Ctrl_et.isOnline == 1 && rc_Ctrl_et.rc.s2==2)
 	{
@@ -100,7 +98,6 @@ void TIM14_Task(void)
 			MotorFillData(&Behind_camera.Behind_camera_motor,0);
 	}
 
-//	UsartDmaPrintf("%d,%.2f,%.2f\r\n",Brain.Autoaim.fire_flag,Holder.Yaw1.Target_Angle,Holder.Yaw1.Can_Angle);
 	if (rc_Ctrl_et.isOnline == 1 ) 
 		{
 		  ShootPlateControl(&AmmoBooster,&Brain);
@@ -115,11 +112,11 @@ void TIM14_Task(void)
   RobotOnlineState(&check_robot_state, &rc_Ctrl_et);
 		 if(tim14.ClockTime%200==0)  sentry_decision_control();
 	Change_BrainMode(&Brain);
-	//Brain.Autoaim.Mode=2;
+
 	RobotToBrain(&Brain);
 		
 		
-		
+		//跟map_command_t有关的具体跟云台手小地图发点决策有关，很麻烦，逻辑写的有点乱
 	if (referee_Fps>=0 && referee2022.game_status.game_progress!=4)
 	{
 			referee2022.map_command_t.cmd_keyboard=0;

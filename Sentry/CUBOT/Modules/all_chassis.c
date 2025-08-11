@@ -353,6 +353,7 @@ angle = atan2(vx, vy) ;  // 使用更精确的弧度转角度系数
    else if (min(abs1,min(abs2,min(abs3,abs4)))==abs3)return a3*57.3;
 	else return a4*57.3;
 }
+//翻车断电检测
 uint8_t Judege_fall(double roll,RC_Ctrl_ET* rc_ctrl)
 {
 	static int cnt_fallover;

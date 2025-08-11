@@ -149,6 +149,7 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
 	    }
    }
 }
+//跟a222有关的跟上堡垒标志位有关，相关已弃用
 float a222;
 void Brain_Lidar_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//解包雷达数据
 {
@@ -168,7 +169,7 @@ void Brain_Lidar_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//解包雷达数据
 		}
 	}
 }
-
+//通信需要结合上位机代码
 void  Brain_Autoaim_DataUnpack(Brain_t* Brain ,uint8_t * recBuffer)//解包自瞄数据
 {
 	
@@ -248,12 +249,7 @@ for (int i=0;i< Brain->All_See.Find_size;i++)
 		
 		}
 }
-/**
-  * @brief  下位机向上位机发送时间戳以及四元数
-  */
-int cnt___;
-int n=0;
-int change_position; 
+//打符控制
 void Single_Mode(Brain_t* Brain)
 {
 	static int Arrive_cnt,Find_cnt;
@@ -315,7 +311,7 @@ void RobotToBrain_Autoaim(float yaw,Brain_t* brain)//发给自瞄
 //brain->Autoaim.Mode=n;
   Armor_Ignore(brain); 
 	RobotToBrainTimeBuffer[14] = brain->Autoaim.Mode;//1 是前哨站 0是普通 2是打符
-  RobotToBrainTimeBuffer[15] = brain->Autoaim.Ignore_armorNumber;//
+  RobotToBrainTimeBuffer[15] = brain->Autoaim.Ignore_armorNumber;//忽略装甲板
 
 
 	RobotToBrainTimeBuffer[16] = 0xDD;
@@ -329,11 +325,10 @@ void RobotToBrain_Autoaim(float yaw,Brain_t* brain)//发给自瞄
 uint8_t amm;
 int kkk,kk1;
 extern uint8_t referee_Fps;
-uint8_t lidar_station_flag;//2梯高，1环高，0基地前面
+//只有比赛时间(包含调试处理)和模式位和change_position位有用，具体看Lidar_mode枚举类型
+
 void RobotToBrain_Lidar(Brain_t* Brain)//发给雷达
 {
-//  x = referee2022.map_command_t.target_position_x * 100;
-//	y = referee2022.map_command_t.target_position_y * 100;
 	RobotToBrainChassisTimeBuffer[0]  = 0xAA;
 
 	if(referee_Fps==0)
@@ -351,54 +346,20 @@ void RobotToBrain_Lidar(Brain_t* Brain)//发给雷达
 	  RobotToBrainChassisTimeBuffer[2]  = 0;
 	}
 		if (rc_Ctrl_et.rc.s2==1)
-		{	RobotToBrainChassisTimeBuffer[1]  = 1;        //referee2022.game_status.stage_remain_time
+		{	RobotToBrainChassisTimeBuffer[1]  = 1;        
 	 RobotToBrainChassisTimeBuffer[2]  = 1;}
 		
 	 if (rc_Ctrl_et.isOnline==0)
-		 		{	RobotToBrainChassisTimeBuffer[1]  = 1;        //referee2022.game_status.stage_remain_time
+		 		{	RobotToBrainChassisTimeBuffer[1]  = 1;        
 	 RobotToBrainChassisTimeBuffer[2]  = 1;}
-  //if(referee2022.game_robot_status.robot_id==0x07)
- // {
-  //  outpost_self=referee2022.game_robot_hp.red_outpost_HP;
-	//	outpost_enemy=referee2022.game_robot_hp.blue_outpost_HP;
-  //}
-//	else if(referee2022.game_robot_status.robot_id==0x6b)
-//{
- //   outpost_self=referee2022.game_robot_hp.blue_outpost_HP;
-//		outpost_enemy=referee2022.game_robot_hp.red_outpost_HP;
- // }
-//	if(referee2022.bullet_remaining.bullet_remaining_num>0&&referee2022.game_robot_status.mains_power_shooter_output==0)
-//		shoot_flag=0;
-//	else shoot_flag=1;
-	//if(referee2022.buff.defence_buff>0)defense_flag=1;
-//	else defense_flag=0;
-	
-//change_position=kkk;
+
 	RobotToBrainChassisTimeBuffer[3]  = Brain->Lidar.change_position;
 
-//Brain->Lidar.mode=3;
-	//=Lidar_Fortress;
-	//Brain->Lidar.mode=kk1;
 	RobotToBrainChassisTimeBuffer[4]  = Brain->Lidar.mode ;
-//	RobotToBrainChassisTimeBuffer[5]  = y&0xff;    
-//	RobotToBrainChassisTimeBuffer[6]  = y>>8;	
-//	RobotToBrainChassisTimeBuffer[7]  = outpost_self&0xff;    
-//	RobotToBrainChassisTimeBuffer[8]  = outpost_self>>8;	
-//	RobotToBrainChassisTimeBuffer[9]  = outpost_enemy&0xff;    
-//	RobotToBrainChassisTimeBuffer[10]  = outpost_enemy>>8;
+
 	RobotToBrainChassisTimeBuffer[11]  = referee2022.game_robot_status.remain_HP&0xff;    
 	RobotToBrainChassisTimeBuffer[12]  = referee2022.game_robot_status.remain_HP>>8;
-//	if (RobotToBrainChassisTimeBuffer[11]==0xDD) RobotToBrainChassisTimeBuffer[11]=0xDE;
-	
-	
-//	RobotToBrainChassisTimeBuffer[13]  = referee2022.bullet_remaining.bullet_remaining_num&0xff;    
-//	RobotToBrainChassisTimeBuffer[14]  = referee2022.bullet_remaining.bullet_remaining_num >> 8;	
-//	RobotToBrainChassisTimeBuffer[15]  = shoot_flag;//referee2022.game_robot_status.mains_power_shooter_output;    
-//	RobotToBrainChassisTimeBuffer[16]  = referee2022.bullet_remaining.money&0xff;	
-//	RobotToBrainChassisTimeBuffer[17]  = referee2022.bullet_remaining.money >> 8;  
-  //RobotToBrainChassisTimeBuffer[18]  = defense_flag;
-//	RobotToBrainChassisTimeBuffer[19]  = lidar_station_flag;
-//	RobotToBrainChassisTimeBuffer[20]  = lidar_mode;
+
 	RobotToBrainChassisTimeBuffer[21]  = 0xDD;
 	HAL_UART_Transmit_DMA(&huart5, RobotToBrainChassisTimeBuffer, 22);
 }
@@ -414,19 +375,17 @@ void RobotToBrain_All_See()
 
 void RobotToBrain(Brain_t* Brain)
 {
-  RobotToBrain_All_See();
-	
 if(tim14.ClockTime%2== 0) {RobotToBrain_Lidar(Brain);}
 	if(tim14.ClockTime%1== 0) {RobotToBrain_Autoaim(Holder.Yaw.GYRO_Angle,Brain);} 
 	
 }
 
 extern int hurt_flag;
-//#define Text
+//决策函数，包括比赛用和日常调试用
 void Change_BrainMode(Brain_t* Brain)
 {
 	static int cnt_change,flag_Outpose;
-//#ifndef Text 
+
 if (referee_Fps==0)
 {	
 	if (referee2022.game_robot_status.remain_HP<150) Brain->Lidar.mode=Lidar_home;
@@ -476,39 +435,6 @@ else if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}
 else Brain->Autoaim.Mode=Autoaim;
  }
  else single=Single_IDLE;
-//#else 
-//	 
-// if (referee2022.game_status.game_progress==4)
-// {
-////	if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>=800) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>=800))&&referee2022.game_status.stage_remain_time<=360) flag_Outpose=1;
-//	 
-//			if (referee2022.game_status.stage_remain_time<=330 &&referee2022.game_status.stage_remain_time>=328)single=Single_IDLE;//重置
-//	else if (referee2022.game_status.stage_remain_time<=300 &&referee2022.game_status.stage_remain_time>=298)single=Single_Exit;
-//	 if (referee2022.game_robot_status.remain_HP<=150) Brain->Lidar.mode=Lidar_home;
-//	else if (referee2022.buff.recovery_buff>=10&&referee2022.game_robot_status.remain_HP!=400) Brain->Lidar.mode=Lidar_home;
-//	else 
-//	{
-//		Single_Mode(Brain);
-//		if (single!=Single_Exit)  {
-//		
-//		Brain->Lidar.mode=Lidar_Patrol;
-//		if (referee2022.game_status.stage_remain_time>=400)
-//		Brain->Lidar.change_position=0;
-//		else Brain->Lidar.change_position=1	;
-//		
-//		}
-//	else if (((referee2022.game_robot_status.robot_id>10 && referee2022.game_robot_hp.red_outpost_HP>0) ||(referee2022.game_robot_status.robot_id<10 && referee2022.game_robot_hp.blue_outpost_HP>0))) Brain->Lidar.mode=Lidar_Outpost;
-//	else {Brain->Lidar.mode=Lidar_Patrol;if (Brain->Lidar.change_position==0 ||Brain->Lidar.change_position==1) Brain->Lidar.change_position=2;}
-
-
-//	}
-
-//if (Brain->Lidar.mode==Lidar_Outpost && Brain->Lidar.Arrive==1) {Brain->Autoaim.Mode=Outpost;}
-//if (single!=Single_IDLE&&single!=Single_Exit) {Brain->Autoaim.Mode=Single;}	 
-//else Brain->Autoaim.Mode=Autoaim;
-// }
-// #endif 
- 
 }
 void Armor_Ignore(Brain_t* brain)
 {
